@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ro" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RESET v2.3 // Neuro-Camarad</title>
+    <meta name="theme-color" content="#090d16">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #090d16; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-scroll { height: calc(100vh - 225px); overflow-y: auto; }
+        .breath-circle { transition: all 0.4s ease-in-out; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body class="pb-24 select-none">
+
+    <!-- HEADER -->
+    <header class="px-4 py-3 border-b border-slate-800/80 flex justify-between items-center bg-[#090d16]/90 sticky top-0 z-20 backdrop-blur-md">
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse"></span>
+            <h1 class="text-base font-extrabold tracking-wider bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                RESET // NEURO v2.3
+            </h1>
+        </div>
+        <span id="phase-badge" class="text-[11px] bg-emerald-950/90 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-700/60 font-semibold">
+            Faza 1: Zero THC
+        </span>
+    </header>
+
+    <!-- ==================== TAB 1: DASHBOARD ==================== -->
+    <main id="tab-dash" class="tab-content active p-4 space-y-4 max-w-lg mx-auto">
+        <div class="glass rounded-3xl p-5 text-center relative overflow-hidden shadow-xl">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <p id="timer-label" class="text-[11px] text-slate-400 uppercase tracking-widest font-semibold">Timp liber de THC</p>
+            <div id="main-timer" class="text-4xl font-mono font-extrabold text-white tracking-tight my-1.5">0z 00h 00m 00s</div>
+            
+            <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-800/80 text-xs">
+                <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
+                    <span class="text-slate-400 block text-[10px]">Economisiți</span>
+                    <span id="money-saved" class="text-emerald-400 font-bold text-sm font-mono">£0.00</span>
+                </div>
+                <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
+                    <span class="text-slate-400 block text-[10px]">Stadiu</span>
+                    <span id="current-day-label" class="text-cyan-400 font-bold text-sm">Ziua 1</span>
+                </div>
+                <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
+                    <span class="text-slate-400 block text-[10px]">Joint-uri evitate</span>
+                    <span id="joints-avoided" class="text-purple-400 font-bold text-sm font-mono">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Semaforul de Țigări -->
+        <div class="glass rounded-3xl p-4 space-y-3">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span id="cig-traffic-light" class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <h3 class="text-sm font-bold text-white">Pacing Țigări (Faza 1)</h3>
+                    </div>
+                    <p id="last-cig-timer" class="text-xs text-slate-400 mt-0.5">Nicio țigară azi. Păstrează ritmul rar.</p>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <button onclick="changeCigs(-1)" class="w-10 h-10 rounded-2xl bg-slate-800 border border-slate-700 text-white font-bold text-lg active:scale-90 transition">-</button>
+                    <div class="text-center min-w-[52px]">
+                        <span id="cigs-today" class="text-2xl font-extrabold font-mono text-white">0</span>
+                        <span class="text-xs text-slate-400">/<span id="cigs-limit">15</span></span>
+                    </div>
+                    <button onclick="changeCigs(1)" class="w-10 h-10 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-lg active:scale-90 transition shadow-lg shadow-amber-600/20">+</button>
+                </div>
+            </div>
+            <div id="cig-warning-banner" class="hidden text-[11px] bg-red-950/70 border border-red-800/80 text-red-300 px-3 py-2 rounded-xl">
+                ⚠️ <strong>Atenție la compensare!</strong> Au trecut sub 45 min de la ultima țigară. Bea apă și amână 15 minute.
+            </div>
+        </div>
+
+        <!-- Checklist Rapid Suplimente -->
+        <div class="glass rounded-3xl p-4 space-y-2.5">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Protocol Chimic Zilnic (Atinge când iei)</h3>
+                <span class="text-[11px] text-emerald-400 font-mono" id="supp-score">0/4 azi</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="toggleSupp('morning')" id="supp-morning" class="p-3 rounded-2xl border border-slate-800 bg-slate-900/70 text-left transition flex items-center gap-2.5">
+                    <span class="text-lg">☀️</span>
+                    <div>
+                        <div class="text-xs font-bold text-slate-200">Dimineața</div>
+                        <div class="text-[10px] text-slate-400">NAC / L-Tyrosine</div>
+                    </div>
+                </button>
+                <button onclick="toggleSupp('noon')" id="supp-noon" class="p-3 rounded-2xl border border-slate-800 bg-slate-900/70 text-left transition flex items-center gap-2.5">
+                    <span class="text-lg">💧</span>
+                    <div>
+                        <div class="text-xs font-bold text-slate-200">Prânz & Masă</div>
+                        <div class="text-[10px] text-slate-400">Krill Oil + Hidratare</div>
+                    </div>
+                </button>
+                <button onclick="toggleSupp('calm')" id="supp-calm" class="p-3 rounded-2xl border border-slate-800 bg-slate-900/70 text-left transition flex items-center gap-2.5">
+                    <span class="text-lg">🧘‍♂️</span>
+                    <div>
+                        <div class="text-xs font-bold text-slate-200">Anti-Stres</div>
+                        <div class="text-[10px] text-slate-400">L-Theanine (200mg)</div>
+                    </div>
+                </button>
+                <button onclick="toggleSupp('night')" id="supp-night" class="p-3 rounded-2xl border border-slate-800 bg-slate-900/70 text-left transition flex items-center gap-2.5">
+                    <span class="text-lg">🌙</span>
+                    <div>
+                        <div class="text-xs font-bold text-slate-200">Somn (Ora 21-22)</div>
+                        <div class="text-[10px] text-slate-400">Magneziu + Inositol</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Ce face creierul tău AZI -->
+        <div class="glass rounded-3xl p-4 space-y-3">
+            <h2 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🧠</span> <span id="bio-title">Ziua 1</span>
+            </h2>
+            <p id="bio-desc" class="text-xs text-slate-300 leading-relaxed"></p>
+            <div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800 space-y-1.5 text-xs">
+                <div><strong class="text-cyan-400">🍲 Nutriție:</strong> <span id="bio-food" class="text-slate-300"></span></div>
+                <div><strong class="text-purple-400">🎯 Tactică:</strong> <span id="bio-action" class="text-slate-300"></span></div>
+            </div>
+        </div>
+
+        <!-- Bare de Progres -->
+        <div class="glass rounded-3xl p-4 space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Regenerare Receptori & Corp</h3>
+            <div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span>Eliminare Monoxid de Carbon (24h)</span>
+                    <span id="bar-co-val" class="text-emerald-400 font-mono">0%</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2">
+                    <div id="bar-co" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span>Stabilizare Arhitectură Somn REM (14 zile)</span>
+                    <span id="bar-rem-val" class="text-cyan-400 font-mono">0%</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2">
+                    <div id="bar-rem" class="bg-cyan-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span>Densitate Normală Receptori CB1 (28 zile)</span>
+                    <span id="bar-cb1-val" class="text-purple-400 font-mono">0%</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2">
+                    <div id="bar-cb1" class="bg-purple-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== TAB 2: SOS & NEURO-TOOLS ==================== -->
+    <main id="tab-sos" class="tab-content p-4 space-y-4 max-w-lg mx-auto">
+        <div class="glass border-red-800/60 rounded-3xl p-5 text-center space-y-4">
+            <div class="flex justify-between items-center">
+                <span class="text-[11px] uppercase tracking-wider font-bold text-red-400 bg-red-950/80 px-2.5 py-1 rounded-full border border-red-800">Protocol Anti-Craving</span>
+                <span id="sos-timer" class="text-xl font-mono font-bold text-white">05:00</span>
+            </div>
+
+            <div class="py-4 flex flex-col items-center justify-center">
+                <div id="breath-box" class="w-36 h-36 rounded-full border-4 border-emerald-500/40 bg-emerald-500/10 flex items-center justify-center breath-circle shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+                    <span id="breath-text" class="text-xs font-bold text-emerald-300 px-3 text-center leading-tight">
+                        Apasă Start pentru Oftatul Fiziologic
+                    </span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-3 max-w-xs">
+                    2 inspirații pe nas + 1 expirație lungă pe gură. Scade mecanic pulsul în 30 de secunde.
+                </p>
+            </div>
+
+            <button onclick="toggleSosProtocol()" id="sos-btn" class="w-full py-3.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:scale-95 text-white font-bold rounded-2xl shadow-lg transition text-sm">
+                ▶ Pornește Respirația + Cronometrul (5 Min)
+            </button>
+        </div>
+
+        <div class="glass rounded-3xl p-4 space-y-3">
+            <button onclick="document.getElementById('tape-box').classList.toggle('hidden')" class="w-full flex justify-between items-center text-left">
+                <div>
+                    <h3 class="text-sm font-bold text-amber-400">🎬 „Ce se întâmplă dacă aprind acum?”</h3>
+                    <p class="text-[11px] text-slate-400">Sparge minciuna dopaminei. Vezi filmul complet înainte să cedezi.</p>
+                </div>
+                <span class="text-slate-400 text-lg">▼</span>
+            </button>
+            <div id="tape-box" class="hidden pt-2 border-t border-slate-800 space-y-2.5 text-xs">
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <strong class="text-emerald-400">Minutul 0 – 5 (Iluzia):</strong> Tragi primele fumuri. Simți o ușurare scurtă pentru că ai oprit alarma amigdalei.
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <strong class="text-amber-400">Minutul 15 – 45 (Realitatea):</strong> Începe tahicardia ușoară, ceața în gândire și dezamăgirea. Starea nici măcar nu mai e plăcută, e doar amorțeală.
+                </div>
+                <div class="p-2.5 rounded-xl bg-red-950/50 border border-red-900/60">
+                    <strong class="text-red-400">Mâine dimineață (Prețul):</strong> Receptorii CB1 s-au re-internalizat. O iei de la capăt cu Ziua 1, transpirațiile și insomnia.
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">Intervenție AI Instantă (1-Tap)</p>
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="triggerSOSChat('Sunt plictisit și totul pare plat. Creierul îmi cere un joint doar ca să treacă timpul mai ușor.')" class="p-3.5 glass rounded-2xl text-left text-xs hover:border-emerald-500 transition flex justify-between items-center">
+                    <span>😑 <strong>Plictiseală / Anhedonie:</strong> „Totul pare plat și fără chef”</span>
+                    <span class="text-emerald-400 font-bold">→</span>
+                </button>
+                <button onclick="triggerSOSChat('Am terminat munca, sunt plin de nervi și stresat. Creierul îmi spune că merit să mă relaxez cu câteva fumuri.')" class="p-3.5 glass rounded-2xl text-left text-xs hover:border-emerald-500 transition flex justify-between items-center">
+                    <span>🤬 <strong>Stres după tură:</strong> „Sunt nervos, merit să mă relaxez”</span>
+                    <span class="text-emerald-400 font-bold">→</span>
+                </button>
+                <button onclick="triggerSOSChat('Nu pot să dorm și mă foiesc în pat. Îmi vine să trag două fumuri doar ca să adorm.')" class="p-3.5 glass rounded-2xl text-left text-xs hover:border-emerald-500 transition flex items-center justify-between">
+                    <span>🌙 <strong>Insomnie:</strong> Negociez „doar două fumuri pentru somn”</span>
+                    <span class="text-emerald-400 font-bold">→</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== TAB 3: CHAT CU CAMARADUL ==================== -->
+    <main id="tab-chat" class="tab-content max-w-lg mx-auto">
+        <div class="px-4 py-2 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center text-xs">
+            <span id="provider-status" class="text-emerald-400 font-mono text-[11px]">AI: Auto-Detect</span>
+            <div class="flex gap-3">
+                <button onclick="toggleTTS()" id="tts-btn" class="text-slate-400 hover:text-white">🔇 Voce: Oprit</button>
+                <button onclick="clearChat()" class="text-red-400 hover:text-red-300">Șterge Istoric</button>
+            </div>
+        </div>
+
+        <div id="chat-box" class="chat-scroll p-4 space-y-3"></div>
+
+        <div class="p-3 bg-[#090d16]/95 border-t border-slate-800 flex gap-2 items-center sticky bottom-16">
+            <button onclick="startVoiceInput()" id="mic-btn" class="w-11 h-11 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg active:scale-90 transition">
+                🎙️
+            </button>
+            <input id="chat-input" type="text" placeholder="Scrie sau apasă microfonul..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500" onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition">
+                Trimite
+            </button>
+        </div>
+    </main>
+
+    <!-- ==================== TAB 4: SETĂRI ==================== -->
+    <main id="tab-settings" class="tab-content p-4 space-y-4 max-w-lg mx-auto">
+        
+        <div class="glass rounded-3xl p-4 space-y-3 border-emerald-500/40">
+            <h2 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">1. Cheie API AI (Gemini 3.8 / 3.1)</h2>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Conectează direct cheia ta <strong>`AQ...`</strong> pe noile modele <strong>`gemini-3.8-flash`</strong> și <strong>`gemini-3.1-pro-preview`</strong>.
+            </p>
+            <div>
+                <label class="text-[11px] text-slate-400 block mb-1">Cheia ta API (`AQ...` / `gsk_...` / `sk-...`)</label>
+                <input type="password" id="set-api-key" placeholder="Lipește cheia ta AQ... aici" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono">
+            </div>
+            <div>
+                <label class="text-[11px] text-slate-400 block mb-1">Model Google Gemini Preferat</label>
+                <select id="set-gemini-model" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-mono">
+                    <option value="gemini-3.8-flash">gemini-3.8-flash (Recomandat de Google - Rapid)</option>
+                    <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Recomandat de Google - Pro)</option>
+                    <option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
+                    <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
+                </select>
+            </div>
+            
+            <div class="flex gap-2 pt-1">
+                <button onclick="testApiConnection()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-300 font-bold rounded-xl text-xs">
+                    🔌 Testează Cheia API
+                </button>
+                <button onclick="saveSettings()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg">
+                    💾 Salvează Tot
+                </button>
+            </div>
+            <div id="api-test-result" class="hidden text-xs p-3 rounded-xl font-mono whitespace-pre-wrap"></div>
+        </div>
+
+        <div class="glass rounded-3xl p-4 space-y-4">
+            <h2 class="text-sm font-bold text-cyan-400 uppercase tracking-wider">2. Configurare Start & Obiective</h2>
+            <div>
+                <label class="text-xs text-slate-400 block mb-1">Data și ora opririi (THC / Iarbă)</label>
+                <input type="datetime-local" id="set-quit-date" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white">
+            </div>
+            <div>
+                <label class="text-xs text-slate-400 block mb-1">Faza Curentă</label>
+                <select id="set-phase" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white">
+                    <option value="1">Faza 1: Renunțare la Iarbă (Țigări sub limită)</option>
+                    <option value="2">Faza 2: Zero Iarbă + Zero Țigări (Total Clean)</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Cost/zi (£)</label>
+                    <input type="number" id="set-daily-cost" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white">
+                </div>
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Joint-uri/zi</label>
+                    <input type="number" id="set-daily-joints" value="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white">
+                </div>
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Max Țigări/zi</label>
+                    <input type="number" id="set-cig-limit" value="15" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white">
+                </div>
+            </div>
+            <button onclick="resetToNow()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-amber-400 font-bold rounded-xl">
+                🔄 Resetează ceasul la momentul ACUM (Start Ziua 1)
+            </button>
+        </div>
+    </main>
+
+    <!-- NAVIGARE JOS -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#090d16]/95 border-t border-slate-800/90 flex justify-around py-2 px-1 z-30 backdrop-blur-md">
+        <button onclick="switchTab('dash')" id="nav-dash" class="flex flex-col items-center text-emerald-400 text-[11px] font-semibold py-1 px-4 rounded-2xl">
+            <span class="text-lg">📊</span><span>Panou</span>
+        </button>
+        <button onclick="switchTab('sos')" id="nav-sos" class="flex flex-col items-center text-red-400 text-[11px] font-bold py-1 px-4 rounded-2xl">
+            <span class="text-lg">🚨</span><span>SOS / Respirație</span>
+        </button>
+        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center text-slate-400 text-[11px] font-semibold py-1 px-4 rounded-2xl">
+            <span class="text-lg">💬</span><span>Camarad AI</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center text-slate-400 text-[11px] font-semibold py-1 px-4 rounded-2xl">
+            <span class="text-lg">⚙️</span><span>Setări</span>
+        </button>
+    </nav>
+
+    <script>
+        const TIMELINE_DB = [
+            {
+                maxDay: 1,
+                title: "Ziua 1: Decuplarea și Șocul Dopaminei",
+                desc: "Creierul sesizează absența THC-ului exogen. Receptorii CB1 sunt încă desensibilizați, iar anandamida naturală e jos. E normal să simți agitație seara și impulsul mecanic de a rula.",
+                food: "Hidratare intensă (apă cu lămâie și un praf de sare). Mâncare caldă ușoară la Instant Pot (supe, linte, legume).",
+                action: "Aruncă sau pune sub cheie grinderul și foițele. Schimbă locul unde stai seara ca să rupi asocierea pavloviană."
+            },
+            {
+                maxDay: 3,
+                title: "Zilele 2–3: Vârful Iritabilității & Amigdala Turată",
+                desc: "THC-ul scade abrupt. Amigdala nu mai are 'frâna' pusă de canabis și reacționează exagerat la orice frustrare în trafic sau acasă. Somnul e fragmentat.",
+                food: "Nu te forța cu mese grele. Banane, ouă, smoothie-uri, ciocolată neagră 85%.",
+                action: "Folosește Oftatul Fiziologic din tab-ul SOS ori de câte ori simți că îți sare țandăra. Duș fierbinte cu 30 min înainte de pat."
+            },
+            {
+                maxDay: 7,
+                title: "Zilele 4–7: Rebound-ul Somnului REM & Detoxul",
+                desc: "Somnul REM revine cu forță dublă. Vei avea vise extrem de vii sau ciudate și posibile transpirații nocturne. E dovada clinică că arhitectura creierului se curăță.",
+                food: "Alimente bogate în triptofan (curcan, pește, nuci) și Omega-3 (Krill Oil) pentru refacerea membranei lipidice a receptorilor CB1.",
+                action: "Atenție maximă la Semaforul de Țigări! Nu lăsa creierul să înlocuiască joint-ul cu fumatul țigară de la țigară."
+            },
+            {
+                maxDay: 14,
+                title: "Săptămâna 2: Ceața Mentală și 'Valul Plat'",
+                desc: "Sevrajul fizic acut a trecut, dar apare anhedonia temporară (plictiseala). Receptorii de dopamină încă se recalibrează.",
+                food: "Proteine dimineața și zero zahăr rafinat ca să eviți căderile de energie după-amiaza.",
+                action: "Evită statul pasiv pe canapea. Ocupă-ți mâinile și creierul: editare video, codat sau meșterit."
+            },
+            {
+                maxDay: 21,
+                title: "Săptămâna 3: Claritatea Cognitivă (Pregătirea Fazei 2)",
+                desc: "Peste 75% din receptorii CB1 au revenit la suprafața neuronilor. Memoria de lucru, calmul și energia de dimineață sunt la alt nivel.",
+                food: "Pregătește muniția pentru lăsatul de țigări: mere acrișoare, scobitori mentolate, apă minerală rece.",
+                action: "Începe să amâni cu 30 de minute prima țigară de dimineață."
+            },
+            {
+                maxDay: 9999,
+                title: "Ziua 22+: Receptori Resetați & Asaltul pe Nicotină",
+                desc: "Sistemul tău endocanabinoid funcționează din nou autonom. În Faza 2 (Zero Țigări), nicotina iese din corp în 72h.",
+                food: "Atenție la scăderile de glicemie din primele zile fără nicotină — bea puțin suc natural sau mănâncă un fruct când simți gol în stomac.",
+                action: "Păstrează garda sus la stresul neprevăzut. Ești liber!"
+            }
+        ];
+
+        const todayStr = new Date().toDateString();
+        let savedModel = localStorage.getItem('reset_geminiModel') || "gemini-3.8-flash";
+        // Curăță automat dacă rămăsese salvat modelul vechi 3.0 sau 2.5
+        if (savedModel.includes("2.5") || savedModel === "gemini-3.0-flash" || savedModel === "gemini-3.0-pro") {
+            savedModel = "gemini-3.8-flash";
+            localStorage.setItem('reset_geminiModel', savedModel);
+        }
+
+        let state = {
+            quitDate: localStorage.getItem('reset_quitDate') || new Date().toISOString().slice(0, 16),
+            phase: localStorage.getItem('reset_phase') || "1",
+            dailyCost: parseFloat(localStorage.getItem('reset_dailyCost') || "10"),
+            dailyJoints: parseFloat(localStorage.getItem('reset_dailyJoints') || "3"),
+            cigLimit: parseInt(localStorage.getItem('reset_cigLimit') || "15"),
+            cigsToday: parseInt(localStorage.getItem('reset_cigsToday') || "0"),
+            lastCigTime: parseInt(localStorage.getItem('reset_lastCigTime') || "0"),
+            lastDate: localStorage.getItem('reset_lastDate') || todayStr,
+            supps: JSON.parse(localStorage.getItem('reset_supps') || '{"morning":false,"noon":false,"calm":false,"night":false}'),
+            apiKey: localStorage.getItem('reset_apiKey') || "",
+            geminiModel: savedModel,
+            ttsEnabled: false,
+            chatHistory: JSON.parse(localStorage.getItem('reset_chatHistory') || '[]')
+        };
+
+        if (state.lastDate !== todayStr) {
+            state.cigsToday = 0;
+            state.supps = { morning: false, noon: false, calm: false, night: false };
+            state.lastDate = todayStr;
+            localStorage.setItem('reset_cigsToday', "0");
+            localStorage.setItem('reset_supps', JSON.stringify(state.supps));
+            localStorage.setItem('reset_lastDate', todayStr);
+        }
+
+        function haptic(ms = 40) {
+            if (navigator.vibrate) navigator.vibrate(ms);
+        }
+
+        function detectProvider(key) {
+            const k = (key || "").trim();
+            if (k.startsWith("gsk_")) return { name: "Groq (Llama 3.3 70B)", type: "openai", url: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile" };
+            if (k.startsWith("sk-")) return { name: "DeepSeek / OpenAI", type: "openai", url: "https://api.deepseek.com/chat/completions", model: "deepseek-chat" };
+            return { name: `Google Gemini (${state.geminiModel})`, type: "gemini" };
+        }
+
+        function initApp() {
+            document.getElementById('set-quit-date').value = state.quitDate;
+            document.getElementById('set-phase').value = state.phase;
+            document.getElementById('set-daily-cost').value = state.dailyCost;
+            document.getElementById('set-daily-joints').value = state.dailyJoints;
+            document.getElementById('set-cig-limit').value = state.cigLimit;
+            document.getElementById('set-api-key').value = state.apiKey;
+            document.getElementById('set-gemini-model').value = state.geminiModel;
+
+            updateProviderLabel();
+            renderSupps();
+            renderChatHistory();
+            updateDashboard();
+            setInterval(updateDashboard, 1000);
+        }
+
+        function updateProviderLabel() {
+            const p = detectProvider(state.apiKey);
+            document.getElementById('provider-status').innerText = state.apiKey ? `🟢 ${p.name}` : "🔴 Cheie API lipsă (Mergi în Setări)";
+        }
+
+        function getProgressStats() {
+            const start = new Date(state.quitDate).getTime();
+            const now = Date.now();
+            const diffMs = Math.max(0, now - start);
+            const totalHours = diffMs / (1000 * 60 * 60);
+            const totalDays = totalHours / 24;
+            const currentDayNum = Math.floor(totalDays) + 1;
+            return { diffMs, totalHours, totalDays, currentDayNum };
+        }
+
+        function updateDashboard() {
+            const { diffMs, totalHours, totalDays, currentDayNum } = getProgressStats();
+
+            const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diffMs / 1000 / 60) % 60);
+            const s = Math.floor((diffMs / 1000) % 60);
+            document.getElementById('main-timer').innerText = 
+                `${d}z ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+
+            document.getElementById('money-saved').innerText = `£${(totalDays * state.dailyCost).toFixed(2)}`;
+            document.getElementById('joints-avoided').innerText = Math.floor(totalDays * state.dailyJoints);
+            document.getElementById('current-day-label').innerText = `Ziua ${currentDayNum}`;
+
+            const coPct = Math.min(100, (totalHours / 24) * 100).toFixed(0);
+            const remPct = Math.min(100, (totalDays / 14) * 100).toFixed(0);
+            const cb1Pct = Math.min(100, (totalDays / 28) * 100).toFixed(0);
+
+            document.getElementById('bar-co').style.width = `${coPct}%`;
+            document.getElementById('bar-co-val').innerText = `${coPct}%`;
+            document.getElementById('bar-rem').style.width = `${remPct}%`;
+            document.getElementById('bar-rem-val').innerText = `${remPct}%`;
+            document.getElementById('bar-cb1').style.width = `${cb1Pct}%`;
+            document.getElementById('bar-cb1-val').innerText = `${cb1Pct}%`;
+
+            const bio = TIMELINE_DB.find(item => currentDayNum <= item.maxDay) || TIMELINE_DB[TIMELINE_DB.length - 1];
+            document.getElementById('bio-title').innerText = bio.title;
+            document.getElementById('bio-desc').innerText = bio.desc;
+            document.getElementById('bio-food').innerText = bio.food;
+            document.getElementById('bio-action').innerText = bio.action;
+
+            document.getElementById('cigs-today').innerText = state.cigsToday;
+            document.getElementById('cigs-limit').innerText = state.cigLimit;
+            const light = document.getElementById('cig-traffic-light');
+            const warnBanner = document.getElementById('cig-warning-banner');
+            const lastTimerEl = document.getElementById('last-cig-timer');
+
+            if (state.lastCigTime > 0) {
+                const minsSinceCig = Math.floor((Date.now() - state.lastCigTime) / 60000);
+                const hrs = Math.floor(minsSinceCig / 60);
+                const mins = minsSinceCig % 60;
+                lastTimerEl.innerText = `Ultima țigară: acum ${hrs > 0 ? hrs + 'h ' : ''}${mins} min`;
+
+                if (minsSinceCig < 45) {
+                    light.className = "w-3 h-3 rounded-full bg-red-500 animate-ping";
+                    warnBanner.classList.remove('hidden');
+                } else if (minsSinceCig < 65) {
+                    light.className = "w-3 h-3 rounded-full bg-amber-400";
+                    warnBanner.classList.add('hidden');
+                } else {
+                    light.className = "w-3 h-3 rounded-full bg-emerald-500";
+                    warnBanner.classList.add('hidden');
+                }
+            }
+        }
+
+        function changeCigs(delta) {
+            haptic(50);
+            state.cigsToday = Math.max(0, state.cigsToday + delta);
+            if (delta > 0) {
+                state.lastCigTime = Date.now();
+                localStorage.setItem('reset_lastCigTime', state.lastCigTime);
+            }
+            localStorage.setItem('reset_cigsToday', state.cigsToday);
+            updateDashboard();
+        }
+
+        function toggleSupp(key) {
+            haptic(30);
+            state.supps[key] = !state.supps[key];
+            localStorage.setItem('reset_supps', JSON.stringify(state.supps));
+            renderSupps();
+        }
+
+        function renderSupps() {
+            let count = 0;
+            ['morning', 'noon', 'calm', 'night'].forEach(k => {
+                const el = document.getElementById(`supp-${k}`);
+                if (state.supps[k]) {
+                    count++;
+                    el.className = "p-3 rounded-2xl border border-emerald-500/80 bg-emerald-950/40 text-left transition flex items-center gap-2.5";
+                } else {
+                    el.className = "p-3 rounded-2xl border border-slate-800 bg-slate-900/70 text-left transition flex items-center gap-2.5 opacity-75";
+                }
+            });
+            document.getElementById('supp-score').innerText = `${count}/4 azi`;
+        }
+
+        // PROTOCOL SOS
+        let sosInterval = null;
+        let breathTimeout = null;
+        let sosSeconds = 300;
+
+        function runBreathingCycle() {
+            if (!sosInterval) return;
+            const box = document.getElementById('breath-box');
+            const txt = document.getElementById('breath-text');
+
+            txt.innerText = "1. Inspiră adânc pe nas...";
+            box.style.transform = "scale(1.22)";
+            box.style.borderColor = "#34d399";
+            haptic(40);
+
+            breathTimeout = setTimeout(() => {
+                if (!sosInterval) return;
+                txt.innerText = "2. Încă un tras scurt pe nas! (Maxim)";
+                box.style.transform = "scale(1.38)";
+                box.style.borderColor = "#22d3ee";
+                haptic([40, 60, 40]);
+
+                breathTimeout = setTimeout(() => {
+                    if (!sosInterval) return;
+                    txt.innerText = "3. Expiră luuung pe gură...";
+                    box.style.transform = "scale(0.92)";
+                    box.style.borderColor = "#818cf8";
+                    haptic(80);
+
+                    breathTimeout = setTimeout(runBreathingCycle, 5000);
+                }, 1600);
+            }, 2500);
+        }
+
+        function toggleSosProtocol() {
+            haptic(60);
+            const btn = document.getElementById('sos-btn');
+            const box = document.getElementById('breath-box');
+            const txt = document.getElementById('breath-text');
+
+            if (sosInterval) {
+                clearInterval(sosInterval);
+                clearTimeout(breathTimeout);
+                sosInterval = null;
+                sosSeconds = 300;
+                document.getElementById('sos-timer').innerText = "05:00";
+                box.style.transform = "scale(1)";
+                txt.innerText = "Apasă Start pentru Oftatul Fiziologic";
+                btn.innerText = "▶ Pornește Respirația + Cronometrul (5 Min)";
+                return;
+            }
+
+            btn.innerText = "⏹ Oprește / Resetează Protocolul";
+            sosInterval = setInterval(() => {
+                sosSeconds--;
+                const m = String(Math.floor(sosSeconds / 60)).padStart(2, '0');
+                const s = String(sosSeconds % 60).padStart(2, '0');
+                document.getElementById('sos-timer').innerText = `${m}:${s}`;
+                if (sosSeconds <= 0) {
+                    clearInterval(sosInterval);
+                    clearTimeout(breathTimeout);
+                    sosInterval = null;
+                    txt.innerText = "AI TRECUT PESTE VAL! 🎉";
+                    haptic([100, 50, 100, 50, 200]);
+                }
+            }, 1000);
+
+            runBreathingCycle();
+        }
+
+        function triggerSOSChat(presetMessage) {
+            switchTab('chat');
+            document.getElementById('chat-input').value = presetMessage;
+            sendMessage();
+        }
+
+        // CHAT & APELARE UNIVERSALĂ API (Cu Modelele exacte Gemini 3.8 Flash & 3.1 Pro)
+        function renderChatHistory() {
+            const box = document.getElementById('chat-box');
+            box.innerHTML = '';
+            if (state.chatHistory.length === 0) {
+                appendBubble("Salut! Sunt pregătit și conectat la Gemini 3.8 Flash. Îți văd în timp real progresul receptorilor CB1, semaforul de țigări și suplimentele luate azi. Cum te simți?", 'ai', false);
+            } else {
+                state.chatHistory.forEach(msg => {
+                    appendBubble(msg.content, msg.role === 'user' ? 'user' : 'ai', false);
+                });
+            }
+        }
+
+        function clearChat() {
+            state.chatHistory = [];
+            localStorage.removeItem('reset_chatHistory');
+            renderChatHistory();
+        }
+
+        function toggleTTS() {
+            state.ttsEnabled = !state.ttsEnabled;
+            document.getElementById('tts-btn').innerText = state.ttsEnabled ? "🔊 Voce: Pornit" : "🔇 Voce: Oprit";
+            if (!state.ttsEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+        }
+
+        function speakText(text) {
+            if (!state.ttsEnabled || !window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'ro-RO';
+            utter.rate = 1.05;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function startVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Folosește microfonul de pe tastatura telefonului!");
+                return;
+            }
+            const rec = new SpeechRecognition();
+            rec.lang = 'ro-RO';
+            const micBtn = document.getElementById('mic-btn');
+            micBtn.classList.add('border-red-500', 'animate-pulse');
+            rec.onresult = (e) => {
+                document.getElementById('chat-input').value = e.results[0][0].transcript;
+                micBtn.classList.remove('border-red-500', 'animate-pulse');
+                sendMessage();
+            };
+            rec.onerror = () => micBtn.classList.remove('border-red-500', 'animate-pulse');
+            rec.start();
+        }
+
+        function buildSystemPrompt() {
+            const { totalHours, currentDayNum } = getProgressStats();
+            const bio = TIMELINE_DB.find(item => currentDayNum <= item.maxDay) || TIMELINE_DB[TIMELINE_DB.length - 1];
+            const nowHour = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            const suppsTaken = Object.entries(state.supps).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'niciunul încă';
+
+            return `Ești cel mai bun prieten și camaradul meu pragmatic în renunțarea la fumat (Faza 1: Zero THC, țigări sub control; Faza 2: Zero Nicotină).
+Vorbim în română, direct, fără limbaj de lemn și fără clișee terapeutice.
+
+DATELE MELE ÎN TIMP REAL:
+- Ziua curentă: Ziua ${currentDayNum} (${totalHours.toFixed(1)} ore fără THC).
+- Țigări fumate azi: ${state.cigsToday} din limita de ${state.cigLimit}.
+- Suplimente bifate azi: ${suppsTaken}.
+- Ora exactă acum: ${nowHour}.
+- Stadiu neurobiologic: ${bio.title} - ${bio.desc}
+
+REGULI:
+1. Dacă încerc să negociez ("trag doar două fumuri să dorm", "am avut o tură grea"), demontează-mi capcana direct! Amintește-mi de "Play the Tape Forward": 5 minute de ușurare falsă urmate de regret și resetarea receptorilor CB1 la zero.
+2. Leagă-te de biologie și de suplimentele pe care le am în casă (Magneziu Bisglicinat, L-Theanine, Inositol, Krill Oil, NAC) sau de o masă caldă la Instant Pot.
+3. Fii scurt (2-3 paragrafe ușor de citit pe telefon) și încheie cu o întrebare scurtă.`;
+        }
+
+        async function trySingleGeminiModel(key, mdl, systemPrompt, contents) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${mdl}:generateContent?key=${encodeURIComponent(key)}`;
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    contents: contents,
+                    generationConfig: { temperature: 0.7 }
+                })
+            });
+            const data = await res.json();
+            return { ok: res.ok && !data.error, data, status: res.status };
+        }
+
+        async function callGeminiWithFallback(key, systemPrompt, contents) {
+            const selected = document.getElementById('set-gemini-model')?.value || state.geminiModel;
+            const candidateModels = [
+                selected,
+                "gemini-3.8-flash",
+                "gemini-3.1-pro-preview",
+                "gemini-3-flash-preview",
+                "gemini-3.1-flash-lite"
+            ].filter((v, i, a) => v && a.indexOf(v) === i);
+
+            let lastErr = "";
+            for (const mdl of candidateModels) {
+                const attempt = await trySingleGeminiModel(key, mdl, systemPrompt, contents);
+                if (attempt.ok) {
+                    state.geminiModel = mdl;
+                    localStorage.setItem('reset_geminiModel', mdl);
+                    if (document.getElementById('set-gemini-model')) {
+                        document.getElementById('set-gemini-model').value = mdl;
+                    }
+                    updateProviderLabel();
+                    return attempt.data.candidates?.[0]?.content?.parts?.[0]?.text || "Răspuns gol.";
+                }
+
+                lastErr = attempt.data.error?.message || `HTTP ${attempt.status}`;
+
+                // Dacă mesajul de eroare de la Google ne indică exact ce model să folosim (ex: "use models/gemini-3.8-flash"), îl extragem și îl apelăm imediat!
+                const match = lastErr.match(/use models\/([a-zA-Z0-9.\-_]+)/i);
+                if (match && match[1] && !candidateModels.includes(match[1])) {
+                    const suggestedModel = match[1];
+                    const retry = await trySingleGeminiModel(key, suggestedModel, systemPrompt, contents);
+                    if (retry.ok) {
+                        state.geminiModel = suggestedModel;
+                        localStorage.setItem('reset_geminiModel', suggestedModel);
+                        updateProviderLabel();
+                        return retry.data.candidates?.[0]?.content?.parts?.[0]?.text || "Răspuns gol.";
+                    }
+                }
+            }
+            throw new Error(lastErr);
+        }
+
+        async function callUniversalAI(apiKey, systemPrompt, messagesArray) {
+            const key = apiKey.trim();
+            const provider = detectProvider(key);
+
+            if (provider.type === "gemini") {
+                const contents = messagesArray.map(m => ({
+                    role: m.role === "assistant" ? "model" : "user",
+                    parts: [{ text: m.content }]
+                }));
+                return await callGeminiWithFallback(key, systemPrompt, contents);
+            } else {
+                const res = await fetch(provider.url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${key}`
+                    },
+                    body: JSON.stringify({
+                        model: provider.model,
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            ...messagesArray
+                        ],
+                        temperature: 0.7
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok || data.error) {
+                    throw new Error(data.error?.message || JSON.stringify(data.error) || `HTTP ${res.status}`);
+                }
+                return data.choices?.[0]?.message?.content || "Răspuns gol.";
+            }
+        }
+
+        async function testApiConnection() {
+            const key = document.getElementById('set-api-key').value.trim();
+            const resBox = document.getElementById('api-test-result');
+            resBox.classList.remove('hidden');
+
+            if (!key) {
+                resBox.className = "text-xs p-3 rounded-xl font-mono bg-red-950 text-red-300 border border-red-800";
+                resBox.innerText = "❌ Lipește mai întâi o cheie API în câmpul de mai sus!";
+                return;
+            }
+
+            resBox.className = "text-xs p-3 rounded-xl font-mono bg-slate-900 text-cyan-300 border border-slate-700";
+            resBox.innerText = `⏳ Conectez cheia (${key.slice(0, 5)}...) la Google Gemini 3.8 Flash...`;
+
+            try {
+                const reply = await callUniversalAI(key, "Răspunde scurt în română.", [{ role: "user", content: "Spune doar: Conexiune reușită!" }]);
+                const p = detectProvider(key);
+                resBox.className = "text-xs p-3 rounded-xl font-mono bg-emerald-950 text-emerald-300 border border-emerald-700";
+                resBox.innerText = `✅ SUCCES (${p.name}):\n"${reply.trim()}"\n\nApasă pe Salvează Tot!`;
+                state.apiKey = key;
+                localStorage.setItem('reset_apiKey', key);
+                updateProviderLabel();
+            } catch (err) {
+                resBox.className = "text-xs p-3 rounded-xl font-mono bg-red-950 text-red-300 border border-red-800";
+                resBox.innerText = `❌ EROARE API:\n${err.message}`;
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendBubble(text, 'user', true);
+            input.value = '';
+
+            if (!state.apiKey) {
+                appendBubble("⚠️ Nu ai salvat cheia API! Mergi în ⚙️ Setări, lipește cheia și apasă Salvează.", 'ai', false);
+                return;
+            }
+
+            const loadingId = appendBubble("Scrie...", 'ai', false);
+
+            try {
+                const reply = await callUniversalAI(state.apiKey, buildSystemPrompt(), state.chatHistory.slice(-10));
+                document.getElementById(loadingId).innerText = reply;
+                
+                state.chatHistory.push({ role: "assistant", content: reply });
+                localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory.slice(-20)));
+                speakText(reply);
+            } catch (err) {
+                state.chatHistory.pop();
+                localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory));
+                document.getElementById(loadingId).innerText = `❌ Eroare API: ${err.message}`;
+            }
+        }
+
+        function appendBubble(text, sender, saveToStorage = false) {
+            if (saveToStorage && sender === 'user') {
+                state.chatHistory.push({ role: "user", content: text });
+                localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory.slice(-20)));
+            }
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            const id = 'msg-' + Date.now() + Math.random();
+            div.id = id;
+            div.className = sender === 'user'
+                ? "bg-emerald-600 text-white p-3.5 rounded-2xl rounded-tr-none text-xs max-w-[85%] ml-auto leading-relaxed whitespace-pre-wrap shadow"
+                : "glass text-slate-200 p-3.5 rounded-2xl rounded-tl-none text-xs max-w-[88%] leading-relaxed whitespace-pre-wrap shadow";
+            div.innerText = text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return id;
+        }
+
+        function switchTab(tab) {
+            haptic(20);
+            ['dash', 'sos', 'chat', 'settings'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.remove('active');
+                if (t !== 'sos') document.getElementById(`nav-${t}`).classList.replace('text-emerald-400', 'text-slate-400');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            if (tab !== 'sos') document.getElementById(`nav-${tab}`).classList.replace('text-slate-400', 'text-emerald-400');
+        }
+
+        function saveSettings() {
+            haptic(50);
+            state.quitDate = document.getElementById('set-quit-date').value;
+            state.phase = document.getElementById('set-phase').value;
+            state.dailyCost = parseFloat(document.getElementById('set-daily-cost').value) || 10;
+            state.dailyJoints = parseFloat(document.getElementById('set-daily-joints').value) || 3;
+            state.cigLimit = parseInt(document.getElementById('set-cig-limit').value) || 15;
+            state.apiKey = document.getElementById('set-api-key').value.trim();
+            state.geminiModel = document.getElementById('set-gemini-model').value;
+
+            localStorage.setItem('reset_quitDate', state.quitDate);
+            localStorage.setItem('reset_phase', state.phase);
+            localStorage.setItem('reset_dailyCost', state.dailyCost);
+            localStorage.setItem('reset_dailyJoints', state.dailyJoints);
+            localStorage.setItem('reset_cigLimit', state.cigLimit);
+            localStorage.setItem('reset_apiKey', state.apiKey);
+            localStorage.setItem('reset_geminiModel', state.geminiModel);
+
+            updateProviderLabel();
+            updateDashboard();
+            switchTab('dash');
+        }
+
+        function resetToNow() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('set-quit-date').value = now.toISOString().slice(0, 16);
+            saveSettings();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
