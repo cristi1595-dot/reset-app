@@ -1,8 +1,9 @@
-const CACHE_NAME = 'reset-neuro-v2.4';
+const CACHE_NAME = 'reset-neuro-v2.5';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './manifest.json',
   './icon.svg',
   './icon-192.png',
   './icon-512.png'
@@ -11,13 +12,11 @@ const PRECACHE_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      // Precache local essential assets
       try {
         await cache.addAll(PRECACHE_ASSETS);
       } catch (err) {
         console.warn('[SW] Precache failed for some local assets', err);
       }
-      // Precache Tailwind CDN so offline works smoothly
       try {
         await cache.add('https://cdn.tailwindcss.com');
       } catch (err) {
@@ -51,10 +50,10 @@ self.addEventListener('fetch', (event) => {
     url.hostname.includes('deepseek.com') ||
     url.hostname.includes('openai.com')
   ) {
-    return; // Pass through to network directly
+    return;
   }
 
-  // Network-First with Cache fallback for HTML / navigation requests (so GitHub Pages updates land immediately)
+  // Network-First with Cache fallback for navigation requests
   if (event.request.mode === 'navigate' || event.request.destination === 'document') {
     event.respondWith(
       fetch(event.request)
@@ -65,12 +64,12 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => caches.match('./index.html').then((cached) => cached || caches.match(event.request)))
+        .catch(() => caches.match('./index.html').then((cached) => cached || caches.match('./')))
     );
     return;
   }
 
-  // Stale-While-Revalidate for other static assets (Tailwind CDN, icons, manifest)
+  // Stale-While-Revalidate for local assets and Tailwind
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)

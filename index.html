@@ -12,6 +12,7 @@
 
     <!-- PWA & Favicons -->
     <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./icon.svg">
     <link rel="apple-touch-icon" href="./icon-192.png">
 
@@ -57,6 +58,21 @@
 
     <!-- ==================== TAB 1: DASHBOARD ==================== -->
     <main id="tab-dash" class="tab-content active p-4 space-y-4 max-w-lg mx-auto">
+        
+        <!-- Banner Instalare PWA (apare dacă browserul oferă promptul de instalare) -->
+        <div id="pwa-install-banner" class="hidden glass border-emerald-500/60 rounded-3xl p-3.5 flex items-center justify-between gap-3 shadow-xl bg-emerald-950/40">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl">📲</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-bold text-white truncate">Instalează RESET pe telefon</div>
+                    <div class="text-[10px] text-emerald-300 truncate">Standalone & funcționare 100% offline</div>
+                </div>
+            </div>
+            <button onclick="triggerPwaInstall()" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow active:scale-95 transition shrink-0">
+                Instalează
+            </button>
+        </div>
+
         <div class="glass rounded-3xl p-5 text-center relative overflow-hidden shadow-xl">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
             <p id="timer-label" class="text-[11px] text-slate-400 uppercase tracking-widest font-semibold">Timp liber de THC</p>
@@ -410,6 +426,35 @@
                     📤 Restaurează Backup
                     <input type="file" id="import-file" accept=".json" class="hidden" onchange="importDataBackup(event)">
                 </label>
+            </div>
+        </div>
+
+        <!-- Secțiune PWA & Ghid Instalare pe Telefon -->
+        <div class="glass rounded-3xl p-4 space-y-3 border-teal-500/40">
+            <h2 class="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📲</span> 4. Instalare Aplicație (PWA)
+            </h2>
+            <p class="text-xs text-slate-300">
+                Rulează aplicația direct de pe ecranul telefonului în mod ecran complet, cu pornire instantă și suport offline.
+            </p>
+            <button id="pwa-settings-btn" onclick="triggerPwaInstall()" class="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl text-xs shadow-lg transition">
+                📲 Instalează Aplicația pe Ecran
+            </button>
+            
+            <!-- Ghid depanare dacă apare deja instalată -->
+            <div class="pt-2 border-t border-slate-800 space-y-2">
+                <button onclick="document.getElementById('pwa-fix-guide').classList.toggle('hidden')" class="w-full text-left text-xs text-amber-300 hover:text-amber-200 font-semibold flex justify-between items-center">
+                    <span>⚠️ Îți apare că este „deja instalată” dar nu se deschide?</span>
+                    <span>▼</span>
+                </button>
+                <div id="pwa-fix-guide" class="hidden text-xs bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2 text-slate-300">
+                    <p class="text-amber-400 font-bold">Cum rezolvi în 30 de secunde:</p>
+                    <ol class="list-decimal pl-4 space-y-1.5 text-slate-300">
+                        <li><strong>Șterge scurtătura veche:</strong> Caută pe ecranul telefonului iconița veche RESET, ține apăsat pe ea și alege <em>Dezinstalează</em> (sau <em>Elimină</em>).</li>
+                        <li><strong>Curăță memoria Chrome:</strong> În Chrome, atinge pictograma cu două liniuțe/lacăt din stânga adresei web (lângă <code>cristi1595-dot...</code>) → <em>Setări pentru site</em> → <em>Șterge și resetează</em>.</li>
+                        <li><strong>Reîncarcă și Instalează:</strong> Trage cu degetul în jos pentru refresh, apasă pe cele 3 puncte verticale din dreapta sus → <em>Instalează aplicația</em> (sau apasă butonul verde de sus).</li>
+                    </ol>
+                </div>
             </div>
         </div>
     </main>
@@ -1208,6 +1253,41 @@ REGULI:
                 }
             };
             reader.readAsText(file);
+        }
+
+        // GESTIUNE INSTALARE PWA (Prompt Nativ)
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.remove('hidden');
+            const btn = document.getElementById('pwa-settings-btn');
+            if (btn) btn.innerText = "📲 Instalează Acum pe Ecran";
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.add('hidden');
+            const btn = document.getElementById('pwa-settings-btn');
+            if (btn) btn.innerText = "✅ Aplicație Instalată";
+        });
+
+        function triggerPwaInstall() {
+            haptic(40);
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        const banner = document.getElementById('pwa-install-banner');
+                        if (banner) banner.classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("Pentru a instala pe telefon:\n\n1. În Chrome: apasă pe cele 3 puncte (dreapta sus) → 'Instalează aplicația'\n\n2. Dacă scrie 'deja instalată', șterge mai întâi scurtătura veche de pe ecran!\n\n3. În Safari (iPhone): apasă 'Share' → 'Adaugă la ecranul de pornire'");
+            }
         }
 
         initApp();
