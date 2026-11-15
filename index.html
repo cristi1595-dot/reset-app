@@ -85,7 +85,10 @@
         }
         html.light-mode .text-white { color: #0f172a !important; }
         html.light-mode .bg-emerald-600,
+        html.light-mode .bg-emerald-600\/90,
+        html.light-mode .bg-emerald-600\/80,
         html.light-mode .bg-emerald-600 .text-white,
+        html.light-mode .bg-orange-600,
         html.light-mode .bg-amber-600,
         html.light-mode .bg-amber-600\/90,
         html.light-mode .bg-cyan-600,
@@ -100,6 +103,7 @@
             -webkit-background-clip: border-box !important;
             color: #047857 !important;
         }
+        html.light-mode .text-slate-100,
         html.light-mode .text-slate-200,
         html.light-mode .text-slate-300 { color: #1e293b !important; }
         html.light-mode .text-slate-400,
@@ -109,8 +113,16 @@
         html.light-mode .text-emerald-200 { color: #065f46 !important; }
         html.light-mode .text-cyan-300,
         html.light-mode .text-cyan-400 { color: #0e7490 !important; }
+        html.light-mode .text-amber-100,
+        html.light-mode .text-amber-200,
         html.light-mode .text-amber-300,
         html.light-mode .text-amber-400 { color: #b45309 !important; }
+        html.light-mode #cooking-mode-modal .text-white { color: #ffffff !important; }
+        html.light-mode #cooking-mode-modal .text-slate-200,
+        html.light-mode #cooking-mode-modal .text-slate-300 { color: #e2e8f0 !important; }
+        html.light-mode #cooking-mode-modal .text-amber-300 { color: #fcd34d !important; }
+        html.light-mode #cooking-mode-modal .bg-slate-900\/70,
+        html.light-mode #cooking-mode-modal .bg-slate-900\/95 { background-color: rgba(15, 23, 42, 0.85) !important; border-color: #1e293b !important; }
         html.light-mode .text-orange-300,
         html.light-mode .text-orange-400 { color: #c2410c !important; }
         html.light-mode .text-purple-300,
@@ -232,7 +244,7 @@
                     <span class="w-8 h-8 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-lg shrink-0">🤖</span>
                     <div class="min-w-0">
                         <h2 class="text-xs font-extrabold text-emerald-300 uppercase tracking-wider truncate">Camarad AI • Check-in Pas cu Pas</h2>
-                        <p id="checkin-subtitle" class="text-[10px] text-slate-400 truncate">Pasul activ: Dimineața (06:30)</p>
+                        <p id="checkin-subtitle" class="text-[10px] text-slate-400 truncate">Pasul activ: Dimineața (09:00)</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
@@ -248,7 +260,7 @@
                 <button onclick="selectCheckinStep('morning')" id="step-pill-morning" class="p-2 rounded-2xl border border-slate-800 bg-slate-900/70 text-center transition">
                     <div class="text-sm">☀️</div>
                     <div class="text-[10px] font-bold text-slate-200 truncate">Dimineața</div>
-                    <div id="step-time-lbl-morning" class="text-[9px] text-slate-400 font-mono">06:30</div>
+                    <div id="step-time-lbl-morning" class="text-[9px] text-slate-400 font-mono">09:00</div>
                 </button>
                 <button onclick="selectCheckinStep('noon')" id="step-pill-noon" class="p-2 rounded-2xl border border-slate-800 bg-slate-900/70 text-center transition">
                     <div class="text-sm">🚕</div>
@@ -971,8 +983,8 @@
             </p>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="applyWakeMode('start')" id="wake-btn-start" class="p-2.5 rounded-2xl border border-slate-700 bg-slate-900 text-left text-xs transition">
-                    <strong class="text-emerald-300 block">🌅 Mod Start (06:30)</strong>
-                    <span class="text-[10px] text-slate-400">06:30 • 12:30 • 17:30 • 20:30</span>
+                    <strong class="text-emerald-300 block">🌅 Mod Start (09:00)</strong>
+                    <span class="text-[10px] text-slate-400">09:00 • 12:30 • 17:30 • 20:30</span>
                 </button>
                 <button onclick="applyWakeMode('advanced')" id="wake-btn-advanced" class="p-2.5 rounded-2xl border border-slate-700 bg-slate-900 text-left text-xs transition">
                     <strong class="text-cyan-300 block">🚀 Mod Avansat (05:30)</strong>
@@ -2448,7 +2460,7 @@
             localStorage.setItem('reset_geminiModel', savedModel);
         }
 
-        const DEFAULT_STEP_TIMES = { morning: "06:30", noon: "12:30", calm: "17:30", night: "20:30" };
+        const DEFAULT_STEP_TIMES = { morning: "09:00", noon: "12:30", calm: "17:30", night: "20:30" };
         const DEFAULT_MOVE_STATS = { walkMinsToday: 0, walkGoal: 30, taxiBreaksToday: 0, workoutDoneToday: false, completedExercises: {} };
 
         let state = {
@@ -2569,7 +2581,7 @@
             document.getElementById('set-tg-token').value = state.tgToken;
             document.getElementById('set-tg-chatid').value = state.tgChatId;
             document.getElementById('set-cloud-sync-url').value = state.cloudSyncUrl;
-            document.getElementById('set-time-morning').value = state.stepTimes.morning || "06:30";
+            document.getElementById('set-time-morning').value = state.stepTimes.morning || "09:00";
             document.getElementById('set-time-noon').value = state.stepTimes.noon || "12:30";
             document.getElementById('set-time-calm').value = state.stepTimes.calm || "17:30";
             document.getElementById('set-time-night').value = state.stepTimes.night || "20:30";
@@ -2810,7 +2822,7 @@
             if (document.getElementById('set-gemini-model')) document.getElementById('set-gemini-model').value = state.geminiModel;
             if (document.getElementById('set-tg-token')) document.getElementById('set-tg-token').value = state.tgToken;
             if (document.getElementById('set-tg-chatid')) document.getElementById('set-tg-chatid').value = state.tgChatId;
-            if (document.getElementById('set-time-morning')) document.getElementById('set-time-morning').value = state.stepTimes.morning || "06:30";
+            if (document.getElementById('set-time-morning')) document.getElementById('set-time-morning').value = state.stepTimes.morning || "09:00";
             if (document.getElementById('set-time-noon')) document.getElementById('set-time-noon').value = state.stepTimes.noon || "12:30";
             if (document.getElementById('set-time-calm')) document.getElementById('set-time-calm').value = state.stepTimes.calm || "17:30";
             if (document.getElementById('set-time-night')) document.getElementById('set-time-night').value = state.stepTimes.night || "20:30";
@@ -6671,7 +6683,7 @@ Structurează clar cu:
             const apiKey = (document.getElementById('set-api-key').value || state.apiKey || "PUNE_AICI_GEMINI_KEY").trim();
             const model = document.getElementById('set-gemini-model').value || state.geminiModel || "gemini-3.5-flash";
             const cloudUrl = (document.getElementById('set-cloud-sync-url')?.value || state.cloudSyncUrl || "").trim();
-            const tM = document.getElementById('set-time-morning').value || state.stepTimes.morning || "06:30";
+            const tM = document.getElementById('set-time-morning').value || state.stepTimes.morning || "09:00";
             const tN = document.getElementById('set-time-noon').value || state.stepTimes.noon || "12:30";
             const tC = document.getElementById('set-time-calm').value || state.stepTimes.calm || "17:30";
             const tNi = document.getElementById('set-time-night').value || state.stepTimes.night || "20:30";
@@ -6960,7 +6972,7 @@ function setWebhook() {
             if (mode === 'advanced') {
                 state.stepTimes = { morning: "05:30", noon: "12:00", calm: "17:00", night: "20:00" };
             } else {
-                state.stepTimes = { morning: "06:30", noon: "12:30", calm: "17:30", night: "20:30" };
+                state.stepTimes = { morning: "09:00", noon: "12:30", calm: "17:30", night: "20:30" };
             }
             document.getElementById('set-time-morning').value = state.stepTimes.morning;
             document.getElementById('set-time-noon').value = state.stepTimes.noon;
@@ -7363,7 +7375,7 @@ REGULI:
             state.tgChatId = document.getElementById('set-tg-chatid').value.trim();
             state.cloudSyncUrl = document.getElementById('set-cloud-sync-url').value.trim();
             state.stepTimes = {
-                morning: document.getElementById('set-time-morning').value || "06:30",
+                morning: document.getElementById('set-time-morning').value || "09:00",
                 noon: document.getElementById('set-time-noon').value || "12:30",
                 calm: document.getElementById('set-time-calm').value || "17:30",
                 night: document.getElementById('set-time-night').value || "20:30"
