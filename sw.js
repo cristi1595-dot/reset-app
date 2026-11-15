@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reset-neuro-v2.6';
+const CACHE_NAME = 'reset-neuro-v3.0';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -43,12 +43,15 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Do NOT cache AI API requests
+  // Do NOT cache AI, Telegram, or YouTube API/embed requests
   if (
     url.hostname.includes('googleapis.com') ||
     url.hostname.includes('groq.com') ||
     url.hostname.includes('deepseek.com') ||
-    url.hostname.includes('openai.com')
+    url.hostname.includes('openai.com') ||
+    url.hostname.includes('telegram.org') ||
+    url.hostname.includes('youtube.com') ||
+    url.hostname.includes('youtube-nocookie.com')
   ) {
     return;
   }
@@ -83,6 +86,18 @@ self.addEventListener('fetch', (event) => {
         .catch(() => cachedResponse);
 
       return cachedResponse || fetchPromise;
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow('./index.html');
     })
   );
 });
