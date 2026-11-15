@@ -574,14 +574,42 @@
     </main>
 
     <!-- ==================== TAB 3: NUTRIȚIE & PLAN MÂNCARE ==================== -->
-    <main id="tab-food" class="tab-content p-4 space-y-4 max-w-lg mx-auto">
-        <!-- Sub-tab switcher -->
-        <div class="grid grid-cols-2 gap-2 glass p-1.5 rounded-2xl">
-            <button onclick="switchFoodSubTab('plan')" id="food-sub-plan" class="py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white transition">
-                📅 Meniu 7 Zile (Taxi)
+    <main id="tab-food" class="tab-content p-4 space-y-3 max-w-lg mx-auto">
+        <!-- Bară rapidă Cămară & Cumpărături -->
+        <div class="grid grid-cols-2 gap-2">
+            <button onclick="openPantryModal()" class="glass rounded-2xl px-3 py-2.5 flex items-center justify-between border border-amber-500/30 hover:border-amber-400/60 transition active:scale-95">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">🥫</span>
+                    <div class="text-left">
+                        <div class="text-xs font-extrabold text-amber-300 leading-tight">Cămara</div>
+                        <div id="pantry-badge-sub" class="text-[10px] text-slate-400">0 produse</div>
+                    </div>
+                </div>
+                <span id="pantry-out-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-950/80 text-red-300 border border-red-700/60">0 lipsă</span>
             </button>
-            <button onclick="switchFoodSubTab('chef')" id="food-sub-chef" class="py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition">
-                🤖 Chef AI: Ce am în frigider
+
+            <button onclick="openShoppingModal()" class="glass rounded-2xl px-3 py-2.5 flex items-center justify-between border border-emerald-500/30 hover:border-emerald-400/60 transition active:scale-95">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">🛒</span>
+                    <div class="text-left">
+                        <div class="text-xs font-extrabold text-emerald-300 leading-tight">Cumpărături</div>
+                        <div id="shopping-badge-sub" class="text-[10px] text-slate-400">Listă goală</div>
+                    </div>
+                </div>
+                <span id="shopping-count-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">0</span>
+            </button>
+        </div>
+
+        <!-- Sub-tab switcher (3 taburi compacte) -->
+        <div class="grid grid-cols-3 gap-1.5 glass p-1.5 rounded-2xl">
+            <button onclick="switchFoodSubTab('plan')" id="food-sub-plan" class="py-2 rounded-xl text-[11px] font-bold bg-emerald-600 text-white transition">
+                📅 Meniu 7 Zile
+            </button>
+            <button onclick="switchFoodSubTab('recipes')" id="food-sub-recipes" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">
+                📖 Rețete <span id="recipes-tab-count" class="opacity-75"></span>
+            </button>
+            <button onclick="switchFoodSubTab('chef')" id="food-sub-chef" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">
+                🤖 Chef AI
             </button>
         </div>
 
@@ -602,7 +630,25 @@
             <div id="food-meals-container" class="space-y-3"></div>
         </div>
 
-        <!-- Sub-tab 2: Chef AI Ce am în frigider -->
+        <!-- Sub-tab 2: Rețetele Mele (Categorii + Import Link/Poză/Paste) -->
+        <div id="food-panel-recipes" class="hidden space-y-3">
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <input id="recipe-search-input" type="text" oninput="renderRecipesList()" placeholder="🔍 Caută rețetă sau ingredient..." class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <button onclick="openAddRecipeModal()" class="px-3.5 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 active:scale-95 text-white font-bold rounded-2xl text-xs shadow-lg shrink-0 transition">
+                    + Adaugă
+                </button>
+            </div>
+
+            <!-- Categorii orizontale -->
+            <div id="recipe-categories-bar" class="flex gap-1.5 overflow-x-auto pb-1"></div>
+
+            <!-- Lista rețetelor salvate -->
+            <div id="recipes-list-container" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Sub-tab 3: Chef AI Ce am în frigider -->
         <div id="food-panel-chef" class="hidden space-y-4">
             <div class="glass rounded-3xl p-4 space-y-3 border-emerald-500/40">
                 <div>
@@ -613,7 +659,12 @@
                 </div>
 
                 <div>
-                    <div class="text-[11px] font-bold text-slate-400 uppercase mb-1.5">1. Bifează ce ai în casă:</div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase">1. Bifează ce ai în casă:</div>
+                        <button onclick="loadPantryIntoChefAI()" class="text-[11px] font-bold text-amber-300 hover:text-amber-200 bg-amber-950/50 border border-amber-700/50 px-2.5 py-1 rounded-xl transition">
+                            🥫 Încarcă din Cămară
+                        </button>
+                    </div>
                     <div id="fridge-chips" class="flex flex-wrap gap-1.5"></div>
                 </div>
 
@@ -647,7 +698,7 @@
                 </button>
             </div>
 
-            <div id="fridge-recipe-result" class="hidden glass rounded-3xl p-4 text-xs text-slate-200 leading-relaxed space-y-2 selectable"></div>
+            <div id="fridge-recipe-result" class="hidden glass rounded-3xl p-4 text-xs text-slate-200 leading-relaxed space-y-3 selectable"></div>
         </div>
     </main>
 
@@ -1106,6 +1157,173 @@
                     Închide
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: ADAUGĂ REȚETĂ (LINK / POZĂ / PASTE) ==================== -->
+    <div id="add-recipe-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-orange-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-extrabold text-orange-300 uppercase tracking-wider flex items-center gap-2">
+                    <span>📖</span> Adaugă Rețetă Inteligent
+                </h3>
+                <button onclick="toggleModal('add-recipe-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <!-- Moduri import -->
+            <div class="grid grid-cols-3 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
+                <button onclick="switchAddRecipeMode('paste')" id="add-mode-paste" class="py-2 rounded-xl text-xs font-bold bg-orange-600 text-white transition">📋 Paste Text</button>
+                <button onclick="switchAddRecipeMode('link')" id="add-mode-link" class="py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition">🔗 Link URL</button>
+                <button onclick="switchAddRecipeMode('photo')" id="add-mode-photo" class="py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition">📷 Poză</button>
+            </div>
+
+            <!-- Mod 1: Paste -->
+            <div id="add-panel-paste" class="space-y-2.5">
+                <p class="text-[11px] text-slate-400">Lipește orice text de rețetă (de pe Facebook, Instagram, blog sau notițe). AI-ul o structurează și o pune automat în categoria potrivită.</p>
+                <textarea id="add-recipe-text" rows="6" placeholder="Ex: Ciorbă de pui a la grec... Ingrediente: 500g piept de pui, 2 morcovi..." class="w-full bg-slate-900 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-orange-500"></textarea>
+            </div>
+
+            <!-- Mod 2: Link -->
+            <div id="add-panel-link" class="hidden space-y-2.5">
+                <p class="text-[11px] text-slate-400">Lipește linkul unei rețete (blog culinar, site de rețete). Dacă site-ul blochează accesul automat, folosește Paste Text sau Poză.</p>
+                <input id="add-recipe-url" type="url" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-orange-500">
+            </div>
+
+            <!-- Mod 3: Poză -->
+            <div id="add-panel-photo" class="hidden space-y-2.5">
+                <p class="text-[11px] text-slate-400">Încarcă o poză dintr-o carte de bucate sau un screenshot de pe telefon. AI-ul citește textul și salvează rețeta structurată.</p>
+                <label class="block w-full border-2 border-dashed border-slate-700 hover:border-orange-500/70 rounded-2xl p-5 text-center cursor-pointer bg-slate-900/50 transition">
+                    <input id="add-recipe-file" type="file" accept="image/*" onchange="handleRecipeImageSelected(event)" class="hidden">
+                    <div class="text-2xl mb-1">📷</div>
+                    <div id="add-recipe-file-label" class="text-xs font-bold text-slate-300">Apasă pentru a alege o poză sau a face fotografie</div>
+                </label>
+                <img id="add-recipe-preview" class="hidden w-full max-h-44 object-contain rounded-2xl border border-slate-800 bg-black/40" alt="Previzualizare rețetă">
+            </div>
+
+            <div class="flex items-center justify-between gap-2 text-xs">
+                <span class="text-slate-400 shrink-0">Categorie:</span>
+                <select id="add-recipe-category-override" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                    <option value="auto">✨ Detectează automat (recomandat)</option>
+                </select>
+            </div>
+
+            <div id="add-recipe-status" class="hidden text-xs p-3 rounded-2xl font-mono"></div>
+
+            <button onclick="processAndSaveRecipe()" id="add-recipe-submit-btn" class="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 active:scale-95 text-white font-bold rounded-2xl text-xs shadow-lg transition">
+                ✨ Extrage și Salvează Rețeta
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: DETALIU REȚETĂ ==================== -->
+    <div id="recipe-detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4 selectable">
+            <div class="flex justify-between items-start gap-2 border-b border-slate-800 pb-3">
+                <div class="min-w-0">
+                    <span id="detail-recipe-cat" class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 mb-1"></span>
+                    <h3 id="detail-recipe-title" class="text-base font-extrabold text-white leading-snug"></h3>
+                    <div id="detail-recipe-meta" class="text-[11px] text-slate-400 mt-1"></div>
+                </div>
+                <button onclick="toggleModal('recipe-detail-modal')" class="text-slate-400 hover:text-white text-lg p-1 shrink-0">✕</button>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <button onclick="sendCurrentRecipeToShopping()" class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs transition active:scale-95">
+                    🛒 Adaugă în Cumpărături
+                </button>
+                <button onclick="toggleCurrentRecipeFavorite()" id="detail-fav-btn" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-2xl text-xs transition">
+                    ☆
+                </button>
+                <button onclick="deleteCurrentRecipe()" class="px-3 py-2.5 bg-red-950/70 hover:bg-red-900/80 border border-red-800/60 text-red-300 font-bold rounded-2xl text-xs transition">
+                    🗑️
+                </button>
+            </div>
+
+            <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2">
+                <div class="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">🛒 Ingrediente</div>
+                <ul id="detail-recipe-ingredients" class="space-y-1.5 text-xs text-slate-200"></ul>
+            </div>
+
+            <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2">
+                <div class="text-xs font-extrabold text-emerald-300 uppercase tracking-wider">👨‍🍳 Mod de preparare</div>
+                <ol id="detail-recipe-steps" class="space-y-2 text-xs text-slate-200 list-decimal pl-4"></ol>
+            </div>
+
+            <div id="detail-recipe-notes-box" class="hidden bg-amber-950/30 border border-amber-800/40 rounded-2xl p-3 text-xs text-amber-200"></div>
+            <div id="detail-recipe-source-box" class="hidden text-[11px] text-slate-400 truncate"></div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: CĂMARA ==================== -->
+    <div id="pantry-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-amber-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-2">
+                        <span>🥫</span> Cămara Mea
+                    </h3>
+                    <div id="pantry-modal-stats" class="text-[11px] text-slate-400"></div>
+                </div>
+                <button onclick="toggleModal('pantry-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <!-- Filtre & Acțiune rapidă epuizate -->
+            <div class="p-3 border-b border-slate-800/80 space-y-2 bg-slate-900/40">
+                <div class="flex gap-1.5">
+                    <input id="pantry-search-input" type="text" oninput="renderPantryList()" placeholder="🔍 Caută în cămară..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <button onclick="sendOutOfStockToShopping()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-[11px] shrink-0 transition">
+                        🛒 Trimite lipsurile
+                    </button>
+                </div>
+                <div class="flex gap-1.5 text-[11px]">
+                    <button onclick="setPantryFilter('all')" id="pantry-flt-all" class="px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white">Toate</button>
+                    <button onclick="setPantryFilter('inStock')" id="pantry-flt-inStock" class="px-2.5 py-1 rounded-lg font-bold bg-slate-800 text-slate-300">✅ În stoc</button>
+                    <button onclick="setPantryFilter('outOfStock')" id="pantry-flt-outOfStock" class="px-2.5 py-1 rounded-lg font-bold bg-slate-800 text-slate-300">❌ Nu mai am</button>
+                    <button onclick="populateDefaultPantryStaples()" class="ml-auto px-2.5 py-1 rounded-lg font-bold bg-slate-800 hover:bg-slate-700 text-amber-300">✨ Bază</button>
+                </div>
+            </div>
+
+            <!-- Lista produse cămară -->
+            <div id="pantry-list-container" class="flex-1 overflow-y-auto p-3 space-y-1.5"></div>
+
+            <!-- Formular adăugare rapidă -->
+            <form onsubmit="addPantryItem(event)" class="p-3 border-t border-slate-800 bg-slate-900/70 flex gap-2">
+                <input id="pantry-new-name" type="text" placeholder="Adaugă produs (ex: ouă, orez)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                <input id="pantry-new-amount" type="text" placeholder="Cant." class="w-16 bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white text-center focus:outline-none focus:border-amber-500">
+                <button type="submit" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs">+</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: LISTA DE CUMPĂRĂTURI ==================== -->
+    <div id="shopping-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-extrabold text-emerald-300 uppercase tracking-wider flex items-center gap-2">
+                        <span>🛒</span> Lista de Cumpărături
+                    </h3>
+                    <div id="shopping-modal-stats" class="text-[11px] text-slate-400"></div>
+                </div>
+                <button onclick="toggleModal('shopping-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <!-- Acțiuni rapide listă -->
+            <div class="px-3 py-2 border-b border-slate-800/80 flex flex-wrap gap-1.5 bg-slate-900/40">
+                <button onclick="copyShoppingListText()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-[11px]">📋 Copiază lista</button>
+                <button onclick="moveCheckedShoppingToPantry()" class="px-2.5 py-1.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300 font-bold rounded-xl text-[11px]">🥫 Mută bifatele în Cămară</button>
+                <button onclick="clearCheckedShopping()" class="ml-auto px-2.5 py-1.5 bg-red-950/60 hover:bg-red-900/70 text-red-300 font-bold rounded-xl text-[11px]">🗑️ Șterge bifatele</button>
+            </div>
+
+            <!-- Lista grupată pe raioane -->
+            <div id="shopping-list-container" class="flex-1 overflow-y-auto p-3 space-y-3"></div>
+
+            <!-- Formular adăugare manuală -->
+            <form onsubmit="addShoppingItemManual(event)" class="p-3 border-t border-slate-800 bg-slate-900/70 flex gap-2">
+                <input id="shopping-new-name" type="text" placeholder="Adaugă pe listă (ex: lapte, roșii)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                <input id="shopping-new-amount" type="text" placeholder="Cant." class="w-16 bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white text-center focus:outline-none focus:border-emerald-500">
+                <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs">+</button>
+            </form>
         </div>
     </div>
 
@@ -1703,7 +1921,10 @@
             apiKey: localStorage.getItem('reset_apiKey') || DEFAULT_API_KEY,
             geminiModel: savedModel,
             ttsEnabled: false,
-            chatHistory: JSON.parse(localStorage.getItem('reset_chatHistory') || '[]')
+            chatHistory: JSON.parse(localStorage.getItem('reset_chatHistory') || '[]'),
+            recipes: JSON.parse(localStorage.getItem('reset_recipes') || '[]'),
+            pantry: JSON.parse(localStorage.getItem('reset_pantry') || '[]'),
+            shoppingList: JSON.parse(localStorage.getItem('reset_shoppingList') || '[]')
         };
 
         if (!localStorage.getItem('reset_apiKey')) {
@@ -1807,6 +2028,10 @@
             renderFoodDays();
             renderFoodMeals();
             renderFridgeChips();
+            initRecipeCategorySelect();
+            renderRecipeCategories();
+            renderRecipesList();
+            updateNutritionBadges();
             renderChatHistory();
             updateDashboard();
 
@@ -1980,7 +2205,10 @@
                 fontSize: state.fontSize,
                 apiKey: state.apiKey,
                 geminiModel: state.geminiModel,
-                chatHistory: (state.chatHistory || []).slice(-20)
+                chatHistory: (state.chatHistory || []).slice(-20),
+                recipes: state.recipes || [],
+                pantry: state.pantry || [],
+                shoppingList: state.shoppingList || []
             };
         }
 
@@ -1990,7 +2218,7 @@
                 'lastDate', 'quitDate', 'phase', 'dailyCost', 'dailyJoints', 'cigLimit',
                 'cigsToday', 'lastCigTime', 'supps', 'wakeMode', 'stepTimes', 'stepsDone',
                 'exerciseLevel', 'moveStats', 'tgToken', 'tgChatId', 'theme', 'fontSize',
-                'apiKey', 'geminiModel', 'chatHistory'
+                'apiKey', 'geminiModel', 'chatHistory', 'recipes', 'pantry', 'shoppingList'
             ];
             keys.forEach(k => {
                 if (remote[k] === undefined || remote[k] === null) return;
@@ -2030,6 +2258,9 @@
             renderCheckinCard();
             renderMoveProgress();
             renderExercises();
+            renderRecipeCategories();
+            renderRecipesList();
+            updateNutritionBadges();
             renderChatHistory();
             updateDashboard();
         }
@@ -2749,24 +2980,132 @@
             }, 1000);
         }
 
-        // ==================== NUTRIȚIE & CHEF AI ====================
+        // ==================== NUTRIȚIE, REȚETE, CĂMARĂ, CUMPĂRĂTURI & CHEF AI ====================
+        const RECIPE_CATEGORIES = [
+            { id: 'Ciorbe & Supe', icon: '🥣' },
+            { id: 'Fel Principal', icon: '🍲' },
+            { id: 'Mic Dejun & Brunch', icon: '🍳' },
+            { id: 'Paste & Risotto', icon: '🍝' },
+            { id: 'La Cuptor', icon: '🍗' },
+            { id: 'La Air Fryer', icon: '💨' },
+            { id: 'Sandvișuri & Gustări', icon: '🥪' },
+            { id: 'Salate & Garnituri', icon: '🥗' },
+            { id: 'Prăjituri & Deserturi', icon: '🍰' },
+            { id: 'Pâine & Panificație', icon: '🥖' },
+            { id: 'Altele', icon: '🍽️' }
+        ];
+
+        const SUPERMARKET_AISLES = [
+            { id: 'Legume & Fructe', icon: '🥦' },
+            { id: 'Lactate & Ouă', icon: '🧀' },
+            { id: 'Carne & Pește', icon: '🥩' },
+            { id: 'Panificație', icon: '🥖' },
+            { id: 'Băcănie & Condimente', icon: '🧂' },
+            { id: 'Congelate', icon: '❄️' },
+            { id: 'Băuturi', icon: '🧃' },
+            { id: 'Altele', icon: '🛒' }
+        ];
+
+        const AISLE_RULES = [
+            { aisle: 'Legume & Fructe', kw: ['roșii','rosii','ceapă','ceapa','usturoi','cartof','morcov','ardei','castravet','dovlecel','vânătă','vinete','salată','salata','spanac','ciuperci','varză','varza','pătrunjel','patrunjel','mărar','marar','țelină','telina','lămâi','lamaie','măr','mere','banan','portocal','avocado','ghimbir','conopidă','broccoli','ridichi','afine','căpșuni'] },
+            { aisle: 'Lactate & Ouă', kw: ['lapte','smântână','smantana','iaurt','chefir','unt','brânză','branza','cașcaval','cascaval','parmezan','mozzarella','ricotta','telemea','ou','ouă','oua','feta','frișcă'] },
+            { aisle: 'Carne & Pește', kw: ['carne','pui','curcan','vită','vita','porc','mușchi','bacon','șuncă','sunca','salam','cârnați','pește','peste','somon','ton','macrou','creveți','tocată','tocata','miel','pulpă','pulpa'] },
+            { aisle: 'Panificație', kw: ['pâine','paine','chifle','baghetă','lipie','lipii','toast','pesmet','aluat','foietaj','tortilla'] },
+            { aisle: 'Congelate', kw: ['congelat','înghețată','inghetata'] },
+            { aisle: 'Băuturi', kw: ['cafea','ceai','vin','bere','suc','apă','apa','sirop'] },
+            { aisle: 'Băcănie & Condimente', kw: ['ulei','sare','piper','zahăr','zahar','făină','faina','mălai','malai','orez','paste','spaghete','penne','oțet','otet','sos','bulion','muștar','boia','oregano','busuioc','cimbru','scorțișoară','drojdie','miere','nuci','nucă','migdale','semințe','ovăz','ovaz','fasole','linte','năut','măsline'] }
+        ];
+
+        let selectedRecipeCategory = 'Toate';
+        let currentRecipeDetailId = null;
+        let addRecipeMode = 'paste';
+        let pendingRecipeImageDataUrl = null;
+        let pantryFilterMode = 'all';
+        let lastChefRecipeText = '';
+
+        function classifyAisle(name) {
+            const lower = (name || '').toLowerCase().trim();
+            if (!lower) return 'Altele';
+            for (const rule of AISLE_RULES) {
+                if (rule.kw.some(k => lower.includes(k))) return rule.aisle;
+            }
+            return 'Altele';
+        }
+
+        function saveNutritionState() {
+            localStorage.setItem('reset_recipes', JSON.stringify(state.recipes || []));
+            localStorage.setItem('reset_pantry', JSON.stringify(state.pantry || []));
+            localStorage.setItem('reset_shoppingList', JSON.stringify(state.shoppingList || []));
+            updateNutritionBadges();
+            markStateDirtyAndSync();
+        }
+
+        function updateNutritionBadges() {
+            const pantry = state.pantry || [];
+            const outCount = pantry.filter(i => !i.inStock).length;
+            const pantrySub = document.getElementById('pantry-badge-sub');
+            const pantryOut = document.getElementById('pantry-out-badge');
+            if (pantrySub) pantrySub.innerText = `${pantry.length} produse`;
+            if (pantryOut) {
+                if (outCount > 0) {
+                    pantryOut.innerText = `${outCount} lipsă`;
+                    pantryOut.classList.remove('hidden');
+                } else {
+                    pantryOut.classList.add('hidden');
+                }
+            }
+
+            const shop = state.shoppingList || [];
+            const remCount = shop.filter(i => !i.checked).length;
+            const shopSub = document.getElementById('shopping-badge-sub');
+            const shopBadge = document.getElementById('shopping-count-badge');
+            if (shopSub) shopSub.innerText = shop.length === 0 ? 'Listă goală' : `${remCount} de luat`;
+            if (shopBadge) {
+                if (remCount > 0) {
+                    shopBadge.innerText = String(remCount);
+                    shopBadge.classList.remove('hidden');
+                } else {
+                    shopBadge.classList.add('hidden');
+                }
+            }
+
+            const recCount = document.getElementById('recipes-tab-count');
+            if (recCount) {
+                const len = (state.recipes || []).length;
+                recCount.innerText = len > 0 ? `(${len})` : '';
+            }
+        }
+
+        function initRecipeCategorySelect() {
+            const sel = document.getElementById('add-recipe-category-override');
+            if (!sel) return;
+            sel.innerHTML = `<option value="auto">✨ Detectează automat (recomandat)</option>` +
+                RECIPE_CATEGORIES.map(c => `<option value="${escapeHtml(c.id)}">${c.icon} ${escapeHtml(c.id)}</option>`).join('');
+        }
+
         function switchFoodSubTab(sub) {
             haptic(20);
-            const planPanel = document.getElementById('food-panel-plan');
-            const chefPanel = document.getElementById('food-panel-chef');
-            const planBtn = document.getElementById('food-sub-plan');
-            const chefBtn = document.getElementById('food-sub-chef');
-
-            if (sub === 'plan') {
-                planPanel.classList.remove('hidden');
-                chefPanel.classList.add('hidden');
-                planBtn.className = "py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white transition";
-                chefBtn.className = "py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition";
-            } else {
-                planPanel.classList.add('hidden');
-                chefPanel.classList.remove('hidden');
-                chefBtn.className = "py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white transition";
-                planBtn.className = "py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition";
+            const panels = {
+                plan: document.getElementById('food-panel-plan'),
+                recipes: document.getElementById('food-panel-recipes'),
+                chef: document.getElementById('food-panel-chef')
+            };
+            const btns = {
+                plan: document.getElementById('food-sub-plan'),
+                recipes: document.getElementById('food-sub-recipes'),
+                chef: document.getElementById('food-sub-chef')
+            };
+            Object.keys(panels).forEach(k => {
+                if (panels[k]) panels[k].classList.toggle('hidden', k !== sub);
+                if (btns[k]) {
+                    btns[k].className = k === sub
+                        ? "py-2 rounded-xl text-[11px] font-bold bg-emerald-600 text-white transition"
+                        : "py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition";
+                }
+            });
+            if (sub === 'recipes') {
+                renderRecipeCategories();
+                renderRecipesList();
             }
         }
 
@@ -2789,7 +3128,7 @@
         function renderFoodMeals() {
             const dayObj = FOOD_PLAN_DB[selectedFoodDayIdx] || FOOD_PLAN_DB[0];
             const box = document.getElementById('food-meals-container');
-            box.innerHTML = dayObj.meals.map(meal => `
+            box.innerHTML = dayObj.meals.map((meal, mIdx) => `
                 <div class="glass rounded-3xl p-4 space-y-2.5 selectable">
                     <div class="flex items-start justify-between gap-2">
                         <div>
@@ -2805,13 +3144,430 @@
                         <div><strong class="text-cyan-300">🛒 Ingrediente:</strong> ${escapeHtml(meal.ingredients)}</div>
                         <div><strong class="text-emerald-300">👨‍🍳 Preparare:</strong> ${escapeHtml(meal.steps)}</div>
                     </div>
-                    <div class="text-[11px] text-purple-300 bg-purple-950/30 border border-purple-800/40 rounded-xl p-2.5">
-                        🧠 <strong>De ce ajută:</strong> ${escapeHtml(meal.nutrients)}
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="text-[11px] text-purple-300 bg-purple-950/30 border border-purple-800/40 rounded-xl p-2 flex-1">
+                            🧠 <strong>De ce ajută:</strong> ${escapeHtml(meal.nutrients)}
+                        </div>
+                        <button onclick="addPlanMealToShopping(${selectedFoodDayIdx}, ${mIdx})" class="px-2.5 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-800 border border-emerald-700/60 text-emerald-300 text-[11px] font-bold shrink-0 transition" title="Trimite ingredientele în Lista de Cumpărături">
+                            + 🛒
+                        </button>
                     </div>
                 </div>
             `).join('');
         }
 
+        function addPlanMealToShopping(dayIdx, mealIdx) {
+            haptic(25);
+            const meal = FOOD_PLAN_DB[dayIdx]?.meals[mealIdx];
+            if (!meal) return;
+            const parts = meal.ingredients.split(/[,;]+/).map(s => s.trim()).filter(Boolean);
+            addIngredientsArrayToShopping(parts.map(p => ({ originalText: p, name: p })), meal.name);
+            alert(`✅ ${parts.length} ingrediente din "${meal.name}" au fost adăugate în Lista de Cumpărături!`);
+        }
+
+        // ==================== REȚETE SALVATE & CATEGORII ====================
+        function getCategoryIcon(catId) {
+            const found = RECIPE_CATEGORIES.find(c => c.id === catId);
+            return found ? found.icon : '🍽️';
+        }
+
+        function renderRecipeCategories() {
+            const bar = document.getElementById('recipe-categories-bar');
+            if (!bar) return;
+            const recipes = state.recipes || [];
+            const counts = {};
+            recipes.forEach(r => { counts[r.category] = (counts[r.category] || 0) + 1; });
+
+            const items = [
+                { id: 'Toate', icon: '📚', count: recipes.length },
+                ...RECIPE_CATEGORIES.filter(c => (counts[c.id] || 0) > 0 || selectedRecipeCategory === c.id).map(c => ({
+                    id: c.id,
+                    icon: c.icon,
+                    count: counts[c.id] || 0
+                }))
+            ];
+
+            bar.innerHTML = items.map(c => {
+                const active = selectedRecipeCategory === c.id;
+                return `<button onclick="selectRecipeCategory('${escapeHtml(c.id)}')" class="px-3 py-1.5 rounded-2xl text-[11px] font-bold shrink-0 border transition ${active ? 'bg-orange-600 border-orange-400 text-white shadow' : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:text-white'}">${c.icon} ${escapeHtml(c.id)} <span class="opacity-70">(${c.count})</span></button>`;
+            }).join('');
+        }
+
+        function selectRecipeCategory(cat) {
+            haptic(15);
+            selectedRecipeCategory = cat;
+            renderRecipeCategories();
+            renderRecipesList();
+        }
+
+        function renderRecipesList() {
+            const box = document.getElementById('recipes-list-container');
+            if (!box) return;
+            const query = (document.getElementById('recipe-search-input')?.value || '').toLowerCase().trim();
+            const recipes = (state.recipes || []).filter(r => {
+                if (selectedRecipeCategory !== 'Toate' && r.category !== selectedRecipeCategory) return false;
+                if (!query) return true;
+                const hay = (r.title + ' ' + r.category + ' ' + (r.ingredients || []).map(i => i.originalText || i.name).join(' ')).toLowerCase();
+                return hay.includes(query);
+            });
+
+            if (recipes.length === 0) {
+                box.innerHTML = `
+                    <div class="glass rounded-3xl p-6 text-center space-y-2 border-slate-800">
+                        <div class="text-3xl">📖</div>
+                        <div class="text-xs font-bold text-slate-300">${(state.recipes || []).length === 0 ? 'Nu ai rețete salvate încă.' : 'Nicio rețetă găsită în această categorie.'}</div>
+                        <p class="text-[11px] text-slate-400">Apasă <strong>+ Adaugă</strong> pentru a importa din Link, Poză sau Copy-Paste, ori salvează direct din <strong>Chef AI</strong>.</p>
+                    </div>`;
+                return;
+            }
+
+            box.innerHTML = recipes.map(r => {
+                const totalMins = (r.prepTimeMinutes || 0) + (r.cookTimeMinutes || 0);
+                return `
+                    <div onclick="openRecipeDetail('${escapeHtml(r.id)}')" class="glass rounded-2xl p-3.5 border border-slate-800 hover:border-orange-500/50 cursor-pointer transition active:scale-[0.99] space-y-1.5">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-950/70 text-orange-300 border border-orange-700/50">${getCategoryIcon(r.category)} ${escapeHtml(r.category)}</span>
+                                <h4 class="text-sm font-extrabold text-white mt-1 leading-snug">${r.isFavorite ? '⭐ ' : ''}${escapeHtml(r.title)}</h4>
+                            </div>
+                            <span class="text-xs text-slate-400 shrink-0">→</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-[11px] text-slate-400">
+                            ${totalMins > 0 ? `<span>⏱️ ${totalMins} min</span>` : ''}
+                            <span>🥕 ${(r.ingredients || []).length} ingr.</span>
+                            <span>🍽️ ${r.servings || 4} porții</span>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function openRecipeDetail(id) {
+            const r = (state.recipes || []).find(x => x.id === id);
+            if (!r) return;
+            currentRecipeDetailId = id;
+            document.getElementById('detail-recipe-cat').innerText = `${getCategoryIcon(r.category)} ${r.category}`;
+            document.getElementById('detail-recipe-title').innerText = r.title;
+            const totalMins = (r.prepTimeMinutes || 0) + (r.cookTimeMinutes || 0);
+            document.getElementById('detail-recipe-meta').innerText = `${totalMins > 0 ? '⏱️ ' + totalMins + ' min • ' : ''}🍽️ ${r.servings || 4} porții`;
+            document.getElementById('detail-fav-btn').innerText = r.isFavorite ? '⭐ Favorită' : '☆';
+
+            document.getElementById('detail-recipe-ingredients').innerHTML = (r.ingredients || []).map(ing =>
+                `<li class="flex items-start gap-2"><span class="text-cyan-400">•</span><span>${escapeHtml(ing.originalText || `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim())}</span></li>`
+            ).join('') || '<li class="text-slate-400">Niciun ingredient listat.</li>';
+
+            document.getElementById('detail-recipe-steps').innerHTML = (r.instructions || []).map(st =>
+                `<li>${escapeHtml(st.text || st)}${st.timerMinutes ? ` <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300">⏱️ ${st.timerMinutes}m</span>` : ''}</li>`
+            ).join('') || '<li class="text-slate-400">Niciun pas listat.</li>';
+
+            const notesBox = document.getElementById('detail-recipe-notes-box');
+            if (r.notes) {
+                notesBox.innerHTML = `<strong>💡 Note:</strong> ${escapeHtml(r.notes)}`;
+                notesBox.classList.remove('hidden');
+            } else {
+                notesBox.classList.add('hidden');
+            }
+
+            const srcBox = document.getElementById('detail-recipe-source-box');
+            if (r.sourceUrl) {
+                srcBox.innerHTML = `🔗 Sursă: <a href="${escapeHtml(r.sourceUrl)}" target="_blank" class="text-cyan-400 underline">${escapeHtml(r.sourceUrl)}</a>`;
+                srcBox.classList.remove('hidden');
+            } else {
+                srcBox.classList.add('hidden');
+            }
+
+            toggleModal('recipe-detail-modal');
+        }
+
+        function toggleCurrentRecipeFavorite() {
+            const idx = (state.recipes || []).findIndex(x => x.id === currentRecipeDetailId);
+            if (idx === -1) return;
+            state.recipes[idx].isFavorite = !state.recipes[idx].isFavorite;
+            document.getElementById('detail-fav-btn').innerText = state.recipes[idx].isFavorite ? '⭐ Favorită' : '☆';
+            saveNutritionState();
+            renderRecipesList();
+        }
+
+        function deleteCurrentRecipe() {
+            if (!currentRecipeDetailId) return;
+            if (!confirm('Sigur vrei să ștergi această rețetă?')) return;
+            state.recipes = (state.recipes || []).filter(x => x.id !== currentRecipeDetailId);
+            saveNutritionState();
+            toggleModal('recipe-detail-modal');
+            renderRecipeCategories();
+            renderRecipesList();
+        }
+
+        function sendCurrentRecipeToShopping() {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r || !r.ingredients?.length) return;
+            addIngredientsArrayToShopping(r.ingredients, r.title);
+            alert(`✅ ${r.ingredients.length} ingrediente din "${r.title}" au fost adăugate în Lista de Cumpărături!`);
+        }
+
+        // ==================== IMPORT INTELIGENT REȚETE (LINK / POZĂ / PASTE) ====================
+        function openAddRecipeModal() {
+            document.getElementById('add-recipe-text').value = '';
+            document.getElementById('add-recipe-url').value = '';
+            document.getElementById('add-recipe-file').value = '';
+            document.getElementById('add-recipe-file-label').innerText = 'Apasă pentru a alege o poză sau a face fotografie';
+            document.getElementById('add-recipe-preview').classList.add('hidden');
+            document.getElementById('add-recipe-status').classList.add('hidden');
+            document.getElementById('add-recipe-category-override').value = 'auto';
+            pendingRecipeImageDataUrl = null;
+            switchAddRecipeMode('paste');
+            toggleModal('add-recipe-modal');
+        }
+
+        function switchAddRecipeMode(mode) {
+            addRecipeMode = mode;
+            ['paste', 'link', 'photo'].forEach(m => {
+                document.getElementById(`add-panel-${m}`).classList.toggle('hidden', m !== mode);
+                document.getElementById(`add-mode-${m}`).className = m === mode
+                    ? "py-2 rounded-xl text-xs font-bold bg-orange-600 text-white transition"
+                    : "py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition";
+            });
+        }
+
+        function setAddRecipeStatus(msg, isError = false) {
+            const box = document.getElementById('add-recipe-status');
+            box.classList.remove('hidden');
+            box.className = isError
+                ? "text-xs p-3 rounded-2xl font-mono bg-red-950 text-red-300 border border-red-800"
+                : "text-xs p-3 rounded-2xl font-mono bg-slate-900 text-cyan-300 border border-slate-700";
+            box.innerText = msg;
+        }
+
+        function handleRecipeImageSelected(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            document.getElementById('add-recipe-file-label').innerText = `📷 ${file.name}`;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxDim = 1200;
+                    let w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                        else { w = Math.round(w * maxDim / h); h = maxDim; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    pendingRecipeImageDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                    const prev = document.getElementById('add-recipe-preview');
+                    prev.src = pendingRecipeImageDataUrl;
+                    prev.classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function autoClassifyCategory(title, rawText = '') {
+            const c = (title + ' ' + rawText).toLowerCase();
+            if (/ciorb[aă]|sup[aă]|bor[sș]|zeam[aă]/.test(c)) return 'Ciorbe & Supe';
+            if (/air\s*fryer|airfryer/.test(c)) return 'La Air Fryer';
+            if (/past[ae]|spaghet|penne|tagliatelle|carbonara|risotto/.test(c)) return 'Paste & Risotto';
+            if (/pr[aă]jitur[aă]|tort|chec|cl[aă]tit|brio[sș]|tart[aă]|tiramisu|desert/.test(c)) return 'Prăjituri & Deserturi';
+            if (/p[aâ]ine|focaccia|chifl[eă]|aluat|pl[aă]cint[aă]/.test(c)) return 'Pâine & Panificație';
+            if (/omlet[aă]|mic\s*dejun|brunch|ov[aă]z|smoothie/.test(c)) return 'Mic Dejun & Brunch';
+            if (/sandvi[sș]|sandwich|toast|bruschet/.test(c)) return 'Sandvișuri & Gustări';
+            if (/salat[aă]|garnitur[aă]|piure/.test(c)) return 'Salate & Garnituri';
+            if (/cuptor|friptur[aă]|musaca/.test(c)) return 'La Cuptor';
+            return 'Fel Principal';
+        }
+
+        function unwrapRedirectUrl(rawUrl) {
+            try {
+                const u = new URL(rawUrl.trim());
+                if (u.hostname.includes('facebook.com') && u.searchParams.get('u')) return u.searchParams.get('u');
+                if (u.hostname.includes('google.') && u.searchParams.get('url')) return u.searchParams.get('url');
+                return u.href;
+            } catch {
+                return rawUrl.trim();
+            }
+        }
+
+        async function fetchHtmlViaCorsProxy(targetUrl) {
+            const url = unwrapRedirectUrl(targetUrl);
+            const proxies = [
+                u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+                u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+                u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+            ];
+            for (const mk of proxies) {
+                try {
+                    const ctrl = new AbortController();
+                    const tid = setTimeout(() => ctrl.abort(), 8000);
+                    const res = await fetch(mk(url), { signal: ctrl.signal });
+                    clearTimeout(tid);
+                    if (res.ok) {
+                        const txt = await res.text();
+                        if (txt && txt.length > 250) return txt;
+                    }
+                } catch {}
+            }
+            return null;
+        }
+
+        function parseSchemaRecipeJsonLd(html) {
+            try {
+                const matches = html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+                let obj = null;
+                for (const m of matches) {
+                    try {
+                        const p = JSON.parse(m[1].trim());
+                        if (p['@type'] === 'Recipe' || (Array.isArray(p['@type']) && p['@type'].includes('Recipe'))) { obj = p; break; }
+                        if (Array.isArray(p)) { const f = p.find(x => x['@type'] === 'Recipe'); if (f) { obj = f; break; } }
+                        if (Array.isArray(p['@graph'])) { const f = p['@graph'].find(x => x['@type'] === 'Recipe'); if (f) { obj = f; break; } }
+                    } catch {}
+                }
+                if (!obj) return null;
+                const title = obj.name || obj.headline || 'Rețetă Importată';
+                const rawIngs = Array.isArray(obj.recipeIngredient) ? obj.recipeIngredient : [];
+                const ingredients = rawIngs.map((s, i) => ({ id: 'ing-' + i, name: String(s), originalText: String(s) }));
+                const rawSteps = Array.isArray(obj.recipeInstructions) ? obj.recipeInstructions : [];
+                const instructions = rawSteps.map((s, i) => ({
+                    stepNumber: i + 1,
+                    text: typeof s === 'string' ? s : (s.text || s.name || '')
+                })).filter(s => s.text.trim());
+                if (ingredients.length === 0 && instructions.length === 0) return null;
+                return {
+                    title,
+                    category: autoClassifyCategory(title, JSON.stringify(obj.recipeCategory || '')),
+                    servings: parseInt(String(obj.recipeYield || '4').match(/\d+/)?.[0] || '4', 10),
+                    ingredients,
+                    instructions
+                };
+            } catch {
+                return null;
+            }
+        }
+
+        const RECIPE_EXTRACTOR_PROMPT = `Ești un asistent culinar. Extrage rețeta și returnează EXCLUSIV un obiect JSON valid (fără markdown, fără text în plus) cu structura:
+{
+  "title": "Titlu clar în română",
+  "category": "Exact una din: Ciorbe & Supe | Fel Principal | Mic Dejun & Brunch | Paste & Risotto | La Cuptor | La Air Fryer | Sandvișuri & Gustări | Salate & Garnituri | Prăjituri & Deserturi | Pâine & Panificație | Altele",
+  "servings": 4,
+  "prepTimeMinutes": 15,
+  "cookTimeMinutes": 30,
+  "ingredients": [{ "name": "nume scurt ingredient", "amount": 250, "unit": "g", "originalText": "250g făină" }],
+  "instructions": [{ "stepNumber": 1, "text": "Pas clar...", "timerMinutes": 15 }],
+  "notes": "Sfaturi scurte (opțional)"
+}`;
+
+        function parseRecipeJsonFromAI(rawText) {
+            const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+            let parsed;
+            try { parsed = JSON.parse(cleaned); }
+            catch {
+                const m = cleaned.match(/\{[\s\S]*\}/);
+                if (!m) throw new Error('AI-ul nu a returnat un JSON valid.');
+                parsed = JSON.parse(m[0]);
+            }
+            const validCats = RECIPE_CATEGORIES.map(c => c.id);
+            const category = validCats.includes(parsed.category) ? parsed.category : autoClassifyCategory(parsed.title || '');
+            return {
+                title: parsed.title || 'Rețetă Fără Titlu',
+                category,
+                servings: Number(parsed.servings) > 0 ? Number(parsed.servings) : 4,
+                prepTimeMinutes: Number(parsed.prepTimeMinutes) || undefined,
+                cookTimeMinutes: Number(parsed.cookTimeMinutes) || undefined,
+                ingredients: (parsed.ingredients || []).map((ing, i) => ({
+                    id: 'ing-' + Date.now() + '-' + i,
+                    name: ing.name || ing.originalText || 'Ingredient',
+                    amount: typeof ing.amount === 'number' ? ing.amount : null,
+                    unit: ing.unit || '',
+                    originalText: ing.originalText || `${ing.amount || ''} ${ing.unit || ''} ${ing.name || ''}`.trim()
+                })),
+                instructions: (parsed.instructions || []).map((st, i) => ({
+                    stepNumber: st.stepNumber || i + 1,
+                    text: st.text || String(st),
+                    timerMinutes: Number(st.timerMinutes) > 0 ? Number(st.timerMinutes) : undefined
+                })),
+                notes: parsed.notes || ''
+            };
+        }
+
+        async function processAndSaveRecipe() {
+            const btn = document.getElementById('add-recipe-submit-btn');
+            const overrideCat = document.getElementById('add-recipe-category-override').value;
+
+            if (!state.apiKey && addRecipeMode !== 'link') {
+                setAddRecipeStatus('❌ Configurează cheia API în Setări mai întâi!', true);
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                let extracted = null;
+                let sourceUrl = undefined;
+
+                if (addRecipeMode === 'paste') {
+                    const txt = document.getElementById('add-recipe-text').value.trim();
+                    if (txt.length < 15) throw new Error('Lipește textul complet al rețetei mai întâi!');
+                    setAddRecipeStatus('⏳ AI-ul structurează rețeta...');
+                    const raw = await callUniversalAI(state.apiKey, RECIPE_EXTRACTOR_PROMPT, [{ role: 'user', content: txt }]);
+                    extracted = parseRecipeJsonFromAI(raw);
+                } else if (addRecipeMode === 'link') {
+                    const url = document.getElementById('add-recipe-url').value.trim();
+                    if (!/^https?:\/\//i.test(url)) throw new Error('Introdu un link valid (cu https://)!');
+                    sourceUrl = url;
+                    setAddRecipeStatus('⏳ Descarc pagina rețetei...');
+                    const html = await fetchHtmlViaCorsProxy(url);
+                    if (!html) throw new Error('Site-ul blochează accesul automat (ex: Facebook/Instagram). Copiază textul în "Paste Text" sau fă un screenshot în "Poză"!');
+                    extracted = parseSchemaRecipeJsonLd(html);
+                    if (!extracted) {
+                        if (!state.apiKey) throw new Error('Pagina nu are format standard și lipsește cheia API pentru extragere AI.');
+                        setAddRecipeStatus('⏳ Extrag rețeta din pagină cu AI...');
+                        const cleanTxt = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 9000);
+                        const raw = await callUniversalAI(state.apiKey, RECIPE_EXTRACTOR_PROMPT, [{ role: 'user', content: `Extrage rețeta din acest text de pagină web:\n${cleanTxt}` }]);
+                        extracted = parseRecipeJsonFromAI(raw);
+                    }
+                } else if (addRecipeMode === 'photo') {
+                    if (!pendingRecipeImageDataUrl) throw new Error('Alege o poză sau un screenshot mai întâi!');
+                    const provider = detectProvider(state.apiKey);
+                    if (provider.type !== 'gemini') {
+                        throw new Error('Extragerea din poză necesită o cheie Google Gemini în Setări (cheia actuală este alt provider).');
+                    }
+                    setAddRecipeStatus('⏳ Gemini Vision citește rețeta din poză...');
+                    const m = pendingRecipeImageDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+                    const contents = [{
+                        role: 'user',
+                        parts: [
+                            { inlineData: { mimeType: m[1], data: m[2] } },
+                            { text: 'Citește această imagine (poză sau screenshot) și extrage rețeta completă în formatul JSON cerut.' }
+                        ]
+                    }];
+                    const raw = await callGeminiWithFallback(state.apiKey.trim(), RECIPE_EXTRACTOR_PROMPT, contents);
+                    extracted = parseRecipeJsonFromAI(raw);
+                }
+
+                if (overrideCat !== 'auto') extracted.category = overrideCat;
+
+                const newRecipe = {
+                    id: 'rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                    ...extracted,
+                    sourceUrl,
+                    isFavorite: false,
+                    createdAt: Date.now()
+                };
+
+                state.recipes = [newRecipe, ...(state.recipes || [])];
+                saveNutritionState();
+                selectedRecipeCategory = newRecipe.category;
+                toggleModal('add-recipe-modal');
+                switchFoodSubTab('recipes');
+                alert(`✅ Rețeta "${newRecipe.title}" a fost salvată în categoria ${newRecipe.category}!`);
+            } catch (err) {
+                setAddRecipeStatus('❌ ' + err.message, true);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // ==================== CHEF AI + INTEGRARE CĂMARĂ & SALVARE ====================
         function renderFridgeChips() {
             const box = document.getElementById('fridge-chips');
             box.innerHTML = FRIDGE_CHIPS_LIST.map(item => {
@@ -2825,6 +3581,18 @@
             if (selectedFridgeChips.has(item)) selectedFridgeChips.delete(item);
             else selectedFridgeChips.add(item);
             renderFridgeChips();
+        }
+
+        function loadPantryIntoChefAI() {
+            haptic(20);
+            const inStock = (state.pantry || []).filter(i => i.inStock).map(i => i.name);
+            if (inStock.length === 0) {
+                alert('Nu ai produse marcate "În stoc" în Cămară încă. Deschide Cămara și adaugă câteva produse!');
+                return;
+            }
+            const extraInput = document.getElementById('fridge-extra-input');
+            extraInput.value = inStock.slice(0, 15).join(', ');
+            alert(`✅ Am încărcat ${Math.min(inStock.length, 15)} ingrediente din Cămară!`);
         }
 
         async function generateFridgeRecipe() {
@@ -2863,12 +3631,330 @@ Structurează clar cu:
 5. Beneficiile nutriționale (pentru mușchi, nervi/sciatică, somn sau energie la volan).`;
 
                 const reply = await callUniversalAI(state.apiKey, buildSystemPrompt(), [{ role: "user", content: userPrompt }]);
-                resBox.innerHTML = `<div class="space-y-2">${formatSafeTextToHtml(reply)}</div>`;
+                lastChefRecipeText = reply;
+                resBox.innerHTML = `
+                    <div class="space-y-2">${formatSafeTextToHtml(reply)}</div>
+                    <div class="pt-2 border-t border-slate-800 flex gap-2">
+                        <button onclick="saveLastChefRecipe()" id="save-chef-recipe-btn" class="flex-1 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-xs transition">
+                            💾 Salvează în Rețetele Mele
+                        </button>
+                    </div>`;
             } catch (err) {
                 resBox.innerHTML = `<div class="text-red-300">❌ Eroare: ${escapeHtml(err.message)}</div>`;
             } finally {
                 btn.disabled = false;
             }
+        }
+
+        async function saveLastChefRecipe() {
+            if (!lastChefRecipeText) return;
+            const btn = document.getElementById('save-chef-recipe-btn');
+            if (btn) { btn.disabled = true; btn.innerText = '⏳ Se salvează...'; }
+            try {
+                const raw = await callUniversalAI(state.apiKey, RECIPE_EXTRACTOR_PROMPT, [{ role: 'user', content: lastChefRecipeText }]);
+                const parsed = parseRecipeJsonFromAI(raw);
+                const newRecipe = {
+                    id: 'rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                    ...parsed,
+                    isFavorite: false,
+                    createdAt: Date.now()
+                };
+                state.recipes = [newRecipe, ...(state.recipes || [])];
+                saveNutritionState();
+                if (btn) btn.innerText = `✅ Salvată în ${newRecipe.category}!`;
+            } catch (err) {
+                alert('❌ Eroare la salvare: ' + err.message);
+                if (btn) { btn.disabled = false; btn.innerText = '💾 Salvează în Rețetele Mele'; }
+            }
+        }
+
+        // ==================== CĂMARA (PANTRY) ====================
+        function openPantryModal() {
+            renderPantryList();
+            toggleModal('pantry-modal');
+        }
+
+        function setPantryFilter(mode) {
+            pantryFilterMode = mode;
+            ['all', 'inStock', 'outOfStock'].forEach(m => {
+                const btn = document.getElementById(`pantry-flt-${m}`);
+                if (btn) btn.className = m === mode
+                    ? "px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white"
+                    : "px-2.5 py-1 rounded-lg font-bold bg-slate-800 text-slate-300";
+            });
+            renderPantryList();
+        }
+
+        function renderPantryList() {
+            const box = document.getElementById('pantry-list-container');
+            const stats = document.getElementById('pantry-modal-stats');
+            if (!box) return;
+
+            const all = state.pantry || [];
+            const inCount = all.filter(i => i.inStock).length;
+            const outCount = all.length - inCount;
+            if (stats) stats.innerText = `${inCount} în stoc • ${outCount} epuizate`;
+
+            const q = (document.getElementById('pantry-search-input')?.value || '').toLowerCase().trim();
+            const filtered = all.filter(i => {
+                if (pantryFilterMode === 'inStock' && !i.inStock) return false;
+                if (pantryFilterMode === 'outOfStock' && i.inStock) return false;
+                if (q && !i.name.toLowerCase().includes(q)) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                box.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">
+                    ${all.length === 0 ? 'Cămara este goală. Adaugă produse mai jos sau apasă <strong>✨ Bază</strong>!' : 'Niciun produs nu corespunde filtrului.'}
+                </div>`;
+                return;
+            }
+
+            box.innerHTML = filtered.map(item => `
+                <div class="flex items-center justify-between gap-2 p-2.5 rounded-2xl border ${item.inStock ? 'bg-slate-900/70 border-slate-800' : 'bg-red-950/20 border-red-900/50'}">
+                    <button onclick="togglePantryStock('${escapeHtml(item.id)}')" class="flex items-center gap-2.5 flex-1 text-left min-w-0">
+                        <span class="text-sm shrink-0">${item.inStock ? '✅' : '❌'}</span>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold truncate ${item.inStock ? 'text-white' : 'text-red-300 line-through'}">${escapeHtml(item.name)}</div>
+                            <div class="text-[10px] text-slate-400">${escapeHtml(item.category || 'Altele')}${item.amount ? ' • ' + escapeHtml(item.amount) : ''}</div>
+                        </div>
+                    </button>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="sendSinglePantryToShopping('${escapeHtml(item.id)}')" class="p-1.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-800 text-emerald-300 text-xs" title="Trimite în Lista de Cumpărături">🛒</button>
+                        <button onclick="deletePantryItem('${escapeHtml(item.id)}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-red-900 text-slate-400 hover:text-red-300 text-xs" title="Șterge">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePantryStock(id) {
+            haptic(15);
+            const item = (state.pantry || []).find(i => i.id === id);
+            if (!item) return;
+            item.inStock = !item.inStock;
+            item.updatedAt = Date.now();
+            saveNutritionState();
+            renderPantryList();
+        }
+
+        function addPantryItem(e) {
+            e.preventDefault();
+            const nameEl = document.getElementById('pantry-new-name');
+            const amtEl = document.getElementById('pantry-new-amount');
+            const name = nameEl.value.trim();
+            if (!name) return;
+            state.pantry = [{
+                id: 'pan-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                name,
+                amount: amtEl.value.trim() || '',
+                category: classifyAisle(name),
+                inStock: true,
+                updatedAt: Date.now()
+            }, ...(state.pantry || [])];
+            nameEl.value = '';
+            amtEl.value = '';
+            saveNutritionState();
+            renderPantryList();
+        }
+
+        function deletePantryItem(id) {
+            state.pantry = (state.pantry || []).filter(i => i.id !== id);
+            saveNutritionState();
+            renderPantryList();
+        }
+
+        function populateDefaultPantryStaples() {
+            const staples = [
+                'Ouă', 'Ulei de măsline', 'Sare & Piper', 'Ceapă', 'Usturoi',
+                'Piept de pui', 'Iaurt grecesc', 'Fulgi de ovăz', 'Orez', 'Lămâi', 'Cartofi', 'Morcovi'
+            ];
+            const existing = new Set((state.pantry || []).map(i => i.name.toLowerCase()));
+            const toAdd = staples.filter(s => !existing.has(s.toLowerCase())).map((s, idx) => ({
+                id: 'pan-' + Date.now() + '-' + idx,
+                name: s,
+                amount: '',
+                category: classifyAisle(s),
+                inStock: true,
+                updatedAt: Date.now()
+            }));
+            if (toAdd.length === 0) { alert('Ingredientele de bază sunt deja în cămară!'); return; }
+            state.pantry = [...(state.pantry || []), ...toAdd];
+            saveNutritionState();
+            renderPantryList();
+        }
+
+        function sendSinglePantryToShopping(id) {
+            const item = (state.pantry || []).find(i => i.id === id);
+            if (!item) return;
+            addIngredientsArrayToShopping([{ name: item.name, amount: item.amount }], 'Din Cămară');
+            alert(`✅ "${item.name}" a fost adăugat în Lista de Cumpărături!`);
+        }
+
+        function sendOutOfStockToShopping() {
+            const outItems = (state.pantry || []).filter(i => !i.inStock);
+            if (outItems.length === 0) {
+                alert('Toate produsele din cămară sunt în stoc! Bifează ❌ pe un produs care s-a terminat mai întâi.');
+                return;
+            }
+            addIngredientsArrayToShopping(outItems.map(i => ({ name: i.name, amount: i.amount })), 'Din Cămară (Epuizate)');
+            alert(`✅ ${outItems.length} produse epuizate au fost trimise în Lista de Cumpărături!`);
+        }
+
+        // ==================== LISTA DE CUMPĂRĂTURI ====================
+        function addIngredientsArrayToShopping(ings, recipeTitle) {
+            const list = state.shoppingList || [];
+            const newItems = ings.map((ing, idx) => {
+                const rawName = ing.originalText || ing.name || String(ing);
+                const amountStr = ing.amount ? `${ing.amount}${ing.unit ? ' ' + ing.unit : ''}` : '';
+                return {
+                    id: 'shop-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2, 5),
+                    name: ing.originalText ? ing.originalText : rawName,
+                    amount: ing.originalText ? '' : amountStr,
+                    aisle: classifyAisle(rawName),
+                    recipeTitle: recipeTitle || '',
+                    checked: false,
+                    createdAt: Date.now()
+                };
+            });
+            state.shoppingList = [...newItems, ...list];
+            saveNutritionState();
+        }
+
+        function openShoppingModal() {
+            renderShoppingList();
+            toggleModal('shopping-modal');
+        }
+
+        function renderShoppingList() {
+            const box = document.getElementById('shopping-list-container');
+            const stats = document.getElementById('shopping-modal-stats');
+            if (!box) return;
+
+            const items = state.shoppingList || [];
+            const checkedCount = items.filter(i => i.checked).length;
+            if (stats) stats.innerText = `${items.length - checkedCount} de cumpărat • ${checkedCount} bifate`;
+
+            if (items.length === 0) {
+                box.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">
+                    Lista de cumpărături este goală.<br>Poți adăuga ingrediente direct din <strong>Rețete</strong>, din <strong>Cămară</strong> sau manual mai jos.
+                </div>`;
+                return;
+            }
+
+            const groups = {};
+            SUPERMARKET_AISLES.forEach(a => groups[a.id] = []);
+            items.forEach(it => {
+                const aisle = it.aisle && groups[it.aisle] ? it.aisle : classifyAisle(it.name);
+                groups[aisle].push(it);
+            });
+
+            box.innerHTML = SUPERMARKET_AISLES.filter(a => groups[a.id].length > 0).map(a => `
+                <div class="space-y-1.5">
+                    <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider px-1">${a.icon} ${escapeHtml(a.id)} (${groups[a.id].length})</div>
+                    ${groups[a.id].map(it => `
+                        <div class="flex items-center justify-between gap-2 p-2.5 rounded-2xl border ${it.checked ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : 'bg-slate-900/80 border-slate-800'}">
+                            <button onclick="toggleShoppingChecked('${escapeHtml(it.id)}')" class="flex items-center gap-2.5 flex-1 text-left min-w-0">
+                                <span class="w-5 h-5 rounded-lg border flex items-center justify-center text-xs shrink-0 ${it.checked ? 'bg-emerald-600 border-emerald-500 text-white' : 'border-slate-600'}">${it.checked ? '✓' : ''}</span>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold truncate ${it.checked ? 'line-through text-slate-400' : 'text-white'}">${it.amount ? escapeHtml(it.amount) + ' ' : ''}${escapeHtml(it.name)}</div>
+                                    ${it.recipeTitle ? `<div class="text-[10px] text-slate-400 truncate">Pentru: ${escapeHtml(it.recipeTitle)}</div>` : ''}
+                                </div>
+                            </button>
+                            <button onclick="deleteShoppingItem('${escapeHtml(it.id)}')" class="p-1.5 text-slate-400 hover:text-red-400 text-xs shrink-0">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        function toggleShoppingChecked(id) {
+            haptic(15);
+            const it = (state.shoppingList || []).find(i => i.id === id);
+            if (!it) return;
+            it.checked = !it.checked;
+            saveNutritionState();
+            renderShoppingList();
+        }
+
+        function addShoppingItemManual(e) {
+            e.preventDefault();
+            const nameEl = document.getElementById('shopping-new-name');
+            const amtEl = document.getElementById('shopping-new-amount');
+            const name = nameEl.value.trim();
+            if (!name) return;
+            state.shoppingList = [{
+                id: 'shop-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5),
+                name,
+                amount: amtEl.value.trim() || '',
+                aisle: classifyAisle(name),
+                recipeTitle: '',
+                checked: false,
+                createdAt: Date.now()
+            }, ...(state.shoppingList || [])];
+            nameEl.value = '';
+            amtEl.value = '';
+            saveNutritionState();
+            renderShoppingList();
+        }
+
+        function deleteShoppingItem(id) {
+            state.shoppingList = (state.shoppingList || []).filter(i => i.id !== id);
+            saveNutritionState();
+            renderShoppingList();
+        }
+
+        function clearCheckedShopping() {
+            state.shoppingList = (state.shoppingList || []).filter(i => !i.checked);
+            saveNutritionState();
+            renderShoppingList();
+        }
+
+        function moveCheckedShoppingToPantry() {
+            const checked = (state.shoppingList || []).filter(i => i.checked);
+            if (checked.length === 0) {
+                alert('Bifează mai întâi produsele cumpărate!');
+                return;
+            }
+            const pantry = state.pantry || [];
+            checked.forEach((it, idx) => {
+                const lower = it.name.toLowerCase().trim();
+                const match = pantry.find(p => p.name.toLowerCase().trim() === lower);
+                if (match) {
+                    match.inStock = true;
+                    if (it.amount) match.amount = it.amount;
+                    match.updatedAt = Date.now();
+                } else {
+                    pantry.unshift({
+                        id: 'pan-' + Date.now() + '-' + idx,
+                        name: it.name,
+                        amount: it.amount || '',
+                        category: it.aisle || classifyAisle(it.name),
+                        inStock: true,
+                        updatedAt: Date.now()
+                    });
+                }
+            });
+            state.pantry = pantry;
+            state.shoppingList = (state.shoppingList || []).filter(i => !i.checked);
+            saveNutritionState();
+            renderShoppingList();
+            alert(`✅ ${checked.length} produse cumpărate au fost mutate în Cămară!`);
+        }
+
+        function copyShoppingListText() {
+            const items = state.shoppingList || [];
+            if (items.length === 0) return;
+            let text = '🛒 Lista de Cumpărături (RESET):\n\n';
+            SUPERMARKET_AISLES.forEach(a => {
+                const group = items.filter(i => (i.aisle || classifyAisle(i.name)) === a.id);
+                if (group.length > 0) {
+                    text += `${a.icon} ${a.id}:\n`;
+                    group.forEach(i => { text += `  ${i.checked ? '☑️' : '◻️'} ${i.amount ? i.amount + ' ' : ''}${i.name}\n`; });
+                    text += '\n';
+                }
+            });
+            navigator.clipboard.writeText(text.trim());
+            alert('📋 Lista de cumpărături a fost copiată!');
         }
 
         // ==================== TELEGRAM BOT & ALARME ====================
