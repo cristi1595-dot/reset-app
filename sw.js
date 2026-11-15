@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reset-neuro-v3.4';
+const CACHE_NAME = 'reset-neuro-v3.5';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -50,6 +50,7 @@ self.addEventListener('fetch', (event) => {
     url.hostname.includes('deepseek.com') ||
     url.hostname.includes('openai.com') ||
     url.hostname.includes('telegram.org') ||
+    url.hostname.includes('workers.dev') ||
     url.hostname.includes('script.google.com') ||
     url.hostname.includes('script.googleusercontent.com') ||
     url.hostname.includes('youtube.com') ||

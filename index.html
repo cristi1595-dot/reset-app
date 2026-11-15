@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>RESET v3.4 // Neuro-Camarad</title>
+    <title>RESET v3.5 // Neuro-Camarad</title>
     <meta name="description" content="Ghid neurobiologic, kinetoterapie, nutriție și camarad AI pentru renunțare la THC și fumat">
     <meta name="theme-color" id="meta-theme-color" content="#090d16">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -177,7 +177,7 @@
         <div class="flex items-center gap-2 min-w-0">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse shrink-0"></span>
             <h1 class="text-sm sm:text-base font-extrabold tracking-wider bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent truncate">
-                RESET // NEURO v3.4
+                RESET // NEURO v3.5
             </h1>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
@@ -745,7 +745,7 @@
         <div class="glass rounded-3xl p-4 space-y-3 border-emerald-500/40">
             <div class="flex items-center justify-between">
                 <h2 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">0. Aspect Vizual & Actualizare</h2>
-                <span class="text-[11px] font-mono text-slate-400">v3.4</span>
+                <span class="text-[11px] font-mono text-slate-400">v3.5</span>
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="setTheme('light')" id="theme-btn-light" class="py-2.5 px-3 rounded-2xl border border-slate-700 bg-slate-900 text-xs font-bold transition">
@@ -819,12 +819,12 @@
             <!-- Sincronizare Automată Telefon <-> PC -->
             <div class="pt-2 border-t border-slate-800 space-y-2">
                 <div class="flex items-center justify-between">
-                    <label class="text-[11px] font-bold text-emerald-300">☁️ Link Sincronizare Automată (Web app URL /exec)</label>
+                    <label class="text-[11px] font-bold text-emerald-300">☁️ Link Sincronizare Automată (Cloudflare / Script URL)</label>
                     <span id="cloud-sync-status" class="text-[10px] font-mono text-slate-400">Neconfigurat</span>
                 </div>
-                <input type="url" id="set-cloud-sync-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-mono">
+                <input type="url" id="set-cloud-sync-url" placeholder="https://reset-bot.nume.workers.dev" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-mono">
                 <p class="text-[10px] text-slate-400 leading-relaxed">
-                    Lipește aici URL-ul <code>/exec</code> primit la <em>Deploy</em> în Google Apps Script (și pe telefon, și pe PC). Orice bifare, setare sau mesaj se sincronizează automat între dispozitive!
+                    Lipește aici URL-ul primit de la <strong>Cloudflare Workers</strong> (sau Google Script) și pe telefon, și pe PC. Orice bifare, setare sau mesaj se sincronizează automat între dispozitive!
                 </p>
                 <button onclick="syncWithCloudNow()" class="w-full py-2 bg-emerald-600/85 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition">
                     🔄 Sincronizează Acum cu Cloud-ul
@@ -1056,30 +1056,51 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: GOOGLE CLOUD APPS SCRIPT (24/7 TELEGRAM) ==================== -->
+    <!-- ==================== MODAL: CLOUD 24/7 (CLOUDFLARE WORKERS / GOOGLE SCRIPT) ==================== -->
     <div id="cloud-script-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="glass bg-[#090d16]/95 border border-cyan-700/60 rounded-3xl max-w-lg w-full max-h-[88dvh] overflow-y-auto p-5 space-y-3 selectable">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-sm font-extrabold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-                    <span>☁️</span> Alarme Telegram 24/7 (Gratuit Google Cloud)
+                    <span>☁️</span> Bot 24/7 & Sync Cloud (Gratuit)
                 </h3>
                 <button onclick="toggleModal('cloud-script-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
             </div>
 
-            <p class="text-xs text-slate-300 leading-relaxed">
-                Pentru ca botul să îți scrie singur pe Telegram dimineața și la fiecare pas <strong>chiar și când aplicația RESET este închisă</strong>, poți pune scriptul de mai jos gratuit pe Google Apps Script:
-            </p>
-            <ol class="list-decimal pl-4 text-[11px] text-slate-300 space-y-1">
-                <li>Intră pe <strong>script.google.com</strong> → <em>New Project</em>, șterge tot și lipește codul de mai jos. Apasă <strong>Save</strong> (💾).</li>
-                <li>Pentru <strong>alarme automate</strong>: în stânga la ceas (<em>Triggers</em>) → <em>Add Trigger</em>: funcția <code>checkScheduleAndNotify</code> → <em>Time-driven</em> → <em>Minutes timer</em> → <em>Every 15 minutes</em>.</li>
-                <li>Pentru <strong>răspunsuri instant 24/7</strong>: sus dreapta <em>Deploy</em> → <em>New deployment</em> → rotița ⚙️ → <em>Web app</em> → <em>Who has access: Anyone</em> → <em>Deploy</em>. Copiază <strong>Web app URL</strong>, lipește-l în linia <code>WEBAPP_URL</code> din cod, salvează, apoi selectează sus funcția <code>setWebhook</code> și apasă <strong>Run</strong> (▶) o singură dată!</li>
-            </ol>
+            <!-- Switcher Cloudflare vs Google Script -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="switchCloudScriptTab('cf')" id="cloud-tab-cf" class="py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white transition">
+                    ⚡ Cloudflare (Recomandat)
+                </button>
+                <button onclick="switchCloudScriptTab('gas')" id="cloud-tab-gas" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 transition">
+                    📄 Google Apps Script
+                </button>
+            </div>
+
+            <div id="cloud-guide-cf" class="space-y-1.5 text-[11px] text-slate-300">
+                <p class="text-emerald-300 font-bold">Instant (~50ms), zero dubluri de mesaje și 100.000 cereri/zi gratis:</p>
+                <ol class="list-decimal pl-4 space-y-1">
+                    <li>Intră pe <strong>dash.cloudflare.com</strong> (cont gratuit, fără card) → <em>Compute (Workers)</em> → <em>KV</em> → <strong>Create a namespace</strong> cu numele <code>RESET_KV</code>.</li>
+                    <li>Mergi la <em>Workers & Pages</em> → <strong>Create</strong> → <em>Create Worker</em> (Start with Hello World) → <strong>Deploy</strong>.</li>
+                    <li>Intră în Worker → <em>Settings</em> → <em>Bindings</em> → <strong>Add</strong> → <em>KV Namespace</em>: Variable name = <code>RESET_KV</code>, selectează namespace-ul creat → <strong>Save</strong>.</li>
+                    <li>Tot la <em>Settings</em> → <em>Trigger Events</em> → <strong>Add Cron Trigger</strong> → scrie <code>*/15 * * * *</code> (pentru alarmele automate).</li>
+                    <li>Apasă <strong>Edit code</strong> (dreapta sus), șterge tot, lipește codul de mai jos și apasă <strong>Deploy</strong>.</li>
+                    <li>Deschide o dată în browser link-ul Worker-ului tău cu <code>/setup</code> la final (ex: <code>https://...workers.dev/setup</code>) — leagă automat Telegram-ul fără dubluri!</li>
+                </ol>
+            </div>
+
+            <div id="cloud-guide-gas" class="hidden space-y-1.5 text-[11px] text-slate-300">
+                <ol class="list-decimal pl-4 space-y-1">
+                    <li>Intră pe <strong>script.google.com</strong> → <em>New Project</em>, șterge tot și lipește codul de mai jos. Apasă <strong>Save</strong> (💾).</li>
+                    <li>La ceas (<em>Triggers</em>) → <em>Add Trigger</em>: <code>checkScheduleAndNotify</code> → <em>Time-driven</em> → <em>Every 15 minutes</em>.</li>
+                    <li><em>Deploy</em> → <em>New deployment</em> → <em>Web app</em> (Anyone) → lipește URL-ul în <code>WEBAPP_URL</code> și rulează <code>setWebhook</code>.</li>
+                </ol>
+            </div>
 
             <textarea id="cloud-script-code" readonly rows="10" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-3 text-[10px] font-mono text-emerald-300 focus:outline-none"></textarea>
 
             <div class="flex gap-2">
                 <button onclick="copyCloudScript()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs">
-                    📋 Copiază Scriptul
+                    📋 Copiază Codul
                 </button>
                 <button onclick="toggleModal('cloud-script-modal')" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs">
                     Închide
@@ -3086,6 +3107,21 @@ Structurează clar cu:
             });
         }
 
+        let generatedCloudScripts = { cf: "", gas: "" };
+
+        function switchCloudScriptTab(tab) {
+            const isCf = tab === 'cf';
+            document.getElementById('cloud-tab-cf').className = isCf
+                ? "py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white transition"
+                : "py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 transition";
+            document.getElementById('cloud-tab-gas').className = !isCf
+                ? "py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white transition"
+                : "py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 transition";
+            document.getElementById('cloud-guide-cf').classList.toggle('hidden', !isCf);
+            document.getElementById('cloud-guide-gas').classList.toggle('hidden', isCf);
+            document.getElementById('cloud-script-code').value = isCf ? generatedCloudScripts.cf : generatedCloudScripts.gas;
+        }
+
         function openCloudScriptModal() {
             const tgToken = (document.getElementById('set-tg-token').value || state.tgToken || "PUNE_AICI_TELEGRAM_BOT_TOKEN").trim();
             const tgChat = (document.getElementById('set-tg-chatid').value || state.tgChatId || "PUNE_AICI_CHAT_ID").trim();
@@ -3096,8 +3132,159 @@ Structurează clar cu:
             const tN = document.getElementById('set-time-noon').value || state.stepTimes.noon || "12:30";
             const tC = document.getElementById('set-time-calm').value || state.stepTimes.calm || "17:30";
             const tNi = document.getElementById('set-time-night').value || state.stepTimes.night || "20:30";
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Bucharest";
 
-            const script = `// === RESET NEURO v3.4 — SCRIPT ALARME, BOT TELEGRAM 24/7 & CLOUD SYNC ===
+            generatedCloudScripts.cf = `// === RESET NEURO v3.5 — CLOUDFLARE WORKER (INSTANT, ZERO DUBLURI, SYNC) ===
+const TG_TOKEN = "${tgToken}";
+const TG_CHAT_ID = "${tgChat}";
+const GEMINI_KEY = "${apiKey}";
+const GEMINI_MODEL = "${model}";
+const TIMEZONE = "${tz}";
+
+const STEPS = [
+  { key: "morning", time: "${tM}", label: "☀️ Dimineața", msg: "Neața, camarade! Ai luat NAC + D3 (+ Creatină) și ai făcut 2 min de deblocare psoas drept înainte de volan?" },
+  { key: "noon",    time: "${tN}", label: "🚕 Pauză Taxi", msg: "Pauza de prânz! Ai mâncat caserola + Krill Oil și ai făcut 2 min de extensii McKenzie lângă mașină pentru sciatică?" },
+  { key: "calm",    time: "${tC}", label: "🏋️ După Tură", msg: "Ai terminat tura! Ai luat L-Theanină, ai făcut mersul pe jos și rutina ta pentru psoas, sciatică și postură?" },
+  { key: "night",   time: "${tNi}", label: "🌙 Seara", msg: "E seară! Ai mâncat cina caldă și ai luat Magneziu + Inositol ca să dormi adânc și să te trezești odihnit?" }
+];
+
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type"
+};
+
+export default {
+  async fetch(request, env, ctx) {
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
+    const url = new URL(request.url);
+
+    if (request.method === "GET" && url.pathname === "/setup") {
+      const hookUrl = url.origin + "/";
+      const r = await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/setWebhook?url=" + encodeURIComponent(hookUrl));
+      const data = await r.json();
+      return new Response(JSON.stringify({ webhookUrl: hookUrl, telegram: data }, null, 2), {
+        headers: { "Content-Type": "application/json", ...CORS }
+      });
+    }
+
+    if (request.method === "GET" && url.searchParams.get("action") === "pull") {
+      const raw = env.RESET_KV ? await env.RESET_KV.get("RESET_CLOUD_STATE") : null;
+      return new Response(JSON.stringify({ ok: true, state: raw ? JSON.parse(raw) : null }), {
+        headers: { "Content-Type": "application/json", ...CORS }
+      });
+    }
+
+    if (request.method === "GET") {
+      return new Response("⚡ RESET Bot 24/7 (Cloudflare) este activ!", { headers: CORS });
+    }
+
+    if (request.method === "POST") {
+      const body = await request.json();
+      if (body.syncAction === "push" && body.state) {
+        if (env.RESET_KV) await env.RESET_KV.put("RESET_CLOUD_STATE", JSON.stringify(body.state));
+        return new Response(JSON.stringify({ ok: true, savedAt: body.state.updatedAt }), {
+          headers: { "Content-Type": "application/json", ...CORS }
+        });
+      }
+
+      if (body.update_id) {
+        if (env.RESET_KV) {
+          const seen = await env.RESET_KV.get("upd_" + body.update_id);
+          if (seen) return new Response("OK", { status: 200 });
+          await env.RESET_KV.put("upd_" + body.update_id, "1", { expirationTtl: 3600 });
+        }
+        ctx.waitUntil(handleTelegramUpdate(body, env));
+      }
+      return new Response("OK", { status: 200 });
+    }
+    return new Response("Not Found", { status: 404, headers: CORS });
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runScheduledCheckins(env));
+  }
+};
+
+async function handleTelegramUpdate(body, env) {
+  if (body.callback_query) {
+    const cb = body.callback_query;
+    await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/answerCallbackQuery", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ callback_query_id: cb.id })
+    });
+    const [action, stepKey] = (cb.data || "").split(":");
+    if (action === "step_done") {
+      if (env.RESET_KV) {
+        const raw = await env.RESET_KV.get("RESET_CLOUD_STATE");
+        if (raw) {
+          const st = JSON.parse(raw);
+          st.stepsDone = st.stepsDone || {};
+          st.supps = st.supps || {};
+          st.stepsDone[stepKey] = true;
+          st.supps[stepKey] = true;
+          st.updatedAt = Date.now();
+          await env.RESET_KV.put("RESET_CLOUD_STATE", JSON.stringify(st));
+        }
+      }
+      await sendTg("🔥 Bravo, camarade! Pas bifat și sincronizat! Ține ritmul curat azi.");
+    } else if (action === "step_enc") {
+      const reply = await askGemini("Nu am făcut încă pasul " + stepKey + ". Sunt taximetrist 8-10h/zi cu psoas drept tensionat și sciatică stânga. Încurajează-mă cald fără reproșuri și dă-mi o micro-acțiune de 60 secunde.");
+      await sendTg("💪 " + reply);
+    }
+  } else if (body.message && body.message.text && String(body.message.chat.id) === String(TG_CHAT_ID)) {
+    const reply = await askGemini(body.message.text);
+    await sendTg(reply);
+  }
+}
+
+async function runScheduledCheckins(env) {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false
+  }).formatToParts(now);
+  const getPart = (t) => fmt.find(p => p.type === t)?.value || "00";
+  const todayStr = getPart("year") + "-" + getPart("month") + "-" + getPart("day");
+  const curMins = parseInt(getPart("hour"), 10) * 60 + parseInt(getPart("minute"), 10);
+
+  for (const s of STEPS) {
+    const [hh, mm] = s.time.split(":").map(Number);
+    const targetMins = hh * 60 + mm;
+    const sentKey = "sent_" + todayStr + "_" + s.key;
+    const already = env.RESET_KV ? await env.RESET_KV.get(sentKey) : null;
+    if (curMins >= targetMins && curMins <= targetMins + 25 && !already) {
+      if (env.RESET_KV) await env.RESET_KV.put(sentKey, "1", { expirationTtl: 172800 });
+      await sendTg(s.label + "\\n\\n" + s.msg, {
+        inline_keyboard: [[
+          { text: "✅ Am făcut pasul!", callback_data: "step_done:" + s.key },
+          { text: "💪 Nu încă, încurajează-mă!", callback_data: "step_enc:" + s.key }
+        ]]
+      });
+    }
+  }
+}
+
+async function sendTg(text, replyMarkup) {
+  const payload = { chat_id: TG_CHAT_ID, text: text };
+  if (replyMarkup) payload.reply_markup = replyMarkup;
+  await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+  });
+}
+
+async function askGemini(userText) {
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY;
+  const sys = "Ești camaradul meu pragmatic în renunțarea la THC și tutun. Sunt taximetrist 8-10h/zi, am psoas drept tensionat și sciatică pe stânga, gătesc cu Instant Pot/Airfryer/Blender. Răspunde scurt, cald și încurajator în română.";
+  const res = await fetch(url, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: [{ role: "user", parts: [{ text: userText }] }] })
+  });
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "Ține capul sus, respiră adânc și fă un pas mic acum!";
+}`;
+
+            generatedCloudScripts.gas = `// === RESET NEURO v3.5 — GOOGLE APPS SCRIPT ===
 const TG_TOKEN = "${tgToken}";
 const TG_CHAT_ID = "${tgChat}";
 const GEMINI_KEY = "${apiKey}";
@@ -3211,7 +3398,7 @@ function setWebhook() {
   const res = UrlFetchApp.fetch("https://api.telegram.org/bot" + TG_TOKEN + "/setWebhook?url=" + encodeURIComponent(url));
   Logger.log(res.getContentText());
 }`;
-            document.getElementById('cloud-script-code').value = script;
+            switchCloudScriptTab('cf');
             toggleModal('cloud-script-modal');
         }
 
