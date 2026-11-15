@@ -5568,7 +5568,8 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
             if (!r) return;
             editingRecipeId = r.id;
             pendingManualPhotoThumb = r.image || null;
-            closeModal('recipe-detail-modal');
+            document.getElementById('recipe-detail-modal').classList.add('hidden');
+            stopInlineStepTimer();
             document.getElementById('add-recipe-modal-title').innerHTML = '<span>✏️</span> Editează Rețeta';
             document.getElementById('add-recipe-mode-tabs').classList.add('hidden');
             document.getElementById('add-recipe-submit-btn').innerText = '💾 Salvează Modificările';
@@ -5855,7 +5856,7 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
                     saveNutritionState();
                     const editedId = editingRecipeId;
                     editingRecipeId = null;
-                    toggleModal('add-recipe-modal');
+                    document.getElementById('add-recipe-modal').classList.add('hidden');
                     renderRecipeCategories();
                     renderRecipesList();
                     openRecipeDetail(editedId);
