@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>RESET v3.0 // Neuro-Camarad</title>
+    <title>RESET v3.3 // Neuro-Camarad</title>
     <meta name="description" content="Ghid neurobiologic, kinetoterapie, nutriție și camarad AI pentru renunțare la THC și fumat">
-    <meta name="theme-color" content="#090d16">
+    <meta name="theme-color" id="meta-theme-color" content="#090d16">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RESET">
@@ -56,22 +56,137 @@
         .svg-anim-float { animation: exPulseMove 2.6s ease-in-out infinite; transform-origin: center; }
         .svg-anim-lean { animation: exLeanMove 3s ease-in-out infinite; transform-origin: 50% 80%; }
         .svg-anim-slide { animation: exSlideMove 2.4s ease-in-out infinite; transform-origin: center; }
+
+        /* Mărime scris (Responsive rem + micro-texte) */
+        html.font-normal { font-size: 16px; }
+        html.font-large { font-size: 18px; }
+        html.font-xlarge { font-size: 20px; }
+        html.font-large .text-\[10px\], html.font-xlarge .text-\[10px\] { font-size: 0.72rem !important; line-height: 1.35 !important; }
+        html.font-large .text-\[11px\], html.font-xlarge .text-\[11px\] { font-size: 0.78rem !important; line-height: 1.4 !important; }
+
+        /* Temă Deschisă (Light Mode) cu contrast ridicat */
+        html.light-mode body {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+        html.light-mode header,
+        html.light-mode nav {
+            background-color: rgba(255, 255, 255, 0.94) !important;
+            border-color: #cbd5e1 !important;
+        }
+        html.light-mode .glass {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+        }
+        html.light-mode #camarad-checkin-card {
+            background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 55%, #ecfeff 100%) !important;
+            border-color: #6ee7b7 !important;
+        }
+        html.light-mode .text-white { color: #0f172a !important; }
+        html.light-mode .bg-emerald-600,
+        html.light-mode .bg-emerald-600 .text-white,
+        html.light-mode .bg-amber-600,
+        html.light-mode .bg-amber-600\/90,
+        html.light-mode .bg-cyan-600,
+        html.light-mode .bg-teal-600,
+        html.light-mode .bg-red-600,
+        html.light-mode button.bg-gradient-to-r,
+        html.light-mode .bg-emerald-600 span {
+            color: #ffffff !important;
+        }
+        html.light-mode header h1 {
+            background: none !important;
+            -webkit-background-clip: border-box !important;
+            color: #047857 !important;
+        }
+        html.light-mode .text-slate-200,
+        html.light-mode .text-slate-300 { color: #1e293b !important; }
+        html.light-mode .text-slate-400,
+        html.light-mode .text-slate-500 { color: #475569 !important; }
+        html.light-mode .text-emerald-300,
+        html.light-mode .text-emerald-400 { color: #047857 !important; }
+        html.light-mode .text-emerald-200 { color: #065f46 !important; }
+        html.light-mode .text-cyan-300,
+        html.light-mode .text-cyan-400 { color: #0e7490 !important; }
+        html.light-mode .text-amber-300,
+        html.light-mode .text-amber-400 { color: #b45309 !important; }
+        html.light-mode .text-purple-300,
+        html.light-mode .text-purple-400 { color: #7e22ce !important; }
+        html.light-mode .text-red-300,
+        html.light-mode .text-red-400 { color: #b91c1c !important; }
+        html.light-mode .bg-slate-900,
+        html.light-mode .bg-slate-900\/60,
+        html.light-mode .bg-slate-900\/70,
+        html.light-mode .bg-slate-900\/80,
+        html.light-mode .bg-slate-900\/90,
+        html.light-mode .bg-slate-950,
+        html.light-mode .bg-slate-950\/75,
+        html.light-mode .bg-slate-950\/80 {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+        }
+        html.light-mode .bg-slate-800,
+        html.light-mode .bg-slate-800\/80 {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html.light-mode .bg-emerald-950\/90,
+        html.light-mode .bg-emerald-950\/60,
+        html.light-mode .bg-emerald-950\/50,
+        html.light-mode .bg-emerald-950\/40,
+        html.light-mode .bg-emerald-950\/35,
+        html.light-mode .bg-emerald-950\/20,
+        html.light-mode .bg-emerald-950 {
+            background-color: #d1fae5 !important;
+        }
+        html.light-mode .bg-cyan-950\/70,
+        html.light-mode .bg-cyan-950\/60,
+        html.light-mode .bg-cyan-950\/50,
+        html.light-mode .bg-cyan-950\/40 {
+            background-color: #cffafe !important;
+        }
+        html.light-mode .bg-amber-950\/70 { background-color: #fef3c7 !important; }
+        html.light-mode .bg-purple-950\/90,
+        html.light-mode .bg-purple-950\/30 { background-color: #f3e8ff !important; }
+        html.light-mode .bg-red-950,
+        html.light-mode .bg-red-950\/80,
+        html.light-mode .bg-red-950\/70,
+        html.light-mode .bg-red-950\/50 { background-color: #fee2e2 !important; }
+        html.light-mode input,
+        html.light-mode select,
+        html.light-mode textarea {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
+        }
+        html.light-mode .border-slate-800,
+        html.light-mode .border-slate-800\/80,
+        html.light-mode .border-slate-800\/90,
+        html.light-mode .border-slate-700,
+        html.light-mode .border-slate-700\/80 {
+            border-color: #cbd5e1 !important;
+        }
     </style>
 </head>
 <body class="pb-24">
 
     <!-- HEADER -->
     <header class="px-4 py-3 border-b border-slate-800/80 flex justify-between items-center bg-[#090d16]/90 sticky top-0 z-20 backdrop-blur-md">
-        <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse"></span>
-            <h1 class="text-sm sm:text-base font-extrabold tracking-wider bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                RESET // NEURO v3.0
+        <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse shrink-0"></span>
+            <h1 class="text-sm sm:text-base font-extrabold tracking-wider bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent truncate">
+                RESET // NEURO v3.3
             </h1>
         </div>
-        <div class="flex items-center gap-2">
-            <span id="phase-badge" class="text-[10px] sm:text-[11px] bg-emerald-950/90 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-700/60 font-semibold transition-all">
+        <div class="flex items-center gap-1.5 shrink-0">
+            <span id="phase-badge" class="text-[10px] sm:text-[11px] bg-emerald-950/90 text-emerald-300 px-2 py-1 rounded-full border border-emerald-700/60 font-semibold transition-all">
                 Faza 1: Zero THC
             </span>
+            <button onclick="toggleTheme()" id="theme-toggle-btn" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition" title="Schimbă Tema (Deschisă / Întunecată)">
+                ☀️
+            </button>
             <button onclick="switchTab('settings')" id="nav-settings" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition" title="Setări, Telegram & Backup">
                 ⚙️
             </button>
@@ -625,6 +740,33 @@
 
     <!-- ==================== TAB 6: SETĂRI, TELEGRAM, ORAR & BACKUP ==================== -->
     <main id="tab-settings" class="tab-content p-4 space-y-4 max-w-lg mx-auto">
+
+        <!-- 0. Aspect Vizual (Temă Deschisă/Întunecată & Mărime Scris) + Update App -->
+        <div class="glass rounded-3xl p-4 space-y-3 border-emerald-500/40">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">0. Aspect Vizual & Actualizare</h2>
+                <span class="text-[11px] font-mono text-slate-400">v3.3</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="setTheme('light')" id="theme-btn-light" class="py-2.5 px-3 rounded-2xl border border-slate-700 bg-slate-900 text-xs font-bold transition">
+                    ☀️ Temă Deschisă
+                </button>
+                <button onclick="setTheme('dark')" id="theme-btn-dark" class="py-2.5 px-3 rounded-2xl border border-slate-700 bg-slate-900 text-xs font-bold transition">
+                    🌙 Temă Întunecată
+                </button>
+            </div>
+            <div>
+                <label class="text-[11px] text-slate-400 block mb-1.5">Mărime Scris (Lizibilitate)</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setFontSize('normal')" id="font-btn-normal" class="py-2 rounded-xl border border-slate-700 bg-slate-900 text-xs font-semibold transition">Normal</button>
+                    <button onclick="setFontSize('large')" id="font-btn-large" class="py-2 rounded-xl border border-slate-700 bg-slate-900 text-xs font-bold transition">Mare</button>
+                    <button onclick="setFontSize('xlarge')" id="font-btn-xlarge" class="py-2 rounded-xl border border-slate-700 bg-slate-900 text-sm font-bold transition">Foarte Mare</button>
+                </div>
+            </div>
+            <button onclick="forceAppUpdate()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-cyan-300 font-bold rounded-xl text-xs transition">
+                🔄 Forțează Actualizare App (Curăță Cache Vechi)
+            </button>
+        </div>
         
         <!-- 1. Bot Telegram & Notificări Proactive -->
         <div class="glass rounded-3xl p-4 space-y-3 border-cyan-500/50">
@@ -1517,6 +1659,8 @@
             tgChatId: localStorage.getItem('reset_tgChatId') || "",
             tgLastUpdateId: parseInt(localStorage.getItem('reset_tgLastUpdateId') || "0"),
             tgSentStepsToday: JSON.parse(localStorage.getItem('reset_tgSentStepsToday') || '{}'),
+            theme: localStorage.getItem('reset_theme') || "dark",
+            fontSize: localStorage.getItem('reset_fontSize') || "large",
             apiKey: localStorage.getItem('reset_apiKey') || DEFAULT_API_KEY,
             geminiModel: savedModel,
             ttsEnabled: false,
@@ -1611,6 +1755,7 @@
 
             activeCheckinStep = detectCurrentRecommendedStep();
 
+            applyAppearanceSettings();
             updateWakeModeButtons();
             updatePhaseUI();
             updateProviderLabel();
@@ -1654,11 +1799,95 @@
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js')
-                        .then(reg => console.log('[PWA] Service Worker înregistrat:', reg.scope))
+                    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+                        .then(reg => {
+                            reg.update().catch(() => {});
+                            console.log('[PWA] Service Worker înregistrat:', reg.scope);
+                        })
                         .catch(err => console.warn('[PWA] Eroare SW:', err));
                 });
+                let swReloading = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!swReloading) {
+                        swReloading = true;
+                        window.location.reload();
+                    }
+                });
             }
+        }
+
+        function applyAppearanceSettings() {
+            const root = document.documentElement;
+            const metaTheme = document.getElementById('meta-theme-color');
+            const headerBtn = document.getElementById('theme-toggle-btn');
+
+            if (state.theme === 'light') {
+                root.classList.add('light-mode');
+                root.classList.remove('dark');
+                if (metaTheme) metaTheme.setAttribute('content', '#f1f5f9');
+                if (headerBtn) headerBtn.innerText = '🌙';
+            } else {
+                root.classList.remove('light-mode');
+                root.classList.add('dark');
+                if (metaTheme) metaTheme.setAttribute('content', '#090d16');
+                if (headerBtn) headerBtn.innerText = '☀️';
+            }
+
+            root.classList.remove('font-normal', 'font-large', 'font-xlarge');
+            const fClass = state.fontSize === 'normal' ? 'font-normal' : (state.fontSize === 'xlarge' ? 'font-xlarge' : 'font-large');
+            root.classList.add(fClass);
+
+            const tLight = document.getElementById('theme-btn-light');
+            const tDark = document.getElementById('theme-btn-dark');
+            if (tLight && tDark) {
+                tLight.className = state.theme === 'light'
+                    ? "py-2.5 px-3 rounded-2xl border border-emerald-500 bg-emerald-950/50 text-xs font-bold ring-2 ring-emerald-400/40 transition"
+                    : "py-2.5 px-3 rounded-2xl border border-slate-700 bg-slate-900 text-xs font-bold opacity-75 transition";
+                tDark.className = state.theme === 'dark'
+                    ? "py-2.5 px-3 rounded-2xl border border-emerald-500 bg-emerald-950/50 text-xs font-bold ring-2 ring-emerald-400/40 transition"
+                    : "py-2.5 px-3 rounded-2xl border border-slate-700 bg-slate-900 text-xs font-bold opacity-75 transition";
+            }
+
+            ['normal', 'large', 'xlarge'].forEach(sz => {
+                const b = document.getElementById(`font-btn-${sz}`);
+                if (!b) return;
+                b.className = state.fontSize === sz
+                    ? "py-2 rounded-xl border border-cyan-400 bg-cyan-950/50 text-xs font-bold ring-2 ring-cyan-400/30 transition"
+                    : "py-2 rounded-xl border border-slate-700 bg-slate-900 text-xs font-semibold opacity-75 transition";
+            });
+        }
+
+        function setTheme(theme) {
+            haptic(25);
+            state.theme = theme === 'light' ? 'light' : 'dark';
+            localStorage.setItem('reset_theme', state.theme);
+            applyAppearanceSettings();
+        }
+
+        function toggleTheme() {
+            setTheme(state.theme === 'light' ? 'dark' : 'light');
+        }
+
+        function setFontSize(size) {
+            haptic(25);
+            state.fontSize = ['normal', 'large', 'xlarge'].includes(size) ? size : 'large';
+            localStorage.setItem('reset_fontSize', state.fontSize);
+            applyAppearanceSettings();
+        }
+
+        async function forceAppUpdate() {
+            haptic(40);
+            try {
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(k => caches.delete(k)));
+                }
+                if ('serviceWorker' in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                }
+            } catch (e) {}
+            window.location.href = window.location.pathname + '?v=' + Date.now();
         }
 
         function updatePhaseUI() {
@@ -3242,6 +3471,8 @@ REGULI:
                     moveStats: state.moveStats,
                     tgToken: state.tgToken,
                     tgChatId: state.tgChatId,
+                    theme: state.theme,
+                    fontSize: state.fontSize,
                     apiKey: state.apiKey,
                     geminiModel: state.geminiModel,
                     chatHistory: state.chatHistory

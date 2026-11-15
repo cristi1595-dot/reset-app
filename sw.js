@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reset-neuro-v3.2';
+const CACHE_NAME = 'reset-neuro-v3.3';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
