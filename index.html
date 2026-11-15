@@ -548,29 +548,89 @@
                     +1 Pauză
                 </button>
             </div>
-        </div>
 
-        <!-- Selector Nivel Progresiv -->
-        <div class="space-y-2">
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">Alege Rutina & Nivelul (Cu Video & Cronometru)</div>
-            <div class="grid grid-cols-2 gap-2" id="move-level-tabs">
-                <button onclick="selectExerciseLevel('taxi')" id="lvl-btn-taxi" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
-                    🚕 Pauza de Taxi <span class="block text-[10px] font-normal text-slate-400">2–3 min lângă mașină</span>
-                </button>
-                <button onclick="selectExerciseLevel('level1')" id="lvl-btn-level1" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
-                    🟢 Nivel 1: Începător <span class="block text-[10px] font-normal text-slate-400">Deblocare Psoas & Sciatică</span>
-                </button>
-                <button onclick="selectExerciseLevel('level2')" id="lvl-btn-level2" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
-                    🟡 Nivel 2: Intermediar <span class="block text-[10px] font-normal text-slate-400">Postură & McGill Big 3</span>
-                </button>
-                <button onclick="selectExerciseLevel('level3')" id="lvl-btn-level3" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
-                    🔴 Nivel 3: Avansat <span class="block text-[10px] font-normal text-slate-400">Forță Tot Corpul & Simetrie</span>
-                </button>
+            <!-- Streak & Consistență Săptămânală -->
+            <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center text-[11px]">
+                    <span class="font-bold text-purple-300 flex items-center gap-1">🔥 Streak & Consistență</span>
+                    <span id="move-weekly-summary" class="font-mono text-slate-300">0 zile • 0 min săpt.</span>
+                </div>
+                <div id="move-weekly-dots" class="grid grid-cols-7 gap-1.5 text-center"></div>
             </div>
         </div>
 
-        <!-- Lista Exercițiilor -->
-        <div id="exercises-container" class="space-y-3"></div>
+        <!-- Sub-tab Switcher (3 taburi compacte) -->
+        <div class="grid grid-cols-3 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
+            <button onclick="switchMoveSubTab('kineto')" id="move-sub-kineto" class="py-2 rounded-xl text-[11px] font-bold bg-emerald-600 text-white transition">
+                🏥 Kineto
+            </button>
+            <button onclick="switchMoveSubTab('workouts')" id="move-sub-workouts" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">
+                🔥 Antrenamente
+            </button>
+            <button onclick="switchMoveSubTab('library')" id="move-sub-library" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">
+                📚 Bibliotecă <span id="library-tab-count" class="opacity-75"></span>
+            </button>
+        </div>
+
+        <!-- SUB-TAB 1: KINETO & POSTURĂ -->
+        <div id="move-panel-kineto" class="space-y-3">
+            <!-- Selector Nivel Progresiv -->
+            <div class="space-y-2">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">Alege Rutina & Nivelul (Cu Video & Cronometru)</div>
+                <div class="grid grid-cols-2 gap-2" id="move-level-tabs">
+                    <button onclick="selectExerciseLevel('taxi')" id="lvl-btn-taxi" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
+                        🚕 Pauza de Taxi <span class="block text-[10px] font-normal text-slate-400">2–3 min lângă mașină</span>
+                    </button>
+                    <button onclick="selectExerciseLevel('level1')" id="lvl-btn-level1" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
+                        🟢 Nivel 1: Începător <span class="block text-[10px] font-normal text-slate-400">Deblocare Psoas & Sciatică</span>
+                    </button>
+                    <button onclick="selectExerciseLevel('level2')" id="lvl-btn-level2" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
+                        🟡 Nivel 2: Intermediar <span class="block text-[10px] font-normal text-slate-400">Postură & McGill Big 3</span>
+                    </button>
+                    <button onclick="selectExerciseLevel('level3')" id="lvl-btn-level3" class="p-2.5 rounded-2xl border border-slate-800 bg-slate-900/70 text-left text-xs font-bold transition">
+                        🔴 Nivel 3: Avansat <span class="block text-[10px] font-normal text-slate-400">Forță Tot Corpul & Simetrie</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista Exercițiilor Kineto -->
+            <div id="exercises-container" class="space-y-3"></div>
+        </div>
+
+        <!-- SUB-TAB 2: ANTRENAMENTE ACASĂ (5-30 MIN) -->
+        <div id="move-panel-workouts" class="hidden space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="openWorkoutBuilder()" class="py-2.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white text-xs font-bold shadow active:scale-95 transition">
+                    ➕ Creează Antrenament
+                </button>
+                <button onclick="openQuickWorkoutModal()" class="py-2.5 px-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow active:scale-95 transition">
+                    ⚡ Generator Rapid
+                </button>
+            </div>
+
+            <!-- Filtre durată -->
+            <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar" id="workout-duration-filters">
+                <button onclick="filterWorkoutsByDuration('all')" data-dur="all" class="shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-cyan-600 text-white transition">Toate</button>
+                <button onclick="filterWorkoutsByDuration('short')" data-dur="short" class="shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700 transition">⏱️ 5–10 min</button>
+                <button onclick="filterWorkoutsByDuration('medium')" data-dur="medium" class="shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700 transition">🔥 15–20 min</button>
+                <button onclick="filterWorkoutsByDuration('long')" data-dur="long" class="shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700 transition">💪 25–30 min</button>
+            </div>
+
+            <div id="workouts-container" class="space-y-3"></div>
+        </div>
+
+        <!-- SUB-TAB 3: BIBLIOTECĂ EXERCIȚII & VIDEO -->
+        <div id="move-panel-library" class="hidden space-y-3">
+            <button onclick="openAddExerciseModal()" class="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white text-xs font-bold shadow active:scale-95 transition flex items-center justify-center gap-2">
+                <span>🎬</span><span>Adaugă Exercițiu / Import Video (YouTube, FB, AI)</span>
+            </button>
+
+            <input id="library-search-input" type="text" oninput="renderExerciseLibrary()" placeholder="🔍 Caută exercițiu, zonă sau echipament (ex: gantere, spate)..." class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+
+            <div id="library-category-chips" class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar"></div>
+
+            <div id="library-container" class="space-y-3"></div>
+        </div>
     </main>
 
     <!-- ==================== TAB 3: NUTRIȚIE & PLAN MÂNCARE ==================== -->
@@ -1160,21 +1220,22 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: ADAUGĂ REȚETĂ (LINK / POZĂ / PASTE) ==================== -->
+    <!-- ==================== MODAL: ADAUGĂ / EDITEAZĂ REȚETĂ ==================== -->
     <div id="add-recipe-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
         <div class="glass bg-[#090d16]/95 border border-orange-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-sm font-extrabold text-orange-300 uppercase tracking-wider flex items-center gap-2">
-                    <span>📖</span> Adaugă Rețetă Inteligent
+                <h3 id="add-recipe-modal-title" class="text-sm font-extrabold text-orange-300 uppercase tracking-wider flex items-center gap-2">
+                    <span>📖</span> Adaugă Rețetă
                 </h3>
                 <button onclick="toggleModal('add-recipe-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
             </div>
 
-            <!-- Moduri import -->
-            <div class="grid grid-cols-3 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
-                <button onclick="switchAddRecipeMode('paste')" id="add-mode-paste" class="py-2 rounded-xl text-xs font-bold bg-orange-600 text-white transition">📋 Paste Text</button>
-                <button onclick="switchAddRecipeMode('link')" id="add-mode-link" class="py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition">🔗 Link URL</button>
-                <button onclick="switchAddRecipeMode('photo')" id="add-mode-photo" class="py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition">📷 Poză</button>
+            <!-- Moduri import (4 moduri) -->
+            <div id="add-recipe-mode-tabs" class="grid grid-cols-4 gap-1 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
+                <button onclick="switchAddRecipeMode('paste')" id="add-mode-paste" class="py-2 rounded-xl text-[11px] font-bold bg-orange-600 text-white transition">📋 Paste</button>
+                <button onclick="switchAddRecipeMode('link')" id="add-mode-link" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">🔗 Link</button>
+                <button onclick="switchAddRecipeMode('photo')" id="add-mode-photo" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">📷 Poză</button>
+                <button onclick="switchAddRecipeMode('manual')" id="add-mode-manual" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">✍️ Manual</button>
             </div>
 
             <!-- Mod 1: Paste -->
@@ -1185,7 +1246,7 @@
 
             <!-- Mod 2: Link -->
             <div id="add-panel-link" class="hidden space-y-2.5">
-                <p class="text-[11px] text-slate-400">Lipește linkul unei rețete (blog culinar, site de rețete). Dacă site-ul blochează accesul automat, folosește Paste Text sau Poză.</p>
+                <p class="text-[11px] text-slate-400">Lipește linkul unei rețete (blog culinar, site de rețete). Dacă site-ul blochează accesul automat, folosește Paste sau Poză.</p>
                 <input id="add-recipe-url" type="url" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-orange-500">
             </div>
 
@@ -1198,6 +1259,34 @@
                     <div id="add-recipe-file-label" class="text-xs font-bold text-slate-300">Apasă pentru a alege o poză sau a face fotografie</div>
                 </label>
                 <img id="add-recipe-preview" class="hidden w-full max-h-44 object-contain rounded-2xl border border-slate-800 bg-black/40" alt="Previzualizare rețetă">
+            </div>
+
+            <!-- Mod 4: Manual / Editare -->
+            <div id="add-panel-manual" class="hidden space-y-2.5">
+                <input id="manual-rec-title" type="text" placeholder="Titlu rețetă (ex: Pui cu orez la cuptor)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Porții</label>
+                        <input id="manual-rec-servings" type="number" min="1" value="4" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white text-center">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Pregătire (min)</label>
+                        <input id="manual-rec-prep" type="number" min="0" placeholder="15" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white text-center">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Gătire (min)</label>
+                        <input id="manual-rec-cook" type="number" min="0" placeholder="30" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white text-center">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-0.5">Ingrediente (câte unul pe linie, ex: 500 g piept de pui)</label>
+                    <textarea id="manual-rec-ingredients" rows="4" placeholder="500g piept de pui&#10;2 morcovi&#10;30ml ulei de măsline" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-0.5">Pași de preparare (câte un pas pe linie)</label>
+                    <textarea id="manual-rec-steps" rows="4" placeholder="Taie puiul cubulețe...&#10;Coace 25 minute la 190°C..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500"></textarea>
+                </div>
+                <input id="manual-rec-notes" type="text" placeholder="Note / Sfaturi (opțional)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
             </div>
 
             <div class="flex items-center justify-between gap-2 text-xs">
@@ -1215,42 +1304,164 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: DETALIU REȚETĂ ==================== -->
-    <div id="recipe-detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-        <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4 selectable">
+    <!-- ==================== MODAL: DETALIU REȚETĂ COMPLET ==================== -->
+    <div id="recipe-detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+        <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-5 space-y-3.5 selectable">
+            <!-- Header -->
             <div class="flex justify-between items-start gap-2 border-b border-slate-800 pb-3">
                 <div class="min-w-0">
-                    <span id="detail-recipe-cat" class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 mb-1"></span>
-                    <h3 id="detail-recipe-title" class="text-base font-extrabold text-white leading-snug"></h3>
-                    <div id="detail-recipe-meta" class="text-[11px] text-slate-400 mt-1"></div>
+                    <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                        <span id="detail-recipe-cat" class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/60"></span>
+                        <div id="detail-recipe-tags" class="flex flex-wrap gap-1"></div>
+                    </div>
+                    <h3 id="detail-recipe-title" class="text-base sm:text-lg font-extrabold text-white leading-snug"></h3>
                 </div>
-                <button onclick="toggleModal('recipe-detail-modal')" class="text-slate-400 hover:text-white text-lg p-1 shrink-0">✕</button>
+                <div class="flex items-center gap-1 shrink-0">
+                    <button onclick="toggleCurrentRecipeFavorite()" id="detail-fav-btn" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-xl text-xs transition" title="Favorită">☆</button>
+                    <button onclick="toggleModal('recipe-detail-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+                </div>
             </div>
 
-            <div class="flex flex-wrap gap-2">
+            <!-- Timp Total / Pregătire / Gătire -->
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-2">
+                    <div class="text-[9px] font-bold text-slate-400 uppercase">Timp Total</div>
+                    <div id="detail-time-total" class="text-xs font-extrabold text-orange-300 mt-0.5">—</div>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-2">
+                    <div class="text-[9px] font-bold text-slate-400 uppercase">Pregătire</div>
+                    <div id="detail-time-prep" class="text-xs font-extrabold text-white mt-0.5">—</div>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-2">
+                    <div class="text-[9px] font-bold text-slate-400 uppercase">Gătire</div>
+                    <div id="detail-time-cook" class="text-xs font-extrabold text-white mt-0.5">—</div>
+                </div>
+            </div>
+
+            <!-- Buton Modul Bucătar -->
+            <button onclick="openCookingMode()" class="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+                <span>👨‍🍳</span> Pornește Modul Bucătar (Ecran Activ & Pași Mari)
+            </button>
+
+            <!-- Scaler Porții -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between gap-2 flex-wrap">
+                <span class="text-[11px] font-bold text-slate-300">👥 Porții:</span>
+                <div class="flex items-center gap-1">
+                    <button onclick="setDetailPortionMult(0.5)" id="mult-btn-0.5" class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-800 text-slate-300">0.5x</button>
+                    <button onclick="setDetailPortionMult(1)" id="mult-btn-1" class="px-2 py-1 rounded-lg text-[10px] font-bold bg-orange-600 text-white">1x</button>
+                    <button onclick="setDetailPortionMult(2)" id="mult-btn-2" class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-800 text-slate-300">2x</button>
+                    <button onclick="setDetailPortionMult(3)" id="mult-btn-3" class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-800 text-slate-300">3x</button>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="stepDetailServings(-1)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs">−</button>
+                    <span id="detail-servings-val" class="text-xs font-extrabold text-white min-w-[20px] text-center">4</span>
+                    <button onclick="stepDetailServings(1)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs">+</button>
+                </div>
+            </div>
+
+            <!-- Valori Nutriționale -->
+            <div id="detail-nutrition-box" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 space-y-2"></div>
+
+            <!-- Ingrediente cu bife & badge În Cămară -->
+            <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div class="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">🥕 Ingrediente <span id="detail-ing-count" class="text-slate-400"></span></div>
+                    <div class="flex gap-2 text-[10px] font-bold">
+                        <button onclick="toggleAllDetailIngredients(true)" class="text-emerald-400 hover:underline">Bifează tot</button>
+                        <button onclick="toggleAllDetailIngredients(false)" class="text-slate-400 hover:underline">Resetează</button>
+                    </div>
+                </div>
+                <ul id="detail-recipe-ingredients" class="space-y-1.5 text-xs text-slate-200"></ul>
+            </div>
+
+            <!-- Instrucțiuni cu cronometru pe pas -->
+            <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2.5">
+                <div class="text-xs font-extrabold text-emerald-300 uppercase tracking-wider">📋 Instrucțiuni de Preparare</div>
+                <div id="detail-recipe-steps" class="space-y-2.5 text-xs text-slate-200"></div>
+                <div id="detail-inline-timer-bar" class="hidden bg-amber-950/70 border border-amber-600/60 rounded-2xl p-2.5 flex items-center justify-between">
+                    <span class="text-xs font-bold text-amber-200">⏱️ Cronometru activ: <span id="detail-inline-timer-val" class="font-mono text-white text-sm ml-1">00:00</span></span>
+                    <button onclick="stopInlineStepTimer()" class="px-2.5 py-1 rounded-lg bg-red-900/80 text-red-200 text-[11px] font-bold">Stop</button>
+                </div>
+            </div>
+
+            <!-- Note personale editabile -->
+            <div class="bg-amber-950/25 border border-amber-800/40 rounded-2xl p-3 space-y-1.5">
+                <div class="flex justify-between items-center">
+                    <span class="text-[11px] font-bold text-amber-300">📝 Notele mele despre rețetă</span>
+                    <span class="text-[10px] text-slate-400">Se salvează automat</span>
+                </div>
+                <textarea id="detail-recipe-notes-input" rows="2" oninput="saveDetailRecipeNotes()" placeholder="Adaugă sfaturi, variațiuni sau observații..." class="w-full bg-slate-900/70 border border-slate-800 rounded-xl p-2 text-xs text-amber-100 focus:outline-none focus:border-amber-500"></textarea>
+            </div>
+
+            <div id="detail-recipe-source-box" class="hidden text-[11px] text-slate-400 truncate"></div>
+
+            <!-- Acțiuni jos -->
+            <div class="flex flex-wrap gap-2 pt-1">
                 <button onclick="sendCurrentRecipeToShopping()" class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs transition active:scale-95">
-                    🛒 Adaugă în Cumpărături
+                    🛒 În Cumpărături
                 </button>
-                <button onclick="toggleCurrentRecipeFavorite()" id="detail-fav-btn" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-2xl text-xs transition">
-                    ☆
+                <button onclick="openEditCurrentRecipe()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-2xl text-xs transition">
+                    ✏️ Editează
                 </button>
                 <button onclick="deleteCurrentRecipe()" class="px-3 py-2.5 bg-red-950/70 hover:bg-red-900/80 border border-red-800/60 text-red-300 font-bold rounded-2xl text-xs transition">
                     🗑️
                 </button>
             </div>
+        </div>
+    </div>
 
-            <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2">
-                <div class="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">🛒 Ingrediente</div>
-                <ul id="detail-recipe-ingredients" class="space-y-1.5 text-xs text-slate-200"></ul>
+    <!-- ==================== MODAL: MODUL BUCĂTAR (COOKING MODE) ==================== -->
+    <div id="cooking-mode-modal" class="fixed inset-0 bg-[#050811] z-[60] hidden flex flex-col p-4 sm:p-6">
+        <div class="max-w-lg w-full mx-auto flex flex-col h-full justify-between space-y-4">
+            <!-- Top bar -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-950 text-orange-300 border border-orange-700/60">👨‍🍳 MOD BUCĂTAR</span>
+                        <span id="cook-wakelock-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700/60">🔆 Ecran Activ</span>
+                    </div>
+                    <h3 id="cook-recipe-title" class="text-sm font-extrabold text-white truncate mt-1">Rețetă</h3>
+                </div>
+                <button onclick="closeCookingMode()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold shrink-0">✕ Ieși</button>
             </div>
 
-            <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2">
-                <div class="text-xs font-extrabold text-emerald-300 uppercase tracking-wider">👨‍🍳 Mod de preparare</div>
-                <ol id="detail-recipe-steps" class="space-y-2 text-xs text-slate-200 list-decimal pl-4"></ol>
+            <!-- Progress bar -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[11px] font-bold text-slate-400">
+                    <span id="cook-step-counter">Pasul 1 din 5</span>
+                    <button onclick="toggleCookIngredientsDrawer()" class="text-cyan-300 hover:underline">🥕 Vezi Ingrediente</button>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2">
+                    <div id="cook-progress-bar" class="bg-gradient-to-r from-orange-500 to-amber-400 h-2 rounded-full transition-all duration-300" style="width: 20%"></div>
+                </div>
             </div>
 
-            <div id="detail-recipe-notes-box" class="hidden bg-amber-950/30 border border-amber-800/40 rounded-2xl p-3 text-xs text-amber-200"></div>
-            <div id="detail-recipe-source-box" class="hidden text-[11px] text-slate-400 truncate"></div>
+            <!-- Ingrediente drawer (collapsible) -->
+            <div id="cook-ingredients-drawer" class="hidden bg-slate-900/95 border border-slate-800 rounded-2xl p-3 max-h-48 overflow-y-auto space-y-1 text-xs text-slate-200"></div>
+
+            <!-- Pasul curent (mare, lizibil) -->
+            <div class="flex-1 flex flex-col justify-center bg-slate-900/70 border border-slate-800 rounded-3xl p-5 sm:p-6 space-y-4 overflow-y-auto">
+                <div id="cook-step-text" class="text-base sm:text-xl font-bold text-white leading-relaxed"></div>
+
+                <!-- Cronometru pas (dacă are timerMinutes) -->
+                <div id="cook-timer-box" class="hidden bg-amber-950/40 border border-amber-600/50 rounded-2xl p-4 text-center space-y-2.5">
+                    <div id="cook-timer-display" class="text-4xl font-black font-mono text-amber-300">15:00</div>
+                    <div class="flex justify-center gap-2">
+                        <button onclick="toggleCookTimer()" id="cook-timer-toggle-btn" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs">▶ Start</button>
+                        <button onclick="resetCookTimer()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs">↺ Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controale navigare -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <button onclick="cookPrevStep()" id="cook-prev-btn" class="py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm active:scale-95 transition">
+                    ⏮ Anterior
+                </button>
+                <button onclick="cookNextStep()" id="cook-next-btn" class="py-3.5 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold text-sm active:scale-95 transition">
+                    Următor ⏭
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1279,7 +1490,7 @@
                     <button onclick="setPantryFilter('all')" id="pantry-flt-all" class="px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white">Toate</button>
                     <button onclick="setPantryFilter('inStock')" id="pantry-flt-inStock" class="px-2.5 py-1 rounded-lg font-bold bg-slate-800 text-slate-300">✅ În stoc</button>
                     <button onclick="setPantryFilter('outOfStock')" id="pantry-flt-outOfStock" class="px-2.5 py-1 rounded-lg font-bold bg-slate-800 text-slate-300">❌ Nu mai am</button>
-                    <button onclick="populateDefaultPantryStaples()" class="ml-auto px-2.5 py-1 rounded-lg font-bold bg-slate-800 hover:bg-slate-700 text-amber-300">✨ Bază</button>
+                    <button onclick="openPantryStaplesModal()" class="ml-auto px-2.5 py-1 rounded-lg font-bold bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300">✨ Bază (Listă)</button>
                 </div>
             </div>
 
@@ -1289,9 +1500,33 @@
             <!-- Formular adăugare rapidă -->
             <form onsubmit="addPantryItem(event)" class="p-3 border-t border-slate-800 bg-slate-900/70 flex gap-2">
                 <input id="pantry-new-name" type="text" placeholder="Adaugă produs (ex: ouă, orez)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                <input id="pantry-new-amount" type="text" placeholder="Cant." class="w-16 bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white text-center focus:outline-none focus:border-amber-500">
+                <input id="pantry-new-amount" type="text" placeholder="Cant. (500g)" class="w-20 bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white text-center focus:outline-none focus:border-amber-500">
                 <button type="submit" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs">+</button>
             </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: SELECTARE PRODUSE DE BAZĂ ÎN CĂMARĂ ==================== -->
+    <div id="pantry-staples-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[55] hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-amber-500/50 rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-extrabold text-amber-300 uppercase tracking-wider">✨ Alege Produsele de Bază</h3>
+                    <p class="text-[11px] text-slate-400">Bifează ce ai prin casă și adaugă-le rapid în Cămară.</p>
+                </div>
+                <button onclick="toggleModal('pantry-staples-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+            <div class="p-3 border-b border-slate-800/80 flex gap-2 bg-slate-900/40">
+                <input id="staples-search-input" type="text" oninput="renderPantryStaplesList()" placeholder="🔍 Caută în lista de bază..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                <button onclick="toggleSelectAllStaples(true)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 text-amber-300 text-[11px] font-bold">Tot</button>
+                <button onclick="toggleSelectAllStaples(false)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-[11px] font-bold">Nimic</button>
+            </div>
+            <div id="pantry-staples-list" class="flex-1 overflow-y-auto p-3 space-y-3"></div>
+            <div class="p-3 border-t border-slate-800 bg-slate-900/80">
+                <button onclick="confirmAddSelectedStaples()" id="staples-confirm-btn" class="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-extrabold rounded-2xl text-xs shadow-lg">
+                    ✅ Adaugă selectatele în Cămară
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1324,6 +1559,276 @@
                 <input id="shopping-new-amount" type="text" placeholder="Cant." class="w-16 bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white text-center focus:outline-none focus:border-emerald-500">
                 <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs">+</button>
             </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: ADAUGĂ EXERCIȚIU / IMPORT VIDEO ==================== -->
+    <div id="add-exercise-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-cyan-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                    <span>🎬</span> Adaugă Exercițiu / Import Video
+                </h3>
+                <button onclick="toggleModal('add-exercise-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <!-- Moduri adăugare -->
+            <div class="grid grid-cols-3 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
+                <button onclick="switchAddExMode('manual')" id="ex-mode-manual" class="py-2 rounded-xl text-[11px] font-bold bg-cyan-600 text-white transition">📝 Manual / Link</button>
+                <button onclick="switchAddExMode('photo')" id="ex-mode-photo" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">📷 Screenshot AI</button>
+                <button onclick="switchAddExMode('paste')" id="ex-mode-paste" class="py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition">📋 Paste Text AI</button>
+            </div>
+
+            <!-- Panel AI: Screenshot Reel/FB -->
+            <div id="ex-panel-photo" class="hidden space-y-2.5 bg-slate-900/70 p-3 rounded-2xl border border-slate-800">
+                <p class="text-[11px] text-slate-300">Încarcă un screenshot dintr-un YouTube Short / Facebook Reel. AI-ul extrage numele, grupa musculară, repetările și verifică siguranța lombară.</p>
+                <label class="block w-full border-2 border-dashed border-slate-700 hover:border-cyan-500/70 rounded-2xl p-4 text-center cursor-pointer bg-slate-950/50 transition">
+                    <input id="add-ex-file" type="file" accept="image/*" onchange="handleExImageSelected(event)" class="hidden">
+                    <div class="text-xl mb-1">📷</div>
+                    <div id="add-ex-file-label" class="text-xs font-bold text-slate-300">Alege screenshot sau poză</div>
+                </label>
+                <img id="add-ex-preview" class="hidden w-full max-h-40 object-contain rounded-2xl border border-slate-800 bg-black/40" alt="Previzualizare exercițiu">
+                <button onclick="extractExerciseWithAI('photo')" id="ex-ai-photo-btn" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition">
+                    ✨ Extrage din Screenshot cu Gemini
+                </button>
+            </div>
+
+            <!-- Panel AI: Paste Text -->
+            <div id="ex-panel-paste" class="hidden space-y-2.5 bg-slate-900/70 p-3 rounded-2xl border border-slate-800">
+                <p class="text-[11px] text-slate-300">Lipește descrierea din YouTube / Facebook Shorts / postare. AI-ul completează automat câmpurile de mai jos.</p>
+                <textarea id="add-ex-paste-text" rows="4" placeholder="Ex: 3 sets x 12 Dumbbell Floor Press, great for chest without shoulder pain..." class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500"></textarea>
+                <button onclick="extractExerciseWithAI('paste')" id="ex-ai-paste-btn" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition">
+                    ✨ Completează Automat cu AI
+                </button>
+            </div>
+
+            <div id="add-ex-status" class="hidden text-xs p-2.5 rounded-2xl font-mono"></div>
+
+            <!-- Formular structurat (vizibil mereu pentru editare/verificare) -->
+            <div class="space-y-2.5">
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Nume Exercițiu *</label>
+                    <input id="ex-form-name" type="text" placeholder="Ex: Împins cu gantere pe podea" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Categorie / Zonă</label>
+                        <select id="ex-form-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                            <option value="Spate & Sciatică">Spate & Sciatică</option>
+                            <option value="Gât & Umeri">Gât & Umeri</option>
+                            <option value="Piept & Brațe">Piept & Brațe</option>
+                            <option value="Abdomen / Core">Abdomen / Core</option>
+                            <option value="Picioare & Fesieri">Picioare & Fesieri</option>
+                            <option value="Mobilitate">Mobilitate</option>
+                            <option value="Full Body">Full Body</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Echipament</label>
+                        <select id="ex-form-equipment" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                            <option value="Greutatea corpului">Greutatea corpului</option>
+                            <option value="Gantere 4kg">Gantere 4kg</option>
+                            <option value="Kettlebell 6kg">Kettlebell 6kg</option>
+                            <option value="Benzi elastice">Benzi elastice</option>
+                            <option value="Corzi elastice">Corzi elastice</option>
+                            <option value="Cub yoga">Cub yoga</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Repetări / Serii</label>
+                        <input id="ex-form-reps" type="text" placeholder="Ex: 3 x 12 repetări" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Cronometru (secunde)</label>
+                        <input id="ex-form-timer" type="number" min="15" max="300" value="45" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Link Video (YouTube, YouTube Shorts, Facebook Short/Reel)</label>
+                    <input id="ex-form-video" type="url" placeholder="https://youtube.com/shorts/... sau https://facebook.com/reel/..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+                    <p class="text-[10px] text-slate-500 mt-1">YouTube / Shorts se redau direct în card. Facebook Shorts se deschid cu un click.</p>
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Afecțiune / Scop (opțional)</label>
+                    <input id="ex-form-condition" type="text" placeholder="Ex: Corecție cifoză, Fără presiune lombară" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Tehnică Sigură / Notițe</label>
+                    <textarea id="ex-form-tip" rows="2" placeholder="Ex: Coatele la 45 grade, lombarii lipiți de podea..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></textarea>
+                </div>
+            </div>
+
+            <button onclick="saveCustomExercise()" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 active:scale-95 text-white font-bold rounded-2xl text-xs shadow-lg transition">
+                💾 Salvează Exercițiul în Bibliotecă
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: CONSTRUCTOR ANTRENAMENT (5-30 MIN) ==================== -->
+    <div id="workout-builder-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="builder-modal-title" class="text-sm font-extrabold text-emerald-300 uppercase tracking-wider flex items-center gap-2">
+                    <span>🔥</span> Creează Antrenament
+                </h3>
+                <button onclick="toggleModal('workout-builder-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <div class="space-y-2.5">
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Nume Antrenament *</label>
+                    <input id="wb-title" type="text" placeholder="Ex: Dimineața 15 min Piept & Spate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Durată (min)</label>
+                        <select id="wb-duration" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white">
+                            <option value="5">5 min</option>
+                            <option value="10">10 min</option>
+                            <option value="15" selected>15 min</option>
+                            <option value="20">20 min</option>
+                            <option value="25">25 min</option>
+                            <option value="30">30 min</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Lucru (sec)</label>
+                        <input id="wb-work-sec" type="number" min="15" max="180" value="40" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Pauză (sec)</label>
+                        <input id="wb-rest-sec" type="number" min="5" max="120" value="20" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Zonă / Focus</label>
+                    <input id="wb-target" type="text" placeholder="Ex: Piept & Brațe • Gantere 4kg" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-cyan-300">Exerciții Selectate (<span id="wb-selected-count">0</span>)</span>
+                    <input id="wb-search" type="text" oninput="renderWorkoutBuilderList()" placeholder="🔍 Filtrează..." class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-[11px] text-white w-36">
+                </div>
+                <div id="wb-exercises-list" class="max-h-56 overflow-y-auto space-y-1.5 pr-1"></div>
+            </div>
+
+            <button onclick="saveWorkoutRoutine()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 active:scale-95 text-white font-bold rounded-2xl text-xs shadow-lg transition">
+                💾 Salvează Lista de Antrenament
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: GENERATOR RAPID (5-30 MIN) ==================== -->
+    <div id="quick-workout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-purple-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-extrabold text-purple-300 uppercase tracking-wider flex items-center gap-2">
+                    <span>⚡</span> Generator Rapid (Am doar X min)
+                </h3>
+                <button onclick="toggleModal('quick-workout-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Cât timp ai la dispoziție?</label>
+                    <div class="grid grid-cols-5 gap-1.5" id="qw-duration-btns">
+                        <button onclick="selectQuickDuration(5)" data-qdur="5" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">5m</button>
+                        <button onclick="selectQuickDuration(10)" data-qdur="10" class="py-2 rounded-xl text-xs font-bold bg-purple-600 text-white">10m</button>
+                        <button onclick="selectQuickDuration(15)" data-qdur="15" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">15m</button>
+                        <button onclick="selectQuickDuration(20)" data-qdur="20" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">20m</button>
+                        <button onclick="selectQuickDuration(30)" data-qdur="30" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">30m</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Zona Corpului</label>
+                        <select id="qw-zone" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                            <option value="all">Full Body / Mix</option>
+                            <option value="Spate & Sciatică">Spate & Sciatică</option>
+                            <option value="Gât & Umeri">Gât & Umeri</option>
+                            <option value="Piept & Brațe">Piept & Brațe</option>
+                            <option value="Abdomen / Core">Abdomen / Core</option>
+                            <option value="Picioare & Fesieri">Picioare & Fesieri</option>
+                            <option value="Mobilitate">Mobilitate & Relaxare</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Nivel Energie Azi</label>
+                        <select id="qw-energy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                            <option value="tired">😴 Obosit (blând, fără șoc)</option>
+                            <option value="normal" selected>🙂 Normal (ritm echilibrat)</option>
+                            <option value="high">🔥 Energic (intens)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="generateQuickWorkout()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 text-white font-bold rounded-2xl text-xs shadow-lg transition">
+                ⚡ Asamblează Antrenamentul Acum
+            </button>
+
+            <div id="qw-result-box" class="hidden bg-slate-900/80 border border-purple-500/40 rounded-2xl p-3.5 space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: WORKOUT PLAYER GHIDAT ==================== -->
+    <div id="workout-player-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-emerald-500/50 rounded-3xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="min-w-0">
+                    <div id="wp-routine-title" class="text-xs font-extrabold text-emerald-300 truncate">Antrenament</div>
+                    <div id="wp-step-counter" class="text-[11px] text-slate-400 font-mono">Exercițiul 1 / 5</div>
+                </div>
+                <button onclick="closeWorkoutPlayer()" class="text-slate-400 hover:text-white text-lg p-1 shrink-0">✕</button>
+            </div>
+
+            <!-- Bară progres total -->
+            <div class="w-full bg-slate-900 rounded-full h-2">
+                <div id="wp-progress-bar" class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Fază & Cronometru Mare -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 text-center space-y-2">
+                <span id="wp-phase-badge" class="inline-block text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-600/30 text-emerald-300 border border-emerald-500/50">
+                    🔥 LUCRU
+                </span>
+                <div id="wp-timer-display" class="text-5xl font-black font-mono text-white tracking-tight">00:40</div>
+                <h4 id="wp-ex-name" class="text-base font-extrabold text-white leading-snug pt-1">Nume Exercițiu</h4>
+                <div id="wp-ex-meta" class="text-[11px] text-cyan-300 font-semibold"></div>
+            </div>
+
+            <!-- Tehnică & Video în Player -->
+            <div id="wp-ex-tip" class="text-xs text-slate-300 bg-slate-900/70 border border-slate-800 rounded-2xl p-3 leading-relaxed"></div>
+            <div id="wp-ex-video-area" class="space-y-2"></div>
+
+            <!-- Controale Player -->
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="playerPrevStep()" class="py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs active:scale-95">
+                    ⏮ Anterior
+                </button>
+                <button onclick="togglePlayerPause()" id="wp-pause-btn" class="py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs active:scale-95">
+                    ⏸ Pauză
+                </button>
+                <button onclick="playerNextStep()" class="py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs active:scale-95">
+                    ⏭ Următor
+                </button>
+            </div>
+
+            <button onclick="finishWorkoutPlayer()" class="w-full py-2.5 rounded-2xl bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-300 font-bold text-xs transition">
+                ✅ Marchează Antrenamentul Terminat Acum
+            </button>
         </div>
     </div>
 
@@ -1924,7 +2429,10 @@
             chatHistory: JSON.parse(localStorage.getItem('reset_chatHistory') || '[]'),
             recipes: JSON.parse(localStorage.getItem('reset_recipes') || '[]'),
             pantry: JSON.parse(localStorage.getItem('reset_pantry') || '[]'),
-            shoppingList: JSON.parse(localStorage.getItem('reset_shoppingList') || '[]')
+            shoppingList: JSON.parse(localStorage.getItem('reset_shoppingList') || '[]'),
+            customExercises: JSON.parse(localStorage.getItem('reset_customExercises') || '[]'),
+            workoutRoutines: JSON.parse(localStorage.getItem('reset_workoutRoutines') || '[]'),
+            moveHistory: JSON.parse(localStorage.getItem('reset_moveHistory') || '{}')
         };
 
         if (!localStorage.getItem('reset_apiKey')) {
@@ -1984,6 +2492,7 @@
                 renderCheckinCard();
                 renderMoveProgress();
                 renderExercises();
+                if (typeof renderMoveExtensions === 'function') renderMoveExtensions();
                 updateDashboard();
             }
         }
@@ -2025,10 +2534,12 @@
             renderCheckinCard();
             renderMoveProgress();
             renderExercises();
+            renderMoveExtensions();
             renderFoodDays();
             renderFoodMeals();
             renderFridgeChips();
             initRecipeCategorySelect();
+            seedPlanRecipesIfNeeded();
             renderRecipeCategories();
             renderRecipesList();
             updateNutritionBadges();
@@ -2208,7 +2719,10 @@
                 chatHistory: (state.chatHistory || []).slice(-20),
                 recipes: state.recipes || [],
                 pantry: state.pantry || [],
-                shoppingList: state.shoppingList || []
+                shoppingList: state.shoppingList || [],
+                customExercises: state.customExercises || [],
+                workoutRoutines: state.workoutRoutines || [],
+                moveHistory: state.moveHistory || {}
             };
         }
 
@@ -2218,7 +2732,8 @@
                 'lastDate', 'quitDate', 'phase', 'dailyCost', 'dailyJoints', 'cigLimit',
                 'cigsToday', 'lastCigTime', 'supps', 'wakeMode', 'stepTimes', 'stepsDone',
                 'exerciseLevel', 'moveStats', 'tgToken', 'tgChatId', 'theme', 'fontSize',
-                'apiKey', 'geminiModel', 'chatHistory', 'recipes', 'pantry', 'shoppingList'
+                'apiKey', 'geminiModel', 'chatHistory', 'recipes', 'pantry', 'shoppingList',
+                'customExercises', 'workoutRoutines', 'moveHistory'
             ];
             keys.forEach(k => {
                 if (remote[k] === undefined || remote[k] === null) return;
@@ -2258,6 +2773,7 @@
             renderCheckinCard();
             renderMoveProgress();
             renderExercises();
+            renderMoveExtensions();
             renderRecipeCategories();
             renderRecipesList();
             updateNutritionBadges();
@@ -2730,7 +3246,11 @@
             haptic(40);
             state.moveStats.workoutDoneToday = !state.moveStats.workoutDoneToday;
             localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
+            if (typeof recordMoveActivity === 'function') {
+                recordMoveActivity(state.moveStats.workoutDoneToday ? 15 : 0, state.moveStats.workoutDoneToday);
+            }
             renderMoveProgress();
+            if (typeof renderWeeklyMotivation === 'function') renderWeeklyMotivation();
             updateDashboard();
             markStateDirtyAndSync();
         }
@@ -2978,6 +3498,1058 @@
                     updateLbl();
                 }
             }, 1000);
+        }
+
+        // ==================== BIBLIOTECĂ EXERCIȚII, ANTRENAMENTE 5-30 MIN & PLAYER ====================
+        const LIBRARY_CATEGORIES = [
+            "Toate",
+            "Spate & Sciatică",
+            "Gât & Umeri",
+            "Piept & Brațe",
+            "Abdomen / Core",
+            "Picioare & Fesieri",
+            "Mobilitate",
+            "Full Body"
+        ];
+
+        const PRESET_LIBRARY_EXERCISES = [
+            {
+                id: "lib_kb_goblet",
+                name: "Genuflexiuni Goblet cu Kettlebell 6kg",
+                category: "Picioare & Fesieri",
+                conditionTag: "Forță picioare • Spate drept",
+                equipment: "Kettlebell 6kg",
+                reps: "3 x 12 repetări lente",
+                timerSec: 45,
+                tip: "Ține kettlebell-ul lipit de piept, coatele în jos. Coboară controlat și împinge din călcâie fără să arcuiești lombarul.",
+                videoUrl: "https://www.youtube.com/watch?v=MeIiIdhvXT4",
+                isPreset: true
+            },
+            {
+                id: "lib_kb_deadlift",
+                name: "Îndreptări Românești cu Kettlebell 6kg",
+                category: "Spate & Sciatică",
+                conditionTag: "Întărire lanț posterior • Protecție lombară",
+                equipment: "Kettlebell 6kg",
+                reps: "3 x 12 repetări",
+                timerSec: 45,
+                tip: "Împinge șoldurile spre spate (balama din șold), genunchii ușor flexați, spatele perfect drept. Nu coborî mai jos de jumătatea tibiei dacă simți tensiune.",
+                videoUrl: "https://www.youtube.com/watch?v=2SHsk9AzdjA",
+                isPreset: true
+            },
+            {
+                id: "lib_kb_halo",
+                name: "Halo cu Kettlebell 6kg (Mobilitate Umeri)",
+                category: "Gât & Umeri",
+                conditionTag: "Deblocare umeri & cervicală după volan",
+                equipment: "Kettlebell 6kg",
+                reps: "2 x 8 cercuri pe sens",
+                timerSec: 45,
+                tip: "Rotește kettlebell-ul lent în jurul capului menținând abdomenul încordat și coastele jos.",
+                videoUrl: "https://www.youtube.com/watch?v=w0X2cK1V8lQ",
+                isPreset: true
+            },
+            {
+                id: "lib_db_floor_press",
+                name: "Împins pentru Piept pe Podea (Gantere 4kg)",
+                category: "Piept & Brațe",
+                conditionTag: "Piept & Triceps • Fără presiune pe umeri",
+                equipment: "Gantere 4kg",
+                reps: "3 x 15 repetări",
+                timerSec: 45,
+                tip: "Întins pe podea cu genunchii îndoiți (lombarii lipiți!). Coatele la 45° față de corp, atinge ușor podeaua și împinge sus.",
+                videoUrl: "https://www.youtube.com/watch?v=uUGDRwge4F8",
+                isPreset: true
+            },
+            {
+                id: "lib_db_bent_row",
+                name: "Ramat cu Gantere 4kg (Postură Spate)",
+                category: "Piept & Brațe",
+                conditionTag: "Corecție cifoză • Spate superior",
+                equipment: "Gantere 4kg",
+                reps: "3 x 15 repetări",
+                timerSec: 45,
+                tip: "Apleacă trunchiul la 45° cu spatele drept și trage ganterele spre șolduri strângând omoplații 1 secundă.",
+                videoUrl: "https://www.youtube.com/watch?v=6TSP1TRMUzs",
+                isPreset: true
+            },
+            {
+                id: "lib_db_bicep_curl",
+                name: "Flexii Biceps + Presă Umeri (Gantere 4kg)",
+                category: "Piept & Brațe",
+                conditionTag: "Brațe & Umeri • Tonus acasă",
+                equipment: "Gantere 4kg",
+                reps: "3 x 12 repetări",
+                timerSec: 45,
+                tip: "Ridică ganterele la umeri fără balans, apoi împinge deasupra capului fără să arcuiești mijlocul.",
+                videoUrl: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo",
+                isPreset: true
+            },
+            {
+                id: "lib_band_facepull",
+                name: "Face Pull cu Banda / Coarda Elastică",
+                category: "Gât & Umeri",
+                conditionTag: "Antidot poziție volan • Umeri aduși în față",
+                equipment: "Benzi elastice",
+                reps: "3 x 15 repetări",
+                timerSec: 40,
+                tip: "Prinde banda cu ambele mâini în față și trage spre frunte depărtând coatele și strângând omoplații.",
+                videoUrl: "https://www.youtube.com/watch?v=rep-qVOkqgk",
+                isPreset: true
+            },
+            {
+                id: "lib_band_pullapart",
+                name: "Band Pull-Apart (Deschidere Piept)",
+                category: "Gât & Umeri",
+                conditionTag: "Dureri cervicale & omoplați",
+                equipment: "Benzi elastice",
+                reps: "3 x 15 repetări lente",
+                timerSec: 40,
+                tip: "Brațele întinse la nivelul pieptului, trage banda spre lateral până atinge pieptul. Umerii jos, departe de urechi.",
+                videoUrl: "https://www.youtube.com/watch?v=JObYtU7Y7ag",
+                isPreset: true
+            },
+            {
+                id: "lib_band_row",
+                name: "Ramat din Șezut cu Coarda Elastică",
+                category: "Spate & Sciatică",
+                conditionTag: "Spate puternic • Zero presiune lombară",
+                equipment: "Corzi elastice",
+                reps: "3 x 15 repetări",
+                timerSec: 45,
+                tip: "Stai pe podea cu picioarele întinse, trece coarda peste tălpi și trage coatele pe lângă corp cu pieptul sus.",
+                videoUrl: "https://www.youtube.com/watch?v=GZbfZ033f74",
+                isPreset: true
+            },
+            {
+                id: "lib_yoga_thoracic",
+                name: "Extensie Toracică pe Cub Yoga",
+                category: "Mobilitate",
+                conditionTag: "Rigiditate spate după 8h șofat",
+                equipment: "Cub yoga",
+                reps: "2 x 60 sec respirație profundă",
+                timerSec: 60,
+                tip: "Pune cubul yoga pe lat sub omoplați, susține capul cu mâinile și lasă pieptul să se deschidă ușor spre tavan.",
+                videoUrl: "https://www.youtube.com/watch?v=3vS4eJ7Q7rY",
+                isPreset: true
+            },
+            {
+                id: "lib_yoga_squeeze",
+                name: "Pod Fesier cu Cub Yoga între Genunchi",
+                category: "Picioare & Fesieri",
+                conditionTag: "Stabilizare bazin & adducție",
+                equipment: "Cub yoga",
+                reps: "3 x 12 repetări (menține 2s sus)",
+                timerSec: 45,
+                tip: "Strânge cubul yoga între genunchi pe tot parcursul ridicării bazinului — activează profund fesierii și core-ul.",
+                videoUrl: "https://www.youtube.com/watch?v=PhTDzR0TpZs",
+                isPreset: true
+            },
+            {
+                id: "lib_core_deadbug",
+                name: "Dead Bug (Stabilitate Lombară & Abdomen)",
+                category: "Abdomen / Core",
+                conditionTag: "Abdomen profund • 100% sigur pentru sciatică",
+                equipment: "Greutatea corpului",
+                reps: "3 x 10 pe fiecare parte",
+                timerSec: 45,
+                tip: "Lombarii lipiți de podea! Întinde lent brațul drept și piciorul stâng fără să se dezlipească mijlocul de saltea.",
+                videoUrl: "https://www.youtube.com/watch?v=g_BYB0R-4Ws",
+                isPreset: true
+            },
+            {
+                id: "lib_bw_pushup",
+                name: "Flotări Încărcare Progresivă (Pe Genunchi sau Clasice)",
+                category: "Piept & Brațe",
+                conditionTag: "Piept, umeri, core",
+                equipment: "Greutatea corpului",
+                reps: "3 x 10–12 repetări",
+                timerSec: 40,
+                tip: "Corpul o linie dreaptă, coatele la 45°, strânge fesele și abdomenul ca să nu cadă bazinul.",
+                videoUrl: "https://www.youtube.com/watch?v=IODxDxX7oi4",
+                isPreset: true
+            },
+            {
+                id: "lib_fb_shadowbox",
+                name: "Box Umbră / Pași Rapizi (Cardio Fără Sărituri)",
+                category: "Full Body",
+                conditionTag: "Ardere calorii & descărcare stres",
+                equipment: "Greutatea corpului",
+                reps: "3 x 45 sec ritm alert",
+                timerSec: 45,
+                tip: "Genunchii ușor flexați, lovește controlat în aer cu rotație ușoară din umeri. Ideal pentru energie fără impact pe articulații.",
+                videoUrl: "https://www.youtube.com/watch?v=kJ5dM9mQ0uE",
+                isPreset: true
+            }
+        ];
+
+        const PRESET_WORKOUT_ROUTINES = [
+            {
+                id: "wrk_5m_taxi_reset",
+                title: "Reset Rapid După Tură (Spate & Gât)",
+                durationMin: 5,
+                targetBody: "Spate, Umeri & Mobilitate",
+                workSec: 40,
+                restSec: 15,
+                exerciseIds: ["lib_band_pullapart", "lib_yoga_thoracic", "lib_core_deadbug", "lib_band_facepull"],
+                isPreset: true
+            },
+            {
+                id: "wrk_10m_upper",
+                title: "10 Min Piept & Brațe Acasă",
+                durationMin: 10,
+                targetBody: "Piept, Spate & Brațe (Gantere 4kg + Bandă)",
+                workSec: 40,
+                restSec: 20,
+                exerciseIds: ["lib_bw_pushup", "lib_db_floor_press", "lib_db_bent_row", "lib_db_bicep_curl", "lib_band_facepull"],
+                isPreset: true
+            },
+            {
+                id: "wrk_15m_core_glutes",
+                title: "15 Min Core, Fesieri & Protecție Sciatică",
+                durationMin: 15,
+                targetBody: "Abdomen, Fesieri & Lombar",
+                workSec: 45,
+                restSec: 20,
+                exerciseIds: ["lib_yoga_squeeze", "lib_core_deadbug", "lib_kb_deadlift", "lib_band_row", "lib_yoga_thoracic", "lib_kb_goblet"],
+                isPreset: true
+            },
+            {
+                id: "wrk_20m_fullbody",
+                title: "20 Min Full Body Cu Echipamentul Tău",
+                durationMin: 20,
+                targetBody: "Tot Corpul (Kettlebell 6kg + Gantere 4kg + Bandă)",
+                workSec: 45,
+                restSec: 20,
+                exerciseIds: ["lib_fb_shadowbox", "lib_kb_goblet", "lib_db_floor_press", "lib_band_row", "lib_kb_halo", "lib_db_bicep_curl", "lib_core_deadbug", "lib_yoga_thoracic"],
+                isPreset: true
+            },
+            {
+                id: "wrk_30m_complete",
+                title: "30 Min Antrenament Complet Forță & Postură",
+                durationMin: 30,
+                targetBody: "Full Body Intens • Fără Impact",
+                workSec: 45,
+                restSec: 20,
+                exerciseIds: ["lib_fb_shadowbox", "lib_kb_goblet", "lib_kb_deadlift", "lib_bw_pushup", "lib_db_floor_press", "lib_db_bent_row", "lib_band_facepull", "lib_db_bicep_curl", "lib_yoga_squeeze", "lib_core_deadbug", "lib_yoga_thoracic"],
+                isPreset: true
+            }
+        ];
+
+        let activeMoveSubTab = 'kineto';
+        let selectedLibraryCat = 'Toate';
+        let selectedWorkoutDurFilter = 'all';
+        let addExMode = 'manual';
+        let pendingExImageDataUrl = null;
+        let editingRoutineId = null;
+        let builderSelectedIds = [];
+        let quickSelectedDur = 10;
+        let quickGeneratedRoutine = null;
+        let playerState = {
+            routine: null,
+            exercises: [],
+            idx: 0,
+            phase: 'work', // 'work' | 'rest'
+            remaining: 0,
+            paused: false,
+            interval: null,
+            totalSecondsElapsed: 0
+        };
+
+        function getTodayMoveKey() {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function saveMoveExtensionsState() {
+            localStorage.setItem('reset_customExercises', JSON.stringify(state.customExercises || []));
+            localStorage.setItem('reset_workoutRoutines', JSON.stringify(state.workoutRoutines || []));
+            localStorage.setItem('reset_moveHistory', JSON.stringify(state.moveHistory || {}));
+            markStateDirtyAndSync();
+        }
+
+        function recordMoveActivity(addedMins, didWorkout = false) {
+            if (!state.moveHistory || typeof state.moveHistory !== 'object') state.moveHistory = {};
+            const key = getTodayMoveKey();
+            const cur = state.moveHistory[key] || { mins: 0, workouts: 0 };
+            if (addedMins > 0) cur.mins = (cur.mins || 0) + addedMins;
+            if (didWorkout) cur.workouts = Math.max(1, (cur.workouts || 0) + 1);
+            state.moveHistory[key] = cur;
+            localStorage.setItem('reset_moveHistory', JSON.stringify(state.moveHistory));
+        }
+
+        function renderWeeklyMotivation() {
+            const dotsEl = document.getElementById('move-weekly-dots');
+            const sumEl = document.getElementById('move-weekly-summary');
+            if (!dotsEl || !sumEl) return;
+
+            const hist = state.moveHistory || {};
+            const dayLabels = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+            const now = new Date();
+            const mondayOffset = (now.getDay() + 6) % 7;
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - mondayOffset);
+
+            let activeDays = 0;
+            let weeklyMins = 0;
+            let dotsHtml = '';
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                const entry = hist[key] || { mins: 0, workouts: 0 };
+                const isToday = key === getTodayMoveKey();
+                const isDone = (entry.workouts > 0) || (entry.mins >= 10) || (isToday && state.moveStats.workoutDoneToday);
+                if (isDone) activeDays++;
+                weeklyMins += (entry.mins || 0);
+
+                const cls = isDone
+                    ? 'bg-emerald-600/80 border-emerald-400 text-white'
+                    : (isToday ? 'bg-slate-800 border-purple-500/70 text-purple-300' : 'bg-slate-950/70 border-slate-800 text-slate-500');
+
+                dotsHtml += `
+                    <div class="rounded-xl border py-1.5 text-[10px] font-bold ${cls}">
+                        <div>${dayLabels[i]}</div>
+                        <div class="text-[11px] leading-none mt-0.5">${isDone ? '🔥' : '·'}</div>
+                    </div>`;
+            }
+
+            dotsEl.innerHTML = dotsHtml;
+            sumEl.innerText = `${activeDays}/7 zile • ${weeklyMins} min săpt.`;
+        }
+
+        function switchMoveSubTab(sub) {
+            haptic(15);
+            activeMoveSubTab = sub;
+            ['kineto', 'workouts', 'library'].forEach(k => {
+                const btn = document.getElementById(`move-sub-${k}`);
+                const panel = document.getElementById(`move-panel-${k}`);
+                if (!btn || !panel) return;
+                if (k === sub) {
+                    btn.className = "py-2 rounded-xl text-[11px] font-bold bg-emerald-600 text-white transition";
+                    panel.classList.remove('hidden');
+                } else {
+                    btn.className = "py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition";
+                    panel.classList.add('hidden');
+                }
+            });
+            if (sub === 'workouts') renderWorkoutsList();
+            if (sub === 'library') renderExerciseLibrary();
+        }
+
+        function getAllExercisesCombined() {
+            const kinetoAll = [];
+            Object.keys(EXERCISES_DB).forEach(lvl => {
+                (EXERCISES_DB[lvl].items || []).forEach(it => {
+                    kinetoAll.push({
+                        ...it,
+                        category: "Spate & Sciatică",
+                        equipment: "Greutatea corpului",
+                        conditionTag: it.target,
+                        videoUrl: it.videoId ? `https://www.youtube.com/watch?v=${it.videoId}` : "",
+                        isKineto: true
+                    });
+                });
+            });
+            return [...(state.customExercises || []), ...PRESET_LIBRARY_EXERCISES, ...kinetoAll];
+        }
+
+        function parseVideoSource(url) {
+            const raw = (url || "").trim();
+            if (!raw) return { type: 'none', youtubeId: null, url: '' };
+            const ytMatch = raw.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+            if (ytMatch) {
+                return { type: 'youtube', youtubeId: ytMatch[1], url: raw };
+            }
+            return { type: 'external', youtubeId: null, url: raw };
+        }
+
+        function selectLibraryCategory(cat) {
+            haptic(15);
+            selectedLibraryCat = cat;
+            renderExerciseLibrary();
+        }
+
+        function renderExerciseLibrary() {
+            const chipsEl = document.getElementById('library-category-chips');
+            const contEl = document.getElementById('library-container');
+            const countEl = document.getElementById('library-tab-count');
+            if (!chipsEl || !contEl) return;
+
+            const allLib = [...(state.customExercises || []), ...PRESET_LIBRARY_EXERCISES];
+            if (countEl) countEl.innerText = `(${allLib.length})`;
+
+            chipsEl.innerHTML = LIBRARY_CATEGORIES.map(cat => {
+                const active = cat === selectedLibraryCat;
+                const cls = active
+                    ? "shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-cyan-600 text-white transition"
+                    : "shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700 transition";
+                return `<button onclick="selectLibraryCategory('${escapeHtml(cat)}')" class="${cls}">${escapeHtml(cat)}</button>`;
+            }).join('');
+
+            const q = (document.getElementById('library-search-input')?.value || '').trim().toLowerCase();
+            const filtered = allLib.filter(ex => {
+                const catOk = selectedLibraryCat === 'Toate' || ex.category === selectedLibraryCat;
+                if (!catOk) return false;
+                if (!q) return true;
+                return (ex.name + ' ' + ex.category + ' ' + (ex.equipment || '') + ' ' + (ex.conditionTag || '')).toLowerCase().includes(q);
+            });
+
+            if (!filtered.length) {
+                contEl.innerHTML = `<div class="glass rounded-3xl p-6 text-center text-xs text-slate-400">Niciun exercițiu găsit în această categorie. Apasă pe butonul de sus pentru a adăuga unul!</div>`;
+                return;
+            }
+
+            contEl.innerHTML = filtered.map(ex => {
+                const vid = parseVideoSource(ex.videoUrl);
+                const videoBtnHtml = vid.type === 'youtube'
+                    ? `<button onclick="toggleLibraryVideo('${ex.id}', '${vid.youtubeId}')" id="lib-vid-btn-${ex.id}" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1.5"><span>🎬</span><span>Video YouTube</span></button>`
+                    : (vid.type === 'external'
+                        ? `<a href="${escapeHtml(vid.url)}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-purple-300 font-bold text-xs flex items-center justify-center gap-1.5"><span>🔗</span><span>Deschide Short/Reel ↗</span></a>`
+                        : `<div class="py-2 px-3 rounded-xl bg-slate-900/70 border border-slate-800 text-slate-500 text-xs flex items-center justify-center">Fără video</div>`);
+
+                const deleteBtn = !ex.isPreset
+                    ? `<button onclick="deleteCustomExercise('${ex.id}')" class="text-xs px-2 py-0.5 rounded-lg bg-red-950/70 border border-red-800/60 text-red-300">🗑️</button>`
+                    : '';
+
+                return `
+                <div class="glass rounded-3xl p-4 space-y-2.5 border-slate-700/60">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="space-y-1 min-w-0">
+                            <h4 class="text-xs font-extrabold text-white leading-snug">${escapeHtml(ex.name)}</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="text-[10px] font-semibold text-cyan-300 bg-cyan-950/60 border border-cyan-800/60 px-2 py-0.5 rounded-full">${escapeHtml(ex.category)}</span>
+                                <span class="text-[10px] font-semibold text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">🏋️ ${escapeHtml(ex.equipment || 'Greutatea corpului')}</span>
+                            </div>
+                        </div>
+                        ${deleteBtn}
+                    </div>
+                    ${ex.conditionTag ? `<div class="text-[10px] text-purple-300 font-semibold">🎯 ${escapeHtml(ex.conditionTag)}</div>` : ''}
+                    <div class="text-[11px] text-amber-300 font-semibold">${escapeHtml(ex.reps || `${ex.timerSec || 45} sec`)}</div>
+                    ${ex.tip ? `<p class="text-[11px] text-slate-300 bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 leading-relaxed selectable">💡 ${escapeHtml(ex.tip)}</p>` : ''}
+                    <div class="grid grid-cols-2 gap-2">
+                        ${videoBtnHtml}
+                        <button onclick="startExerciseTimer('${ex.id}', ${ex.timerSec || 45})" id="ex-timer-btn-${ex.id}" class="py-2 px-3 rounded-xl bg-emerald-600/85 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5">
+                            <span>⏱️</span><span id="ex-timer-lbl-${ex.id}">Start ${ex.timerSec || 45}s</span>
+                        </button>
+                    </div>
+                    <div id="lib-video-wrap-${ex.id}" class="hidden space-y-2 pt-1"></div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleLibraryVideo(exId, youtubeId) {
+            haptic(20);
+            const wrap = document.getElementById(`lib-video-wrap-${exId}`);
+            const btn = document.getElementById(`lib-vid-btn-${exId}`);
+            if (!wrap) return;
+            if (!wrap.classList.contains('hidden')) {
+                wrap.classList.add('hidden');
+                wrap.innerHTML = '';
+                if (btn) btn.innerHTML = '<span>🎬</span><span>Video YouTube</span>';
+                return;
+            }
+            wrap.classList.remove('hidden');
+            wrap.innerHTML = `
+                <div class="aspect-video w-full rounded-2xl overflow-hidden border border-slate-700 bg-black">
+                    <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0" title="Video exercițiu" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="flex justify-between items-center text-[10px] text-slate-400 px-1">
+                    <span>Nu pornește în app?</span>
+                    <a href="https://www.youtube.com/watch?v=${youtubeId}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 font-bold underline">Deschide pe YouTube ↗</a>
+                </div>`;
+            if (btn) btn.innerHTML = '<span>✕</span><span>Ascunde Video</span>';
+        }
+
+        function deleteCustomExercise(id) {
+            if (!confirm('Ștergi acest exercițiu din bibliotecă?')) return;
+            state.customExercises = (state.customExercises || []).filter(e => e.id !== id);
+            saveMoveExtensionsState();
+            renderExerciseLibrary();
+        }
+
+        // --- MODAL ADAUGĂ EXERCIȚIU & IMPORT AI ---
+        function openAddExerciseModal() {
+            haptic(20);
+            pendingExImageDataUrl = null;
+            document.getElementById('ex-form-name').value = '';
+            document.getElementById('ex-form-reps').value = '3 x 12 repetări';
+            document.getElementById('ex-form-timer').value = '45';
+            document.getElementById('ex-form-video').value = '';
+            document.getElementById('ex-form-condition').value = '';
+            document.getElementById('ex-form-tip').value = '';
+            document.getElementById('add-ex-paste-text').value = '';
+            document.getElementById('add-ex-preview').classList.add('hidden');
+            document.getElementById('add-ex-file-label').innerText = 'Alege screenshot sau poză';
+            const statusEl = document.getElementById('add-ex-status');
+            statusEl.classList.add('hidden');
+            switchAddExMode('manual');
+            toggleModal('add-exercise-modal');
+        }
+
+        function switchAddExMode(mode) {
+            addExMode = mode;
+            ['manual', 'photo', 'paste'].forEach(m => {
+                const btn = document.getElementById(`ex-mode-${m}`);
+                if (btn) btn.className = m === mode
+                    ? "py-2 rounded-xl text-[11px] font-bold bg-cyan-600 text-white transition"
+                    : "py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition";
+            });
+            document.getElementById('ex-panel-photo').classList.toggle('hidden', mode !== 'photo');
+            document.getElementById('ex-panel-paste').classList.toggle('hidden', mode !== 'paste');
+        }
+
+        function handleExImageSelected(evt) {
+            const file = evt.target.files?.[0];
+            if (!file) return;
+            document.getElementById('add-ex-file-label').innerText = `✅ ${file.name}`;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                pendingExImageDataUrl = e.target.result;
+                const img = document.getElementById('add-ex-preview');
+                img.src = pendingExImageDataUrl;
+                img.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        const EXERCISE_EXTRACTOR_PROMPT = `Ești un kinetoterapeut și antrenor personal. Analizează textul sau imaginea unui exercițiu (dintr-un YouTube Short, Facebook Reel sau postare) și returnează STRICT un obiect JSON valid (fără markdown, fără \`\`\`json) cu structura:
+{
+  "name": "Numele exercițiului în română",
+  "category": "UNA dintre: Spate & Sciatică | Gât & Umeri | Piept & Brațe | Abdomen / Core | Picioare & Fesieri | Mobilitate | Full Body",
+  "equipment": "UNA dintre: Greutatea corpului | Gantere 4kg | Kettlebell 6kg | Benzi elastice | Corzi elastice | Cub yoga",
+  "reps": "ex: 3 x 12 repetări",
+  "timerSec": 45,
+  "conditionTag": "Scopul sau afecțiunea vizată (scurt)",
+  "tip": "Tehnică sigură în română + atenționare dacă pune presiune lombară/sciatică"
+}`;
+
+        async function extractExerciseWithAI(mode) {
+            const statusEl = document.getElementById('add-ex-status');
+            const setExStatus = (msg, isErr = false) => {
+                statusEl.innerText = msg;
+                statusEl.className = `text-xs p-2.5 rounded-2xl font-mono ${isErr ? 'bg-red-950/70 text-red-300 border border-red-700/60' : 'bg-cyan-950/70 text-cyan-200 border border-cyan-700/60'}`;
+                statusEl.classList.remove('hidden');
+            };
+
+            if (!state.apiKey) {
+                setExStatus('❌ Configurează cheia API în Setări mai întâi!', true);
+                return;
+            }
+
+            try {
+                let raw = '';
+                if (mode === 'photo') {
+                    if (!pendingExImageDataUrl) throw new Error('Încarcă un screenshot mai întâi!');
+                    const provider = detectProvider(state.apiKey);
+                    if (provider.type !== 'gemini') throw new Error('Citirea din screenshot necesită cheie Google Gemini.');
+                    setExStatus('⏳ Gemini Vision analizează exercițiul...');
+                    const m = pendingExImageDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+                    const contents = [{
+                        role: 'user',
+                        parts: [
+                            { inlineData: { mimeType: m[1], data: m[2] } },
+                            { text: 'Extrage acest exercițiu în formatul JSON cerut.' }
+                        ]
+                    }];
+                    raw = await callGeminiWithFallback(state.apiKey.trim(), EXERCISE_EXTRACTOR_PROMPT, contents);
+                } else {
+                    const txt = document.getElementById('add-ex-paste-text').value.trim();
+                    if (txt.length < 8) throw new Error('Lipește textul sau descrierea mai întâi!');
+                    setExStatus('⏳ AI-ul structurează exercițiul...');
+                    raw = await callUniversalAI(state.apiKey, EXERCISE_EXTRACTOR_PROMPT, [{ role: 'user', content: txt }]);
+                }
+
+                const cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const match = cleaned.match(/\{[\s\S]*\}/);
+                if (!match) throw new Error('Nu am putut interpreta răspunsul AI.');
+                const data = JSON.parse(match[0]);
+
+                if (data.name) document.getElementById('ex-form-name').value = data.name;
+                if (data.category && LIBRARY_CATEGORIES.includes(data.category)) document.getElementById('ex-form-category').value = data.category;
+                if (data.equipment) {
+                    const eqSel = document.getElementById('ex-form-equipment');
+                    if ([...eqSel.options].some(o => o.value === data.equipment)) eqSel.value = data.equipment;
+                }
+                if (data.reps) document.getElementById('ex-form-reps').value = data.reps;
+                if (data.timerSec) document.getElementById('ex-form-timer').value = parseInt(data.timerSec, 10) || 45;
+                if (data.conditionTag) document.getElementById('ex-form-condition').value = data.conditionTag;
+                if (data.tip) document.getElementById('ex-form-tip').value = data.tip;
+
+                setExStatus('✅ Câmpurile au fost completate! Adaugă opțional linkul video și apasă Salvează.');
+            } catch (err) {
+                setExStatus('❌ ' + err.message, true);
+            }
+        }
+
+        function saveCustomExercise() {
+            const name = document.getElementById('ex-form-name').value.trim();
+            if (!name) {
+                alert('Introdu numele exercițiului!');
+                return;
+            }
+            const newEx = {
+                id: 'ex-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                name,
+                category: document.getElementById('ex-form-category').value,
+                equipment: document.getElementById('ex-form-equipment').value,
+                reps: document.getElementById('ex-form-reps').value.trim() || '3 x 12 repetări',
+                timerSec: Math.max(15, parseInt(document.getElementById('ex-form-timer').value, 10) || 45),
+                videoUrl: document.getElementById('ex-form-video').value.trim(),
+                conditionTag: document.getElementById('ex-form-condition').value.trim(),
+                tip: document.getElementById('ex-form-tip').value.trim(),
+                isPreset: false,
+                createdAt: Date.now()
+            };
+
+            state.customExercises = [newEx, ...(state.customExercises || [])];
+            saveMoveExtensionsState();
+            selectedLibraryCat = newEx.category;
+            toggleModal('add-exercise-modal');
+            switchMoveSubTab('library');
+            haptic(40);
+        }
+
+        // --- ANTRENAMENTE (LISTE 5-30 MIN) & CONSTRUCTOR ---
+        function filterWorkoutsByDuration(dur) {
+            haptic(15);
+            selectedWorkoutDurFilter = dur;
+            document.querySelectorAll('#workout-duration-filters button').forEach(btn => {
+                const isSel = btn.getAttribute('data-dur') === dur;
+                btn.className = isSel
+                    ? "shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-cyan-600 text-white transition"
+                    : "shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700 transition";
+            });
+            renderWorkoutsList();
+        }
+
+        function getAllWorkoutRoutines() {
+            return [...(state.workoutRoutines || []), ...PRESET_WORKOUT_ROUTINES];
+        }
+
+        function renderWorkoutsList() {
+            const cont = document.getElementById('workouts-container');
+            if (!cont) return;
+
+            const all = getAllWorkoutRoutines().filter(r => {
+                if (selectedWorkoutDurFilter === 'short') return r.durationMin <= 10;
+                if (selectedWorkoutDurFilter === 'medium') return r.durationMin > 10 && r.durationMin <= 20;
+                if (selectedWorkoutDurFilter === 'long') return r.durationMin > 20;
+                return true;
+            });
+
+            if (!all.length) {
+                cont.innerHTML = `<div class="glass rounded-3xl p-6 text-center text-xs text-slate-400">Niciun antrenament în acest interval. Creează unul personalizat cu butonul de sus!</div>`;
+                return;
+            }
+
+            const allExMap = {};
+            getAllExercisesCombined().forEach(e => { allExMap[e.id] = e; });
+
+            cont.innerHTML = all.map(r => {
+                const validExs = (r.exerciseIds || []).map(id => allExMap[id]).filter(Boolean);
+                const previewNames = validExs.slice(0, 3).map(e => e.name).join(' • ');
+                const extra = validExs.length > 3 ? ` +${validExs.length - 3}` : '';
+
+                return `
+                <div class="glass rounded-3xl p-4 space-y-2.5 border-slate-700/60">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="space-y-1 min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-700/60">⏱️ ${r.durationMin} min</span>
+                                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">${validExs.length} exerciții</span>
+                                ${!r.isPreset ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950/70 text-purple-300 border border-purple-700/60">Personalizat</span>' : ''}
+                            </div>
+                            <h4 class="text-sm font-extrabold text-white leading-snug">${escapeHtml(r.title)}</h4>
+                            <div class="text-[11px] text-cyan-300">${escapeHtml(r.targetBody || '')}</div>
+                        </div>
+                        ${!r.isPreset ? `
+                        <div class="flex gap-1 shrink-0">
+                            <button onclick="openWorkoutBuilder('${r.id}')" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs">✏️</button>
+                            <button onclick="deleteWorkoutRoutine('${r.id}')" class="p-1.5 rounded-xl bg-red-950/70 hover:bg-red-900/80 text-xs text-red-300">🗑️</button>
+                        </div>` : ''}
+                    </div>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">${escapeHtml(previewNames)}${extra}</p>
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 px-1">
+                        <span>Ritm: ${r.workSec || 40}s lucru / ${r.restSec || 20}s pauză</span>
+                    </div>
+                    <button onclick="startWorkoutPlayerById('${r.id}')" class="w-full py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold text-xs shadow active:scale-95 transition">
+                        ▶ Începe Antrenamentul (${r.durationMin} min)
+                    </button>
+                </div>`;
+            }).join('');
+        }
+
+        function openWorkoutBuilder(editId = null) {
+            haptic(20);
+            editingRoutineId = editId;
+            if (editId) {
+                const r = (state.workoutRoutines || []).find(x => x.id === editId);
+                if (r) {
+                    document.getElementById('builder-modal-title').innerHTML = '<span>✏️</span> Editează Antrenament';
+                    document.getElementById('wb-title').value = r.title;
+                    document.getElementById('wb-duration').value = String(r.durationMin || 15);
+                    document.getElementById('wb-work-sec').value = r.workSec || 40;
+                    document.getElementById('wb-rest-sec').value = r.restSec || 20;
+                    document.getElementById('wb-target').value = r.targetBody || '';
+                    builderSelectedIds = [...(r.exerciseIds || [])];
+                }
+            } else {
+                document.getElementById('builder-modal-title').innerHTML = '<span>🔥</span> Creează Antrenament';
+                document.getElementById('wb-title').value = '';
+                document.getElementById('wb-duration').value = '15';
+                document.getElementById('wb-work-sec').value = '40';
+                document.getElementById('wb-rest-sec').value = '20';
+                document.getElementById('wb-target').value = '';
+                builderSelectedIds = [];
+            }
+            document.getElementById('wb-search').value = '';
+            renderWorkoutBuilderList();
+            toggleModal('workout-builder-modal');
+        }
+
+        function renderWorkoutBuilderList() {
+            const listEl = document.getElementById('wb-exercises-list');
+            const countEl = document.getElementById('wb-selected-count');
+            if (!listEl) return;
+            if (countEl) countEl.innerText = builderSelectedIds.length;
+
+            const q = (document.getElementById('wb-search')?.value || '').trim().toLowerCase();
+            const all = getAllExercisesCombined().filter(e => {
+                if (!q) return true;
+                return (e.name + ' ' + e.category + ' ' + (e.equipment || '')).toLowerCase().includes(q);
+            });
+
+            listEl.innerHTML = all.map(e => {
+                const checked = builderSelectedIds.includes(e.id);
+                return `
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer transition ${checked ? 'border-emerald-500/70 bg-emerald-950/30' : 'border-slate-800 bg-slate-900/70'}">
+                    <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleBuilderEx('${e.id}')" class="accent-emerald-500 w-4 h-4">
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-bold text-white truncate">${escapeHtml(e.name)}</div>
+                        <div class="text-[10px] text-slate-400">${escapeHtml(e.category)} • ${escapeHtml(e.equipment || 'Bodyweight')}</div>
+                    </div>
+                </label>`;
+            }).join('');
+        }
+
+        function toggleBuilderEx(id) {
+            if (builderSelectedIds.includes(id)) {
+                builderSelectedIds = builderSelectedIds.filter(x => x !== id);
+            } else {
+                builderSelectedIds.push(id);
+            }
+            document.getElementById('wb-selected-count').innerText = builderSelectedIds.length;
+            renderWorkoutBuilderList();
+        }
+
+        function saveWorkoutRoutine() {
+            const title = document.getElementById('wb-title').value.trim();
+            if (!title) { alert('Pune un nume antrenamentului!'); return; }
+            if (!builderSelectedIds.length) { alert('Selectează cel puțin un exercițiu!'); return; }
+
+            const routineObj = {
+                id: editingRoutineId || ('wrk-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5)),
+                title,
+                durationMin: parseInt(document.getElementById('wb-duration').value, 10) || 15,
+                workSec: Math.max(15, parseInt(document.getElementById('wb-work-sec').value, 10) || 40),
+                restSec: Math.max(5, parseInt(document.getElementById('wb-rest-sec').value, 10) || 20),
+                targetBody: document.getElementById('wb-target').value.trim() || 'Antrenament personalizat',
+                exerciseIds: [...builderSelectedIds],
+                isPreset: false,
+                createdAt: Date.now()
+            };
+
+            if (editingRoutineId) {
+                state.workoutRoutines = (state.workoutRoutines || []).map(r => r.id === editingRoutineId ? routineObj : r);
+            } else {
+                state.workoutRoutines = [routineObj, ...(state.workoutRoutines || [])];
+            }
+
+            saveMoveExtensionsState();
+            toggleModal('workout-builder-modal');
+            switchMoveSubTab('workouts');
+            haptic(40);
+        }
+
+        function deleteWorkoutRoutine(id) {
+            if (!confirm('Ștergi această listă de antrenament?')) return;
+            state.workoutRoutines = (state.workoutRoutines || []).filter(r => r.id !== id);
+            saveMoveExtensionsState();
+            renderWorkoutsList();
+        }
+
+        // --- GENERATOR RAPID (AM DOAR X MINUTE) ---
+        function openQuickWorkoutModal() {
+            haptic(20);
+            quickGeneratedRoutine = null;
+            document.getElementById('qw-result-box').classList.add('hidden');
+            selectQuickDuration(10);
+            toggleModal('quick-workout-modal');
+        }
+
+        function selectQuickDuration(mins) {
+            quickSelectedDur = mins;
+            document.querySelectorAll('#qw-duration-btns button').forEach(b => {
+                const active = parseInt(b.getAttribute('data-qdur'), 10) === mins;
+                b.className = active
+                    ? "py-2 rounded-xl text-xs font-bold bg-purple-600 text-white"
+                    : "py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700";
+            });
+        }
+
+        function generateQuickWorkout() {
+            haptic(30);
+            const zone = document.getElementById('qw-zone').value;
+            const energy = document.getElementById('qw-energy').value;
+            const workSec = energy === 'tired' ? 35 : (energy === 'high' ? 45 : 40);
+            const restSec = energy === 'tired' ? 25 : (energy === 'high' ? 15 : 20);
+            const targetCount = Math.max(3, Math.min(10, Math.round((quickSelectedDur * 60) / (workSec + restSec) / (quickSelectedDur >= 20 ? 2 : 1))));
+
+            let pool = getAllExercisesCombined();
+            if (zone !== 'all') {
+                const exact = pool.filter(e => e.category === zone);
+                if (exact.length >= 2) pool = exact;
+            }
+            if (energy === 'tired') {
+                const gentle = pool.filter(e => e.category !== 'Full Body' || e.equipment === 'Cub yoga' || e.equipment === 'Benzi elastice');
+                if (gentle.length >= 3) pool = gentle;
+            }
+
+            const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, targetCount);
+            quickGeneratedRoutine = {
+                id: 'wrk-quick-' + Date.now(),
+                title: `Quick ${quickSelectedDur}m: ${zone === 'all' ? 'Full Body' : zone}`,
+                durationMin: quickSelectedDur,
+                targetBody: `${zone === 'all' ? 'Mix Echilibrat' : zone} • Energie ${energy}`,
+                workSec,
+                restSec,
+                exerciseIds: shuffled.map(e => e.id),
+                isPreset: false
+            };
+
+            const box = document.getElementById('qw-result-box');
+            box.classList.remove('hidden');
+            box.innerHTML = `
+                <div class="text-xs font-extrabold text-purple-300">⚡ ${escapeHtml(quickGeneratedRoutine.title)}</div>
+                <div class="text-[11px] text-slate-400">${shuffled.length} exerciții • ${workSec}s lucru / ${restSec}s pauză</div>
+                <ul class="space-y-1 text-xs text-slate-200">
+                    ${shuffled.map((e, i) => `<li>${i + 1}. <strong>${escapeHtml(e.name)}</strong> <span class="text-[10px] text-cyan-300">(${escapeHtml(e.equipment || 'Bodyweight')})</span></li>`).join('')}
+                </ul>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="saveQuickGeneratedRoutine()" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold">💾 Salvează Lista</button>
+                    <button onclick="startQuickGeneratedRoutine()" class="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">▶ Începe Acum</button>
+                </div>`;
+        }
+
+        function saveQuickGeneratedRoutine() {
+            if (!quickGeneratedRoutine) return;
+            state.workoutRoutines = [quickGeneratedRoutine, ...(state.workoutRoutines || [])];
+            saveMoveExtensionsState();
+            toggleModal('quick-workout-modal');
+            switchMoveSubTab('workouts');
+            haptic(30);
+        }
+
+        function startQuickGeneratedRoutine() {
+            if (!quickGeneratedRoutine) return;
+            toggleModal('quick-workout-modal');
+            startWorkoutPlayer(quickGeneratedRoutine);
+        }
+
+        // --- WORKOUT PLAYER GHIDAT ---
+        function playPlayerBeep(freq = 660, durationMs = 180) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                setTimeout(() => { osc.stop(); ctx.close(); }, durationMs);
+            } catch (e) {}
+        }
+
+        function startWorkoutPlayerById(routineId) {
+            const routine = getAllWorkoutRoutines().find(r => r.id === routineId);
+            if (!routine) return;
+            startWorkoutPlayer(routine);
+        }
+
+        function startWorkoutPlayer(routine) {
+            const allMap = {};
+            getAllExercisesCombined().forEach(e => { allMap[e.id] = e; });
+            const exs = (routine.exerciseIds || []).map(id => allMap[id]).filter(Boolean);
+            if (!exs.length) { alert('Antrenamentul nu are exerciții valide!'); return; }
+
+            if (playerState.interval) clearInterval(playerState.interval);
+            playerState = {
+                routine,
+                exercises: exs,
+                idx: 0,
+                phase: 'work',
+                remaining: routine.workSec || 40,
+                paused: false,
+                interval: null,
+                totalSecondsElapsed: 0
+            };
+
+            document.getElementById('wp-routine-title').innerText = routine.title;
+            document.getElementById('wp-pause-btn').innerText = '⏸ Pauză';
+            renderWorkoutPlayerStep();
+            toggleModal('workout-player-modal');
+            playPlayerBeep(720, 180);
+            haptic(50);
+
+            playerState.interval = setInterval(tickWorkoutPlayer, 1000);
+        }
+
+        function tickWorkoutPlayer() {
+            if (playerState.paused) return;
+            playerState.totalSecondsElapsed++;
+            playerState.remaining--;
+
+            if (playerState.remaining <= 3 && playerState.remaining > 0) {
+                playPlayerBeep(520, 100);
+            }
+
+            if (playerState.remaining <= 0) {
+                if (playerState.phase === 'work') {
+                    if (playerState.idx >= playerState.exercises.length - 1) {
+                        finishWorkoutPlayer();
+                        return;
+                    }
+                    playerState.phase = 'rest';
+                    playerState.remaining = playerState.routine.restSec || 20;
+                    playPlayerBeep(440, 260);
+                    haptic(60);
+                } else {
+                    playerState.idx++;
+                    playerState.phase = 'work';
+                    playerState.remaining = playerState.routine.workSec || 40;
+                    playPlayerBeep(880, 220);
+                    haptic(60);
+                }
+                renderWorkoutPlayerStep();
+            } else {
+                updatePlayerTimerDisplay();
+            }
+        }
+
+        function updatePlayerTimerDisplay() {
+            const m = Math.floor(playerState.remaining / 60);
+            const s = playerState.remaining % 60;
+            const el = document.getElementById('wp-timer-display');
+            if (el) el.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function renderWorkoutPlayerStep() {
+            const total = playerState.exercises.length;
+            const ex = playerState.exercises[playerState.idx];
+            const isRest = playerState.phase === 'rest';
+            const nextEx = playerState.exercises[playerState.idx + 1];
+
+            document.getElementById('wp-step-counter').innerText = `Exercițiul ${playerState.idx + 1} / ${total}`;
+            const pct = Math.round(((playerState.idx + (isRest ? 0.5 : 0)) / total) * 100);
+            document.getElementById('wp-progress-bar').style.width = `${pct}%`;
+
+            const badge = document.getElementById('wp-phase-badge');
+            if (isRest) {
+                badge.innerText = '😮‍💨 PAUZĂ • PREGĂTEȘTE-TE';
+                badge.className = 'inline-block text-xs font-extrabold px-3 py-1 rounded-full bg-amber-600/30 text-amber-300 border border-amber-500/50';
+                document.getElementById('wp-ex-name').innerText = nextEx ? `Urmează: ${nextEx.name}` : 'Ultimul pas!';
+                document.getElementById('wp-ex-meta').innerText = nextEx ? `Echipament: ${nextEx.equipment || 'Greutatea corpului'}` : '';
+                document.getElementById('wp-ex-tip').innerText = 'Trage aer adânc pe nas și relaxează umerii.';
+                document.getElementById('wp-ex-video-area').innerHTML = '';
+            } else {
+                badge.innerText = '🔥 LUCRU';
+                badge.className = 'inline-block text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-600/30 text-emerald-300 border border-emerald-500/50';
+                document.getElementById('wp-ex-name').innerText = ex.name;
+                document.getElementById('wp-ex-meta').innerText = `${ex.equipment || 'Greutatea corpului'} • ${ex.reps || ''}`;
+                document.getElementById('wp-ex-tip').innerHTML = `💡 <strong>Tehnică sigură:</strong> ${escapeHtml(ex.tip || 'Mișcare controlată, fără durere ascuțită.')}`;
+
+                const vid = parseVideoSource(ex.videoUrl || (ex.videoId ? `https://www.youtube.com/watch?v=${ex.videoId}` : ''));
+                const vidArea = document.getElementById('wp-ex-video-area');
+                if (vid.type === 'youtube') {
+                    vidArea.innerHTML = `<button onclick="this.outerHTML='<div class=\\'aspect-video w-full rounded-2xl overflow-hidden border border-slate-700 bg-black\\'><iframe class=\\'w-full h-full\\' src=\\'https://www.youtube-nocookie.com/embed/${vid.youtubeId}?rel=0\\' frameborder=\\'0\\' allowfullscreen></iframe></div>'" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-300 text-xs font-bold">🎬 Arată Video Demo YouTube</button>`;
+                } else if (vid.type === 'external') {
+                    vidArea.innerHTML = `<a href="${escapeHtml(vid.url)}" target="_blank" rel="noopener noreferrer" class="block w-full text-center py-2 rounded-xl bg-slate-800 border border-slate-600 text-purple-300 text-xs font-bold">🔗 Deschide Short/Reel ↗</a>`;
+                } else {
+                    vidArea.innerHTML = '';
+                }
+            }
+            updatePlayerTimerDisplay();
+        }
+
+        function togglePlayerPause() {
+            playerState.paused = !playerState.paused;
+            document.getElementById('wp-pause-btn').innerText = playerState.paused ? '▶ Continuă' : '⏸ Pauză';
+            haptic(20);
+        }
+
+        function playerNextStep() {
+            haptic(20);
+            if (playerState.phase === 'work' && playerState.idx < playerState.exercises.length - 1) {
+                playerState.phase = 'rest';
+                playerState.remaining = playerState.routine.restSec || 20;
+            } else if (playerState.idx < playerState.exercises.length - 1) {
+                playerState.idx++;
+                playerState.phase = 'work';
+                playerState.remaining = playerState.routine.workSec || 40;
+            } else {
+                finishWorkoutPlayer();
+                return;
+            }
+            renderWorkoutPlayerStep();
+        }
+
+        function playerPrevStep() {
+            haptic(20);
+            if (playerState.idx > 0) {
+                playerState.idx--;
+            }
+            playerState.phase = 'work';
+            playerState.remaining = playerState.routine.workSec || 40;
+            renderWorkoutPlayerStep();
+        }
+
+        function closeWorkoutPlayer() {
+            if (playerState.interval) clearInterval(playerState.interval);
+            playerState.interval = null;
+            document.getElementById('workout-player-modal').classList.add('hidden');
+        }
+
+        function finishWorkoutPlayer() {
+            if (playerState.interval) clearInterval(playerState.interval);
+            playerState.interval = null;
+            playPlayerBeep(980, 320);
+            haptic(80);
+
+            const minsEarned = Math.max(5, Math.round(playerState.totalSecondsElapsed / 60) || playerState.routine?.durationMin || 10);
+            state.moveStats.workoutDoneToday = true;
+            localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
+            recordMoveActivity(minsEarned, true);
+
+            renderMoveProgress();
+            renderWeeklyMotivation();
+            updateDashboard();
+            markStateDirtyAndSync();
+
+            document.getElementById('workout-player-modal').classList.add('hidden');
+            alert(`🔥 Felicitări! Ai terminat "${playerState.routine?.title}" (+${minsEarned} min active)! Streak-ul tău săptămânal a fost actualizat.`);
+        }
+
+        function renderMoveExtensions() {
+            renderWeeklyMotivation();
+            renderExerciseLibrary();
+            renderWorkoutsList();
         }
 
         // ==================== NUTRIȚIE, REȚETE, CĂMARĂ, CUMPĂRĂTURI & CHEF AI ====================
@@ -3241,31 +4813,160 @@
             }).join('');
         }
 
+        let detailPortionMult = 1;
+        let detailCheckedIngs = new Set();
+        let editingRecipeId = null;
+        let inlineStepTimerInterval = null;
+        let inlineStepTimerSec = 0;
+
+        let cookSteps = [];
+        let cookStepIdx = 0;
+        let cookTimerInterval = null;
+        let cookTimerRemaining = 0;
+        let cookTimerRunning = false;
+        let cookWakeLock = null;
+
+        function parseIngredientStringLocal(raw) {
+            const clean = String(raw || '').trim();
+            const m = clean.match(/^([\d\s\/\.,]+)\s*([a-zA-ZăâîșțĂÂÎȘȚ]+)?\s+(.*)$/);
+            let amount = null, unit = '', name = clean;
+            if (m) {
+                const ra = m[1].trim();
+                if (ra.includes('/')) {
+                    const p = ra.split('/');
+                    if (p.length === 2) amount = parseFloat(p[0]) / parseFloat(p[1]);
+                } else {
+                    const n = parseFloat(ra.replace(',', '.'));
+                    if (!isNaN(n)) amount = n;
+                }
+                unit = (m[2] || '').trim();
+                name = (m[3] || '').trim() || clean;
+            }
+            return {
+                id: 'ing-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                name,
+                amount: (amount !== null && !isNaN(amount)) ? amount : null,
+                unit,
+                originalText: clean
+            };
+        }
+
+        function detectStepTimerMins(text) {
+            const m = String(text || '').match(/(\d+)\s*(?:-|–|la)?\s*(\d+)?\s*(?:de\s*)?(?:min|minute|mins)\b/i);
+            if (m) {
+                const mins = parseInt(m[2] || m[1], 10);
+                if (!isNaN(mins) && mins > 0 && mins <= 360) return mins;
+            }
+            const h = String(text || '').match(/(\d+)\s*(?:or[aă]|ore)\b/i);
+            if (h) {
+                const hrs = parseInt(h[1], 10);
+                if (!isNaN(hrs) && hrs > 0 && hrs <= 12) return hrs * 60;
+            }
+            return undefined;
+        }
+
+        function seedPlanRecipesIfNeeded() {
+            if (localStorage.getItem('reset_planRecipesSeeded') === '1') return;
+            if (!Array.isArray(FOOD_PLAN_DB) || FOOD_PLAN_DB.length === 0) return;
+
+            const existingTitles = new Set((state.recipes || []).map(r => (r.title || '').toLowerCase().trim()));
+            const seeded = [];
+
+            FOOD_PLAN_DB.forEach((dayObj, dIdx) => {
+                (dayObj.meals || []).forEach((meal, mIdx) => {
+                    const title = meal.name;
+                    if (existingTitles.has(title.toLowerCase().trim())) return;
+
+                    let category = autoClassifyCategory(title, meal.appliance + ' ' + meal.slot);
+                    if (meal.appliance === 'Airfryer') category = 'La Air Fryer';
+                    else if (/mic dejun/i.test(meal.slot)) category = 'Mic Dejun & Brunch';
+
+                    const ings = meal.ingredients
+                        .split(/,(?![^(]*\))/)
+                        .map(s => s.trim().replace(/\.$/, ''))
+                        .filter(Boolean)
+                        .map(parseIngredientStringLocal);
+
+                    const rawSteps = meal.steps
+                        .split(/(?<=[.!])\s+(?=[A-ZĂÂÎȘȚ])/)
+                        .map(s => s.trim())
+                        .filter(Boolean);
+
+                    const instructions = (rawSteps.length > 0 ? rawSteps : [meal.steps]).map((st, idx) => ({
+                        stepNumber: idx + 1,
+                        text: st,
+                        timerMinutes: detectStepTimerMins(st)
+                    }));
+
+                    const prepNums = (meal.prep || '').match(/\d+/g) || [];
+                    const prepTimeMinutes = prepNums[0] ? parseInt(prepNums[0], 10) : 10;
+                    const cookTimeMinutes = prepNums[1] ? parseInt(prepNums[1], 10) : undefined;
+
+                    seeded.push({
+                        id: `plan-${dIdx}-${mIdx}-${Date.now()}`,
+                        title,
+                        category,
+                        tags: [dayObj.day.toLowerCase(), meal.appliance.toLowerCase(), 'reset'],
+                        servings: 2,
+                        prepTimeMinutes,
+                        cookTimeMinutes,
+                        ingredients: ings,
+                        instructions,
+                        notes: meal.nutrients ? `🧠 De ce ajută: ${meal.nutrients}` : '',
+                        isFavorite: false,
+                        createdAt: Date.now() - (dIdx * 3 + mIdx) * 1000
+                    });
+                });
+            });
+
+            if (seeded.length > 0) {
+                state.recipes = [...(state.recipes || []), ...seeded];
+                saveNutritionState();
+            }
+            localStorage.setItem('reset_planRecipesSeeded', '1');
+        }
+
+        function formatScaledAmount(amount, mult) {
+            if (amount === null || amount === undefined || isNaN(amount)) return '';
+            const val = Math.round(amount * mult * 100) / 100;
+            return Number.isInteger(val) ? String(val) : String(val).replace(/\.0+$/, '');
+        }
+
+        function isIngredientInPantry(ingName) {
+            const lower = (ingName || '').toLowerCase().trim();
+            if (!lower) return false;
+            return (state.pantry || []).some(p => {
+                if (!p.inStock) return false;
+                const pn = (p.name || '').toLowerCase().trim();
+                return pn && (lower.includes(pn) || pn.includes(lower));
+            });
+        }
+
         function openRecipeDetail(id) {
             const r = (state.recipes || []).find(x => x.id === id);
             if (!r) return;
             currentRecipeDetailId = id;
+            detailPortionMult = 1;
+            detailCheckedIngs = new Set();
+            stopInlineStepTimer();
+
             document.getElementById('detail-recipe-cat').innerText = `${getCategoryIcon(r.category)} ${r.category}`;
             document.getElementById('detail-recipe-title').innerText = r.title;
-            const totalMins = (r.prepTimeMinutes || 0) + (r.cookTimeMinutes || 0);
-            document.getElementById('detail-recipe-meta').innerText = `${totalMins > 0 ? '⏱️ ' + totalMins + ' min • ' : ''}🍽️ ${r.servings || 4} porții`;
-            document.getElementById('detail-fav-btn').innerText = r.isFavorite ? '⭐ Favorită' : '☆';
+            document.getElementById('detail-fav-btn').innerText = r.isFavorite ? '⭐' : '☆';
 
-            document.getElementById('detail-recipe-ingredients').innerHTML = (r.ingredients || []).map(ing =>
-                `<li class="flex items-start gap-2"><span class="text-cyan-400">•</span><span>${escapeHtml(ing.originalText || `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim())}</span></li>`
-            ).join('') || '<li class="text-slate-400">Niciun ingredient listat.</li>';
+            const tagsEl = document.getElementById('detail-recipe-tags');
+            tagsEl.innerHTML = (r.tags || []).slice(0, 4).map(t =>
+                `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">#${escapeHtml(t)}</span>`
+            ).join('');
 
-            document.getElementById('detail-recipe-steps').innerHTML = (r.instructions || []).map(st =>
-                `<li>${escapeHtml(st.text || st)}${st.timerMinutes ? ` <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300">⏱️ ${st.timerMinutes}m</span>` : ''}</li>`
-            ).join('') || '<li class="text-slate-400">Niciun pas listat.</li>';
+            const prep = r.prepTimeMinutes || 0;
+            const cook = r.cookTimeMinutes || 0;
+            const tot = prep + cook;
+            document.getElementById('detail-time-total').innerText = tot > 0 ? `${tot} min` : '—';
+            document.getElementById('detail-time-prep').innerText = prep > 0 ? `${prep} min` : '—';
+            document.getElementById('detail-time-cook').innerText = cook > 0 ? `${cook} min` : '—';
 
-            const notesBox = document.getElementById('detail-recipe-notes-box');
-            if (r.notes) {
-                notesBox.innerHTML = `<strong>💡 Note:</strong> ${escapeHtml(r.notes)}`;
-                notesBox.classList.remove('hidden');
-            } else {
-                notesBox.classList.add('hidden');
-            }
+            document.getElementById('detail-recipe-notes-input').value = r.notes || '';
 
             const srcBox = document.getElementById('detail-recipe-source-box');
             if (r.sourceUrl) {
@@ -3275,7 +4976,322 @@
                 srcBox.classList.add('hidden');
             }
 
+            renderDetailPortionsAndNutrition(r);
+            renderDetailIngredients(r);
+            renderDetailSteps(r);
             toggleModal('recipe-detail-modal');
+        }
+
+        function renderDetailPortionsAndNutrition(r) {
+            const baseServings = r.servings || 4;
+            const currentServings = Math.max(1, Math.round(baseServings * detailPortionMult * 10) / 10);
+            document.getElementById('detail-servings-val').innerText = String(currentServings);
+            [0.5, 1, 2, 3].forEach(m => {
+                const btn = document.getElementById(`mult-btn-${m}`);
+                if (btn) btn.className = Math.abs(detailPortionMult - m) < 0.01
+                    ? "px-2 py-1 rounded-lg text-[10px] font-bold bg-orange-600 text-white"
+                    : "px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-800 text-slate-300";
+            });
+
+            const nutBox = document.getElementById('detail-nutrition-box');
+            if (r.nutrition) {
+                nutBox.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold text-slate-300">🥗 Valori Nutriționale <span class="text-[10px] text-slate-400 font-normal">(per porție)</span></span>
+                        <button onclick="calculateDetailNutritionAI()" class="text-[10px] text-cyan-400 hover:underline">↻ Recalculează</button>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1.5 text-center">
+                        <div class="bg-slate-950/70 rounded-xl p-1.5 border border-slate-800"><div class="text-xs font-extrabold text-orange-300">${r.nutrition.calories}</div><div class="text-[9px] text-slate-400">kcal</div></div>
+                        <div class="bg-slate-950/70 rounded-xl p-1.5 border border-slate-800"><div class="text-xs font-extrabold text-emerald-300">${r.nutrition.protein}g</div><div class="text-[9px] text-slate-400">Proteine</div></div>
+                        <div class="bg-slate-950/70 rounded-xl p-1.5 border border-slate-800"><div class="text-xs font-extrabold text-cyan-300">${r.nutrition.carbs}g</div><div class="text-[9px] text-slate-400">Carbo</div></div>
+                        <div class="bg-slate-950/70 rounded-xl p-1.5 border border-slate-800"><div class="text-xs font-extrabold text-amber-300">${r.nutrition.fat}g</div><div class="text-[9px] text-slate-400">Grăsimi</div></div>
+                    </div>`;
+            } else {
+                nutBox.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-300">🥗 Valori Nutriționale <span class="text-[10px] text-slate-400 font-normal">PER PORȚIE</span></div>
+                            <div class="text-[10px] text-slate-400">Estimare calorii și macronutrienți</div>
+                        </div>
+                        <button onclick="calculateDetailNutritionAI()" id="calc-nut-btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-bold text-amber-300 shrink-0 transition">
+                            ✨ Calculează cu AI
+                        </button>
+                    </div>`;
+            }
+        }
+
+        function setDetailPortionMult(mult) {
+            detailPortionMult = mult;
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            renderDetailPortionsAndNutrition(r);
+            renderDetailIngredients(r);
+        }
+
+        function stepDetailServings(delta) {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            const base = r.servings || 4;
+            const nextServ = Math.max(1, Math.round(base * detailPortionMult) + delta);
+            detailPortionMult = nextServ / base;
+            renderDetailPortionsAndNutrition(r);
+            renderDetailIngredients(r);
+        }
+
+        async function calculateDetailNutritionAI() {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            if (!state.apiKey) { alert('Configurează cheia API în Setări!'); return; }
+            const btn = document.getElementById('calc-nut-btn');
+            if (btn) { btn.disabled = true; btn.innerText = '⏳ Calcul...'; }
+            try {
+                const ingText = (r.ingredients || []).map(i => i.originalText || i.name).join(', ');
+                const prompt = `Estimează valorile nutriționale PER PORȚIE pentru rețeta "${r.title}" (${r.servings || 4} porții). Ingrediente: ${ingText}.
+Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "fat": 16}`;
+                const raw = await callUniversalAI(state.apiKey, 'Ești nutriționist. Răspunzi doar cu JSON valid.', [{ role: 'user', content: prompt }]);
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (!m) throw new Error('Răspuns invalid');
+                const nut = JSON.parse(m[0]);
+                r.nutrition = {
+                    calories: Math.round(Number(nut.calories) || 0),
+                    protein: Math.round(Number(nut.protein) || 0),
+                    carbs: Math.round(Number(nut.carbs) || 0),
+                    fat: Math.round(Number(nut.fat) || 0)
+                };
+                saveNutritionState();
+                renderDetailPortionsAndNutrition(r);
+            } catch (err) {
+                alert('❌ Eroare calcul nutrițional: ' + err.message);
+                if (btn) { btn.disabled = false; btn.innerText = '✨ Calculează cu AI'; }
+            }
+        }
+
+        function renderDetailIngredients(r) {
+            const ings = r.ingredients || [];
+            document.getElementById('detail-ing-count').innerText = `(${ings.length})`;
+            document.getElementById('detail-recipe-ingredients').innerHTML = ings.map((ing, idx) => {
+                const checked = detailCheckedIngs.has(idx);
+                const inPantry = isIngredientInPantry(ing.name || ing.originalText);
+                let label = ing.originalText || `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim();
+                if (ing.amount !== null && ing.amount !== undefined && !isNaN(ing.amount) && detailPortionMult !== 1) {
+                    const scaled = formatScaledAmount(ing.amount, detailPortionMult);
+                    label = `${scaled} ${ing.unit || ''} ${ing.name || ''}`.trim();
+                }
+                return `
+                    <li onclick="toggleDetailIngredient(${idx})" class="flex items-center justify-between gap-2 p-2 rounded-xl border cursor-pointer transition ${checked ? 'bg-slate-900/30 border-slate-800/50 opacity-50' : 'bg-slate-950/50 border-slate-800/80'}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="w-4 h-4 rounded-md border flex items-center justify-center text-[10px] shrink-0 ${checked ? 'bg-emerald-600 border-emerald-500 text-white' : 'border-slate-600'}">${checked ? '✓' : ''}</span>
+                            <span class="${checked ? 'line-through text-slate-400' : 'text-slate-100'}">${escapeHtml(label)}</span>
+                        </div>
+                        ${inPantry ? `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-700/60 shrink-0">🥫 În Cămară</span>` : ''}
+                    </li>`;
+            }).join('') || '<li class="text-slate-400">Niciun ingredient listat.</li>';
+        }
+
+        function toggleDetailIngredient(idx) {
+            haptic(10);
+            if (detailCheckedIngs.has(idx)) detailCheckedIngs.delete(idx);
+            else detailCheckedIngs.add(idx);
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (r) renderDetailIngredients(r);
+        }
+
+        function toggleAllDetailIngredients(checkAll) {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            detailCheckedIngs = checkAll ? new Set((r.ingredients || []).map((_, i) => i)) : new Set();
+            renderDetailIngredients(r);
+        }
+
+        function renderDetailSteps(r) {
+            const steps = r.instructions || [];
+            document.getElementById('detail-recipe-steps').innerHTML = steps.map((st, idx) => {
+                const txt = st.text || String(st);
+                const mins = st.timerMinutes || detectStepTimerMins(txt);
+                return `
+                    <div class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-slate-950/50 border border-slate-800/80">
+                        <span class="w-5 h-5 rounded-full bg-orange-950 text-orange-300 border border-orange-700/60 text-[10px] font-extrabold flex items-center justify-center shrink-0 mt-0.5">${st.stepNumber || idx + 1}</span>
+                        <div class="space-y-1.5 flex-1">
+                            <div class="leading-relaxed text-slate-200">${escapeHtml(txt)}</div>
+                            ${mins ? `<button onclick="startInlineStepTimer(${mins})" class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-xl bg-amber-950/80 hover:bg-amber-900 text-amber-300 border border-amber-700/60 transition">⏱️ Pornește cronometru: ${mins} min</button>` : ''}
+                        </div>
+                    </div>`;
+            }).join('') || '<div class="text-slate-400">Niciun pas listat.</div>';
+        }
+
+        function startInlineStepTimer(mins) {
+            stopInlineStepTimer();
+            inlineStepTimerSec = mins * 60;
+            const bar = document.getElementById('detail-inline-timer-bar');
+            const val = document.getElementById('detail-inline-timer-val');
+            bar.classList.remove('hidden');
+            const update = () => {
+                const m = String(Math.floor(inlineStepTimerSec / 60)).padStart(2, '0');
+                const s = String(inlineStepTimerSec % 60).padStart(2, '0');
+                val.innerText = `${m}:${s}`;
+            };
+            update();
+            inlineStepTimerInterval = setInterval(() => {
+                inlineStepTimerSec--;
+                if (inlineStepTimerSec <= 0) {
+                    stopInlineStepTimer();
+                    haptic(200);
+                    playCookBeep();
+                    alert('⏱️ Timpul pentru acest pas a expirat!');
+                } else {
+                    update();
+                }
+            }, 1000);
+        }
+
+        function stopInlineStepTimer() {
+            if (inlineStepTimerInterval) clearInterval(inlineStepTimerInterval);
+            inlineStepTimerInterval = null;
+            const bar = document.getElementById('detail-inline-timer-bar');
+            if (bar) bar.classList.add('hidden');
+        }
+
+        function saveDetailRecipeNotes() {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            r.notes = document.getElementById('detail-recipe-notes-input').value;
+            localStorage.setItem('reset_recipes', JSON.stringify(state.recipes || []));
+        }
+
+        // ==================== MODUL BUCĂTAR (COOKING MODE) ====================
+        function playCookBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                osc.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.35);
+            } catch {}
+        }
+
+        async function openCookingMode() {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            cookSteps = (r.instructions && r.instructions.length > 0)
+                ? r.instructions
+                : [{ stepNumber: 1, text: 'Această rețetă nu are pași detaliați.' }];
+            cookStepIdx = 0;
+
+            document.getElementById('cook-recipe-title').innerText = r.title;
+            document.getElementById('cook-ingredients-drawer').classList.add('hidden');
+            document.getElementById('cook-ingredients-drawer').innerHTML = (r.ingredients || []).map(i => {
+                const lbl = i.originalText || `${i.amount || ''} ${i.unit || ''} ${i.name}`.trim();
+                return `<div>• ${escapeHtml(lbl)}</div>`;
+            }).join('') || '<div>Niciun ingredient.</div>';
+
+            document.getElementById('cooking-mode-modal').classList.remove('hidden');
+            renderCookingStep();
+
+            try {
+                if ('wakeLock' in navigator) {
+                    cookWakeLock = await navigator.wakeLock.request('screen');
+                    document.getElementById('cook-wakelock-badge').classList.remove('hidden');
+                }
+            } catch {
+                document.getElementById('cook-wakelock-badge').classList.add('hidden');
+            }
+        }
+
+        function closeCookingMode() {
+            if (cookTimerInterval) clearInterval(cookTimerInterval);
+            cookTimerInterval = null;
+            cookTimerRunning = false;
+            if (cookWakeLock) {
+                try { cookWakeLock.release(); } catch {}
+                cookWakeLock = null;
+            }
+            document.getElementById('cooking-mode-modal').classList.add('hidden');
+        }
+
+        function toggleCookIngredientsDrawer() {
+            document.getElementById('cook-ingredients-drawer').classList.toggle('hidden');
+        }
+
+        function renderCookingStep() {
+            if (cookTimerInterval) clearInterval(cookTimerInterval);
+            cookTimerInterval = null;
+            cookTimerRunning = false;
+
+            const st = cookSteps[cookStepIdx];
+            const total = cookSteps.length;
+            document.getElementById('cook-step-counter').innerText = `Pasul ${cookStepIdx + 1} din ${total}`;
+            document.getElementById('cook-progress-bar').style.width = `${Math.round(((cookStepIdx + 1) / total) * 100)}%`;
+            document.getElementById('cook-step-text').innerText = st.text || String(st);
+
+            document.getElementById('cook-prev-btn').disabled = cookStepIdx === 0;
+            document.getElementById('cook-prev-btn').style.opacity = cookStepIdx === 0 ? '0.4' : '1';
+            document.getElementById('cook-next-btn').innerText = cookStepIdx >= total - 1 ? '🎉 Finalizează' : 'Următor ⏭';
+
+            const mins = st.timerMinutes || detectStepTimerMins(st.text || '');
+            const timerBox = document.getElementById('cook-timer-box');
+            if (mins) {
+                cookTimerRemaining = mins * 60;
+                timerBox.classList.remove('hidden');
+                updateCookTimerDisplay();
+                document.getElementById('cook-timer-toggle-btn').innerText = '▶ Start';
+            } else {
+                timerBox.classList.add('hidden');
+            }
+        }
+
+        function updateCookTimerDisplay() {
+            const m = String(Math.floor(cookTimerRemaining / 60)).padStart(2, '0');
+            const s = String(cookTimerRemaining % 60).padStart(2, '0');
+            document.getElementById('cook-timer-display').innerText = `${m}:${s}`;
+        }
+
+        function toggleCookTimer() {
+            const btn = document.getElementById('cook-timer-toggle-btn');
+            if (cookTimerRunning) {
+                clearInterval(cookTimerInterval);
+                cookTimerRunning = false;
+                btn.innerText = '▶ Continuă';
+            } else {
+                cookTimerRunning = true;
+                btn.innerText = '⏸ Pauză';
+                cookTimerInterval = setInterval(() => {
+                    cookTimerRemaining--;
+                    updateCookTimerDisplay();
+                    if (cookTimerRemaining <= 0) {
+                        clearInterval(cookTimerInterval);
+                        cookTimerRunning = false;
+                        btn.innerText = '✅ Gata!';
+                        haptic(250);
+                        playCookBeep();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetCookTimer() {
+            if (cookTimerInterval) clearInterval(cookTimerInterval);
+            cookTimerRunning = false;
+            const st = cookSteps[cookStepIdx];
+            const mins = st.timerMinutes || detectStepTimerMins(st.text || '') || 1;
+            cookTimerRemaining = mins * 60;
+            updateCookTimerDisplay();
+            document.getElementById('cook-timer-toggle-btn').innerText = '▶ Start';
+        }
+
+        function cookPrevStep() {
+            if (cookStepIdx > 0) { cookStepIdx--; renderCookingStep(); }
+        }
+
+        function cookNextStep() {
+            if (cookStepIdx < cookSteps.length - 1) {
+                cookStepIdx++;
+                renderCookingStep();
+            } else {
+                closeCookingMode();
+                alert('🎉 Poftă bună! Ai terminat rețeta!');
+            }
         }
 
         function toggleCurrentRecipeFavorite() {
@@ -3304,8 +5320,12 @@
             alert(`✅ ${r.ingredients.length} ingrediente din "${r.title}" au fost adăugate în Lista de Cumpărături!`);
         }
 
-        // ==================== IMPORT INTELIGENT REȚETE (LINK / POZĂ / PASTE) ====================
+        // ==================== IMPORT INTELIGENT & MANUAL REȚETE ====================
         function openAddRecipeModal() {
+            editingRecipeId = null;
+            document.getElementById('add-recipe-modal-title').innerHTML = '<span>📖</span> Adaugă Rețetă';
+            document.getElementById('add-recipe-mode-tabs').classList.remove('hidden');
+            document.getElementById('add-recipe-submit-btn').innerText = '✨ Extrage și Salvează Rețeta';
             document.getElementById('add-recipe-text').value = '';
             document.getElementById('add-recipe-url').value = '';
             document.getElementById('add-recipe-file').value = '';
@@ -3313,19 +5333,50 @@
             document.getElementById('add-recipe-preview').classList.add('hidden');
             document.getElementById('add-recipe-status').classList.add('hidden');
             document.getElementById('add-recipe-category-override').value = 'auto';
+            document.getElementById('manual-rec-title').value = '';
+            document.getElementById('manual-rec-servings').value = '4';
+            document.getElementById('manual-rec-prep').value = '';
+            document.getElementById('manual-rec-cook').value = '';
+            document.getElementById('manual-rec-ingredients').value = '';
+            document.getElementById('manual-rec-steps').value = '';
+            document.getElementById('manual-rec-notes').value = '';
             pendingRecipeImageDataUrl = null;
             switchAddRecipeMode('paste');
             toggleModal('add-recipe-modal');
         }
 
+        function openEditCurrentRecipe() {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            editingRecipeId = r.id;
+            toggleModal('recipe-detail-modal');
+            document.getElementById('add-recipe-modal-title').innerHTML = '<span>✏️</span> Editează Rețeta';
+            document.getElementById('add-recipe-mode-tabs').classList.add('hidden');
+            document.getElementById('add-recipe-submit-btn').innerText = '💾 Salvează Modificările';
+            document.getElementById('add-recipe-status').classList.add('hidden');
+            document.getElementById('add-recipe-category-override').value = r.category || 'Fel Principal';
+            document.getElementById('manual-rec-title').value = r.title || '';
+            document.getElementById('manual-rec-servings').value = String(r.servings || 4);
+            document.getElementById('manual-rec-prep').value = r.prepTimeMinutes ? String(r.prepTimeMinutes) : '';
+            document.getElementById('manual-rec-cook').value = r.cookTimeMinutes ? String(r.cookTimeMinutes) : '';
+            document.getElementById('manual-rec-ingredients').value = (r.ingredients || []).map(i => i.originalText || `${i.amount || ''} ${i.unit || ''} ${i.name}`.trim()).join('\n');
+            document.getElementById('manual-rec-steps').value = (r.instructions || []).map(s => s.text || String(s)).join('\n');
+            document.getElementById('manual-rec-notes').value = r.notes || '';
+            switchAddRecipeMode('manual');
+            toggleModal('add-recipe-modal');
+        }
+
         function switchAddRecipeMode(mode) {
             addRecipeMode = mode;
-            ['paste', 'link', 'photo'].forEach(m => {
+            ['paste', 'link', 'photo', 'manual'].forEach(m => {
                 document.getElementById(`add-panel-${m}`).classList.toggle('hidden', m !== mode);
                 document.getElementById(`add-mode-${m}`).className = m === mode
-                    ? "py-2 rounded-xl text-xs font-bold bg-orange-600 text-white transition"
-                    : "py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition";
+                    ? "py-2 rounded-xl text-[11px] font-bold bg-orange-600 text-white transition"
+                    : "py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white transition";
             });
+            if (!editingRecipeId) {
+                document.getElementById('add-recipe-submit-btn').innerText = mode === 'manual' ? '💾 Salvează Rețeta' : '✨ Extrage și Salvează Rețeta';
+            }
         }
 
         function setAddRecipeStatus(msg, isError = false) {
@@ -3494,7 +5545,7 @@
             const btn = document.getElementById('add-recipe-submit-btn');
             const overrideCat = document.getElementById('add-recipe-category-override').value;
 
-            if (!state.apiKey && addRecipeMode !== 'link') {
+            if (!state.apiKey && addRecipeMode !== 'link' && addRecipeMode !== 'manual') {
                 setAddRecipeStatus('❌ Configurează cheia API în Setări mai întâi!', true);
                 return;
             }
@@ -3504,7 +5555,26 @@
                 let extracted = null;
                 let sourceUrl = undefined;
 
-                if (addRecipeMode === 'paste') {
+                if (addRecipeMode === 'manual') {
+                    const title = document.getElementById('manual-rec-title').value.trim();
+                    if (!title) throw new Error('Introdu un titlu pentru rețetă!');
+                    const rawIngs = document.getElementById('manual-rec-ingredients').value.split('\n').map(s => s.trim()).filter(Boolean);
+                    const rawSteps = document.getElementById('manual-rec-steps').value.split('\n').map(s => s.trim()).filter(Boolean);
+                    extracted = {
+                        title,
+                        category: overrideCat !== 'auto' ? overrideCat : autoClassifyCategory(title, rawIngs.join(' ')),
+                        servings: parseInt(document.getElementById('manual-rec-servings').value || '4', 10) || 4,
+                        prepTimeMinutes: parseInt(document.getElementById('manual-rec-prep').value || '0', 10) || undefined,
+                        cookTimeMinutes: parseInt(document.getElementById('manual-rec-cook').value || '0', 10) || undefined,
+                        ingredients: rawIngs.map(parseIngredientStringLocal),
+                        instructions: rawSteps.map((st, idx) => ({
+                            stepNumber: idx + 1,
+                            text: st,
+                            timerMinutes: detectStepTimerMins(st)
+                        })),
+                        notes: document.getElementById('manual-rec-notes').value.trim()
+                    };
+                } else if (addRecipeMode === 'paste') {
                     const txt = document.getElementById('add-recipe-text').value.trim();
                     if (txt.length < 15) throw new Error('Lipește textul complet al rețetei mai întâi!');
                     setAddRecipeStatus('⏳ AI-ul structurează rețeta...');
@@ -3546,20 +5616,34 @@
 
                 if (overrideCat !== 'auto') extracted.category = overrideCat;
 
-                const newRecipe = {
-                    id: 'rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
-                    ...extracted,
-                    sourceUrl,
-                    isFavorite: false,
-                    createdAt: Date.now()
-                };
+                if (editingRecipeId) {
+                    const idx = (state.recipes || []).findIndex(x => x.id === editingRecipeId);
+                    if (idx !== -1) {
+                        state.recipes[idx] = { ...state.recipes[idx], ...extracted };
+                    }
+                    saveNutritionState();
+                    const editedId = editingRecipeId;
+                    editingRecipeId = null;
+                    toggleModal('add-recipe-modal');
+                    renderRecipeCategories();
+                    renderRecipesList();
+                    openRecipeDetail(editedId);
+                } else {
+                    const newRecipe = {
+                        id: 'rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                        ...extracted,
+                        sourceUrl,
+                        isFavorite: false,
+                        createdAt: Date.now()
+                    };
 
-                state.recipes = [newRecipe, ...(state.recipes || [])];
-                saveNutritionState();
-                selectedRecipeCategory = newRecipe.category;
-                toggleModal('add-recipe-modal');
-                switchFoodSubTab('recipes');
-                alert(`✅ Rețeta "${newRecipe.title}" a fost salvată în categoria ${newRecipe.category}!`);
+                    state.recipes = [newRecipe, ...(state.recipes || [])];
+                    saveNutritionState();
+                    selectedRecipeCategory = newRecipe.category;
+                    toggleModal('add-recipe-modal');
+                    switchFoodSubTab('recipes');
+                    alert(`✅ Rețeta "${newRecipe.title}" a fost salvată în categoria ${newRecipe.category}!`);
+                }
             } catch (err) {
                 setAddRecipeStatus('❌ ' + err.message, true);
             } finally {
@@ -3716,15 +5800,63 @@ Structurează clar cu:
                         <span class="text-sm shrink-0">${item.inStock ? '✅' : '❌'}</span>
                         <div class="min-w-0">
                             <div class="text-xs font-bold truncate ${item.inStock ? 'text-white' : 'text-red-300 line-through'}">${escapeHtml(item.name)}</div>
-                            <div class="text-[10px] text-slate-400">${escapeHtml(item.category || 'Altele')}${item.amount ? ' • ' + escapeHtml(item.amount) : ''}</div>
+                            <div class="text-[10px] text-slate-400">${escapeHtml(item.category || 'Altele')}</div>
                         </div>
                     </button>
                     <div class="flex items-center gap-1 shrink-0">
+                        <div class="flex items-center bg-slate-950/80 border border-slate-800 rounded-xl px-1 py-0.5">
+                            <button onclick="adjustPantryQty('${escapeHtml(item.id)}', -1)" class="w-5 h-5 rounded-lg hover:bg-slate-800 text-slate-300 font-bold text-xs">−</button>
+                            <button onclick="editPantryAmount('${escapeHtml(item.id)}')" class="px-1.5 text-[11px] font-bold text-amber-300 hover:underline min-w-[34px] text-center" title="Apasă pentru a modifica cantitatea">${escapeHtml(item.amount || '0')}</button>
+                            <button onclick="adjustPantryQty('${escapeHtml(item.id)}', 1)" class="w-5 h-5 rounded-lg hover:bg-slate-800 text-slate-300 font-bold text-xs">+</button>
+                        </div>
                         <button onclick="sendSinglePantryToShopping('${escapeHtml(item.id)}')" class="p-1.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-800 text-emerald-300 text-xs" title="Trimite în Lista de Cumpărături">🛒</button>
                         <button onclick="deletePantryItem('${escapeHtml(item.id)}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-red-900 text-slate-400 hover:text-red-300 text-xs" title="Șterge">✕</button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function adjustPantryQty(id, delta) {
+            haptic(15);
+            const item = (state.pantry || []).find(i => i.id === id);
+            if (!item) return;
+            const cur = (item.amount || '').trim();
+            if (!cur) {
+                item.amount = delta > 0 ? '1' : '0';
+                item.inStock = delta > 0;
+            } else {
+                const m = cur.match(/^([\d.,]+)\s*(.*)$/);
+                if (!m) {
+                    editPantryAmount(id);
+                    return;
+                }
+                const num = parseFloat(m[1].replace(',', '.'));
+                const unit = (m[2] || '').trim();
+                const lu = unit.toLowerCase();
+                let step = 1;
+                if (lu === 'g' || lu === 'gr' || lu === 'ml') step = num >= 500 ? 100 : 50;
+                else if (lu === 'kg' || lu === 'l') step = 0.5;
+                let next = Math.max(0, Math.round((num + delta * step) * 100) / 100);
+                item.amount = unit ? `${next} ${unit}` : String(next);
+                item.inStock = next > 0;
+            }
+            item.updatedAt = Date.now();
+            saveNutritionState();
+            renderPantryList();
+        }
+
+        function editPantryAmount(id) {
+            const item = (state.pantry || []).find(i => i.id === id);
+            if (!item) return;
+            const val = prompt(`Modifică cantitatea pentru "${item.name}" (ex: 500 g, 2 buc, 1 l):`, item.amount || '');
+            if (val === null) return;
+            const trimmed = val.trim();
+            item.amount = trimmed;
+            if (trimmed === '0' || /^0(\s|$)/.test(trimmed)) item.inStock = false;
+            else if (trimmed) item.inStock = true;
+            item.updatedAt = Date.now();
+            saveNutritionState();
+            renderPantryList();
         }
 
         function togglePantryStock(id) {
@@ -3763,23 +5895,129 @@ Structurează clar cu:
             renderPantryList();
         }
 
-        function populateDefaultPantryStaples() {
-            const staples = [
-                'Ouă', 'Ulei de măsline', 'Sare & Piper', 'Ceapă', 'Usturoi',
-                'Piept de pui', 'Iaurt grecesc', 'Fulgi de ovăz', 'Orez', 'Lămâi', 'Cartofi', 'Morcovi'
-            ];
-            const existing = new Set((state.pantry || []).map(i => i.name.toLowerCase()));
-            const toAdd = staples.filter(s => !existing.has(s.toLowerCase())).map((s, idx) => ({
-                id: 'pan-' + Date.now() + '-' + idx,
-                name: s,
-                amount: '',
-                category: classifyAisle(s),
-                inStock: true,
-                updatedAt: Date.now()
+        const PANTRY_STAPLES_CATALOG = [
+            { group: '🥩 Carne & Pește', items: [
+                { name: 'Piept de pui', amount: '500 g' }, { name: 'Pulpe de pui', amount: '600 g' },
+                { name: 'Carne tocată de curcan', amount: '500 g' }, { name: 'Pulpă de vită', amount: '500 g' },
+                { name: 'Mușchi de porc', amount: '500 g' }, { name: 'Somon / Păstrăv', amount: '400 g' },
+                { name: 'Ton în conservă', amount: '2 buc' }, { name: 'Bacon / Șuncă', amount: '200 g' }
+            ]},
+            { group: '🧀 Lactate & Ouă', items: [
+                { name: 'Ouă', amount: '10 buc' }, { name: 'Iaurt grecesc', amount: '400 g' },
+                { name: 'Chefir', amount: '500 ml' }, { name: 'Lapte', amount: '1 l' },
+                { name: 'Telemea', amount: '300 g' }, { name: 'Cașcaval / Mozzarella', amount: '250 g' },
+                { name: 'Smântână', amount: '200 g' }, { name: 'Unt', amount: '200 g' }
+            ]},
+            { group: '🥦 Legume & Fructe', items: [
+                { name: 'Ceapă', amount: '1 kg' }, { name: 'Usturoi', amount: '2 căpățâni' },
+                { name: 'Cartofi', amount: '2 kg' }, { name: 'Cartofi dulci', amount: '1 kg' },
+                { name: 'Morcovi', amount: '1 kg' }, { name: 'Ardei gras / Kapia', amount: '4 buc' },
+                { name: 'Roșii / Roșii cherry', amount: '500 g' }, { name: 'Castraveți', amount: '3 buc' },
+                { name: 'Dovlecei', amount: '2 buc' }, { name: 'Varză', amount: '1 buc' },
+                { name: 'Broccoli / Conopidă', amount: '500 g' }, { name: 'Ciuperci', amount: '400 g' },
+                { name: 'Lămâi', amount: '3 buc' }, { name: 'Banane', amount: '5 buc' },
+                { name: 'Mere', amount: '1 kg' }, { name: 'Avocado', amount: '2 buc' },
+                { name: 'Afine', amount: '150 g' }, { name: 'Pătrunjel / Mărar / Leuștean', amount: '2 leg.' }
+            ]},
+            { group: '🧂 Băcănie & Condimente', items: [
+                { name: 'Ulei de măsline', amount: '500 ml' }, { name: 'Ulei de floarea-soarelui', amount: '1 l' },
+                { name: 'Sare & Piper', amount: '1 buc' }, { name: 'Orez', amount: '1 kg' },
+                { name: 'Fulgi de ovăz', amount: '500 g' }, { name: 'Paste integrale', amount: '500 g' },
+                { name: 'Linte / Fasole / Năut', amount: '500 g' }, { name: 'Suc de roșii / Bulion', amount: '500 ml' },
+                { name: 'Miere', amount: '300 g' }, { name: 'Nuci românești / Migdale', amount: '200 g' },
+                { name: 'Unt de arahide', amount: '350 g' }, { name: 'Cacao crudă', amount: '100 g' },
+                { name: 'Boia dulce / Cimbru / Oregano', amount: '1 set' }, { name: 'Oțet / Sos de soia', amount: '250 ml' }
+            ]},
+            { group: '🥖 Panificație & Extra', items: [
+                { name: 'Pâine integrală', amount: '1 buc' }, { name: 'Lipii / Tortilla', amount: '4 buc' },
+                { name: 'Castraveți murați', amount: '1 borcan' }, { name: 'Măsline', amount: '200 g' }
+            ]}
+        ];
+
+        let selectedStapleNames = new Set();
+
+        function openPantryStaplesModal() {
+            const existing = new Set((state.pantry || []).map(i => i.name.toLowerCase().trim()));
+            selectedStapleNames = new Set();
+            PANTRY_STAPLES_CATALOG.forEach(g => g.items.forEach(it => {
+                if (!existing.has(it.name.toLowerCase().trim())) selectedStapleNames.add(it.name);
             }));
-            if (toAdd.length === 0) { alert('Ingredientele de bază sunt deja în cămară!'); return; }
-            state.pantry = [...(state.pantry || []), ...toAdd];
+            document.getElementById('staples-search-input').value = '';
+            renderPantryStaplesList();
+            toggleModal('pantry-staples-modal');
+        }
+
+        function renderPantryStaplesList() {
+            const box = document.getElementById('pantry-staples-list');
+            const q = (document.getElementById('staples-search-input')?.value || '').toLowerCase().trim();
+            const existing = new Set((state.pantry || []).map(i => i.name.toLowerCase().trim()));
+
+            box.innerHTML = PANTRY_STAPLES_CATALOG.map(grp => {
+                const items = grp.items.filter(it => !q || it.name.toLowerCase().includes(q));
+                if (items.length === 0) return '';
+                return `
+                    <div class="space-y-1.5">
+                        <div class="text-[11px] font-extrabold text-amber-300 uppercase tracking-wider px-1">${grp.group}</div>
+                        <div class="grid grid-cols-1 gap-1.5">
+                            ${items.map(it => {
+                                const already = existing.has(it.name.toLowerCase().trim());
+                                const checked = selectedStapleNames.has(it.name);
+                                return `
+                                    <button onclick="toggleStapleSelection('${escapeHtml(it.name)}')" ${already ? 'disabled' : ''} class="flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition ${already ? 'bg-slate-900/30 border-slate-800/50 opacity-50' : (checked ? 'bg-amber-950/40 border-amber-500/60' : 'bg-slate-900/70 border-slate-800')}">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <span class="w-4 h-4 rounded border flex items-center justify-center text-[10px] shrink-0 ${already ? 'border-emerald-600 bg-emerald-950 text-emerald-400' : (checked ? 'bg-amber-600 border-amber-500 text-white' : 'border-slate-600')}">${already || checked ? '✓' : ''}</span>
+                                            <span class="text-xs font-bold text-white truncate">${escapeHtml(it.name)}</span>
+                                        </div>
+                                        <span class="text-[10px] text-slate-400 shrink-0">${already ? 'Deja în cămară' : escapeHtml(it.amount)}</span>
+                                    </button>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+            }).join('');
+
+            const btn = document.getElementById('staples-confirm-btn');
+            if (btn) btn.innerText = `✅ Adaugă selectatele (${selectedStapleNames.size}) în Cămară`;
+        }
+
+        function toggleStapleSelection(name) {
+            haptic(10);
+            if (selectedStapleNames.has(name)) selectedStapleNames.delete(name);
+            else selectedStapleNames.add(name);
+            renderPantryStaplesList();
+        }
+
+        function toggleSelectAllStaples(selectAll) {
+            const existing = new Set((state.pantry || []).map(i => i.name.toLowerCase().trim()));
+            selectedStapleNames = new Set();
+            if (selectAll) {
+                PANTRY_STAPLES_CATALOG.forEach(g => g.items.forEach(it => {
+                    if (!existing.has(it.name.toLowerCase().trim())) selectedStapleNames.add(it.name);
+                }));
+            }
+            renderPantryStaplesList();
+        }
+
+        function confirmAddSelectedStaples() {
+            if (selectedStapleNames.size === 0) {
+                alert('Bifează cel puțin un produs de adăugat!');
+                return;
+            }
+            const toAdd = [];
+            PANTRY_STAPLES_CATALOG.forEach(g => g.items.forEach((it, idx) => {
+                if (selectedStapleNames.has(it.name)) {
+                    toAdd.push({
+                        id: 'pan-' + Date.now() + '-' + toAdd.length + '-' + idx,
+                        name: it.name,
+                        amount: it.amount,
+                        category: classifyAisle(it.name),
+                        inStock: true,
+                        updatedAt: Date.now()
+                    });
+                }
+            }));
+            state.pantry = [...toAdd, ...(state.pantry || [])];
             saveNutritionState();
+            toggleModal('pantry-staples-modal');
             renderPantryList();
         }
 
