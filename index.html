@@ -4968,8 +4968,8 @@
                             </div>
                         </div>
                         <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 space-y-1.5 text-xs text-slate-300">
-                            ${ingSummary ? `<div><strong class="text-cyan-300">🛒 Ingrediente:</strong> ${escapeHtml(ingSummary)}</div>` : ''}
-                            ${prepSummary ? `<div><strong class="text-emerald-300">👨‍🍳 Preparare:</strong> ${escapeHtml(prepSummary)}</div>` : ''}
+                            ${ingSummary ? `<div class="line-clamp-2"><strong class="text-cyan-300">🛒 Ingrediente:</strong> ${escapeHtml(ingSummary)}</div>` : ''}
+                            ${prepSummary ? `<div class="line-clamp-2"><strong class="text-emerald-300">👨‍🍳 Preparare:</strong> ${escapeHtml(prepSummary)}</div>` : ''}
                         </div>
                     </div>`;
             }).join('');
