@@ -912,9 +912,9 @@
                 Pentru ca botul să îți scrie singur pe Telegram dimineața și la fiecare pas <strong>chiar și când aplicația RESET este închisă</strong>, poți pune scriptul de mai jos gratuit pe Google Apps Script:
             </p>
             <ol class="list-decimal pl-4 text-[11px] text-slate-300 space-y-1">
-                <li>Intră pe <strong>script.google.com</strong> → <em>New Project</em> și lipește codul de mai jos.</li>
-                <li>La ceas (<em>Triggers</em> din stânga) → <em>Add Trigger</em>: funcția <code>checkScheduleAndNotify</code> → <em>Time-driven</em> → <em>Minutes timer</em> → <em>Every 15 minutes</em>.</li>
-                <li>Opțional (pentru răspunsuri instant 24/7 pe Telegram): <em>Deploy</em> → <em>New deployment</em> → <em>Web app</em> (Who has access: Anyone) și apelează o dată funcția <code>setWebhook</code> cu URL-ul primit.</li>
+                <li>Intră pe <strong>script.google.com</strong> → <em>New Project</em>, șterge tot și lipește codul de mai jos. Apasă <strong>Save</strong> (💾).</li>
+                <li>Pentru <strong>alarme automate</strong>: în stânga la ceas (<em>Triggers</em>) → <em>Add Trigger</em>: funcția <code>checkScheduleAndNotify</code> → <em>Time-driven</em> → <em>Minutes timer</em> → <em>Every 15 minutes</em>.</li>
+                <li>Pentru <strong>răspunsuri instant 24/7</strong>: sus dreapta <em>Deploy</em> → <em>New deployment</em> → rotița ⚙️ → <em>Web app</em> → <em>Who has access: Anyone</em> → <em>Deploy</em>. Copiază <strong>Web app URL</strong>, lipește-l în linia <code>WEBAPP_URL</code> din cod, salvează, apoi selectează sus funcția <code>setWebhook</code> și apasă <strong>Run</strong> (▶) o singură dată!</li>
             </ol>
 
             <textarea id="cloud-script-code" readonly rows="10" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-3 text-[10px] font-mono text-emerald-300 focus:outline-none"></textarea>
@@ -2662,11 +2662,12 @@ Structurează clar cu:
             const tC = document.getElementById('set-time-calm').value || state.stepTimes.calm || "17:30";
             const tNi = document.getElementById('set-time-night').value || state.stepTimes.night || "20:30";
 
-            const script = `// === RESET NEURO v3.0 — SCRIPT ALARME TELEGRAM 24/7 ===
+            const script = `// === RESET NEURO v3.2 — SCRIPT ALARME & BOT TELEGRAM 24/7 ===
 const TG_TOKEN = "${tgToken}";
 const TG_CHAT_ID = "${tgChat}";
 const GEMINI_KEY = "${apiKey}";
 const GEMINI_MODEL = "${model}";
+const WEBAPP_URL = ""; // După Deploy, lipește aici URL-ul (/exec) și rulează setWebhook() o singură dată!
 
 const STEPS = [
   { key: "morning", time: "${tM}", label: "☀️ Dimineața", msg: "Neața, camarade! Ai luat NAC + D3 (+ Creatină) și ai făcut 2 min de deblocare psoas drept înainte de volan?" },
@@ -2735,6 +2736,19 @@ function askGemini(userText) {
   });
   const data = JSON.parse(res.getContentText());
   return data.candidates?.[0]?.content?.parts?.[0]?.text || "Ține capul sus, respiră adânc și fă un pas mic acum!";
+}
+
+function doGet() {
+  return ContentService.createTextOutput("RESET Bot 24/7 este activ!");
+}
+
+function setWebhook() {
+  const url = WEBAPP_URL || ScriptApp.getService().getUrl();
+  if (!url || !url.endsWith("/exec")) {
+    throw new Error("Fă mai întâi Deploy -> New deployment -> Web app (Anyone) și lipește URL-ul în WEBAPP_URL!");
+  }
+  const res = UrlFetchApp.fetch("https://api.telegram.org/bot" + TG_TOKEN + "/setWebhook?url=" + encodeURIComponent(url));
+  Logger.log(res.getContentText());
 }`;
             document.getElementById('cloud-script-code').value = script;
             toggleModal('cloud-script-modal');
