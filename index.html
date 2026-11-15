@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>RESET v3.3 // Neuro-Camarad</title>
+    <title>RESET v3.4 // Neuro-Camarad</title>
     <meta name="description" content="Ghid neurobiologic, kinetoterapie, nutriție și camarad AI pentru renunțare la THC și fumat">
     <meta name="theme-color" id="meta-theme-color" content="#090d16">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -177,7 +177,7 @@
         <div class="flex items-center gap-2 min-w-0">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse shrink-0"></span>
             <h1 class="text-sm sm:text-base font-extrabold tracking-wider bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent truncate">
-                RESET // NEURO v3.3
+                RESET // NEURO v3.4
             </h1>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
@@ -745,7 +745,7 @@
         <div class="glass rounded-3xl p-4 space-y-3 border-emerald-500/40">
             <div class="flex items-center justify-between">
                 <h2 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">0. Aspect Vizual & Actualizare</h2>
-                <span class="text-[11px] font-mono text-slate-400">v3.3</span>
+                <span class="text-[11px] font-mono text-slate-400">v3.4</span>
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="setTheme('light')" id="theme-btn-light" class="py-2.5 px-3 rounded-2xl border border-slate-700 bg-slate-900 text-xs font-bold transition">
@@ -813,8 +813,24 @@
                 </button>
             </div>
             <button onclick="openCloudScriptModal()" class="w-full py-2.5 bg-gradient-to-r from-indigo-600/90 to-cyan-600/90 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold rounded-xl text-xs shadow-lg">
-                ☁️ Script Cloud 24/7 (Alarme pe Telegram și cu telefonul închis)
+                ☁️ Script Cloud 24/7 (Telegram + Sincronizare Telefon ↔ PC)
             </button>
+
+            <!-- Sincronizare Automată Telefon <-> PC -->
+            <div class="pt-2 border-t border-slate-800 space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="text-[11px] font-bold text-emerald-300">☁️ Link Sincronizare Automată (Web app URL /exec)</label>
+                    <span id="cloud-sync-status" class="text-[10px] font-mono text-slate-400">Neconfigurat</span>
+                </div>
+                <input type="url" id="set-cloud-sync-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-mono">
+                <p class="text-[10px] text-slate-400 leading-relaxed">
+                    Lipește aici URL-ul <code>/exec</code> primit la <em>Deploy</em> în Google Apps Script (și pe telefon, și pe PC). Orice bifare, setare sau mesaj se sincronizează automat între dispozitive!
+                </p>
+                <button onclick="syncWithCloudNow()" class="w-full py-2 bg-emerald-600/85 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition">
+                    🔄 Sincronizează Acum cu Cloud-ul
+                </button>
+            </div>
+
             <button onclick="requestBrowserNotifications()" class="w-full py-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold rounded-xl text-[11px]">
                 🔔 Activează și Notificările Locale Browser/PWA
             </button>
@@ -1659,6 +1675,8 @@
             tgChatId: localStorage.getItem('reset_tgChatId') || "",
             tgLastUpdateId: parseInt(localStorage.getItem('reset_tgLastUpdateId') || "0"),
             tgSentStepsToday: JSON.parse(localStorage.getItem('reset_tgSentStepsToday') || '{}'),
+            cloudSyncUrl: localStorage.getItem('reset_cloudSyncUrl') || "",
+            lastUpdated: parseInt(localStorage.getItem('reset_lastUpdated') || "0"),
             theme: localStorage.getItem('reset_theme') || "dark",
             fontSize: localStorage.getItem('reset_fontSize') || "large",
             apiKey: localStorage.getItem('reset_apiKey') || DEFAULT_API_KEY,
@@ -1747,6 +1765,7 @@
             document.getElementById('set-gemini-model').value = state.geminiModel;
             document.getElementById('set-tg-token').value = state.tgToken;
             document.getElementById('set-tg-chatid').value = state.tgChatId;
+            document.getElementById('set-cloud-sync-url').value = state.cloudSyncUrl;
             document.getElementById('set-time-morning').value = state.stepTimes.morning || "06:30";
             document.getElementById('set-time-noon').value = state.stepTimes.noon || "12:30";
             document.getElementById('set-time-calm').value = state.stepTimes.calm || "17:30";
@@ -1786,6 +1805,17 @@
                 setTimeout(pollTelegramUpdates, 1200);
             }
 
+            if (state.cloudSyncUrl) {
+                setCloudSyncStatus("⏳ Se verifică...", false);
+                setTimeout(() => pullCloudState(true), 600);
+            }
+
+            setInterval(() => {
+                if (state.cloudSyncUrl) {
+                    pullCloudState(false);
+                }
+            }, 30000);
+
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
                     checkDayRollover();
@@ -1793,6 +1823,9 @@
                     checkScheduledCheckins();
                     if (state.tgToken && state.tgChatId && !telegramWebhookConflict) {
                         pollTelegramUpdates();
+                    }
+                    if (state.cloudSyncUrl) {
+                        pullCloudState(false);
                     }
                 }
             });
@@ -1862,6 +1895,7 @@
             state.theme = theme === 'light' ? 'light' : 'dark';
             localStorage.setItem('reset_theme', state.theme);
             applyAppearanceSettings();
+            markStateDirtyAndSync();
         }
 
         function toggleTheme() {
@@ -1873,6 +1907,7 @@
             state.fontSize = ['normal', 'large', 'xlarge'].includes(size) ? size : 'large';
             localStorage.setItem('reset_fontSize', state.fontSize);
             applyAppearanceSettings();
+            markStateDirtyAndSync();
         }
 
         async function forceAppUpdate() {
@@ -1888,6 +1923,170 @@
                 }
             } catch (e) {}
             window.location.href = window.location.pathname + '?v=' + Date.now();
+        }
+
+        // ==================== SINCRONIZARE AUTOMATĂ CLOUD (TELEFON <-> PC) ====================
+        let syncDebounceTimer = null;
+        let isCloudSyncBusy = false;
+
+        function setCloudSyncStatus(msg, isError = false) {
+            const el = document.getElementById('cloud-sync-status');
+            if (!el) return;
+            el.innerText = msg;
+            el.className = isError ? "text-[10px] font-mono text-red-400" : "text-[10px] font-mono text-emerald-400";
+        }
+
+        function buildSyncPayload() {
+            return {
+                updatedAt: state.lastUpdated || Date.now(),
+                lastDate: state.lastDate,
+                quitDate: state.quitDate,
+                phase: state.phase,
+                dailyCost: state.dailyCost,
+                dailyJoints: state.dailyJoints,
+                cigLimit: state.cigLimit,
+                cigsToday: state.cigsToday,
+                lastCigTime: state.lastCigTime,
+                supps: state.supps,
+                wakeMode: state.wakeMode,
+                stepTimes: state.stepTimes,
+                stepsDone: state.stepsDone,
+                exerciseLevel: state.exerciseLevel,
+                moveStats: state.moveStats,
+                tgToken: state.tgToken,
+                tgChatId: state.tgChatId,
+                theme: state.theme,
+                fontSize: state.fontSize,
+                apiKey: state.apiKey,
+                geminiModel: state.geminiModel,
+                chatHistory: (state.chatHistory || []).slice(-20)
+            };
+        }
+
+        function applySyncedState(remote) {
+            if (!remote || typeof remote !== 'object') return;
+            const keys = [
+                'lastDate', 'quitDate', 'phase', 'dailyCost', 'dailyJoints', 'cigLimit',
+                'cigsToday', 'lastCigTime', 'supps', 'wakeMode', 'stepTimes', 'stepsDone',
+                'exerciseLevel', 'moveStats', 'tgToken', 'tgChatId', 'theme', 'fontSize',
+                'apiKey', 'geminiModel', 'chatHistory'
+            ];
+            keys.forEach(k => {
+                if (remote[k] === undefined || remote[k] === null) return;
+                state[k] = remote[k];
+                if (typeof remote[k] === 'object') {
+                    localStorage.setItem(`reset_${k}`, JSON.stringify(remote[k]));
+                } else {
+                    localStorage.setItem(`reset_${k}`, String(remote[k]));
+                }
+            });
+            state.lastUpdated = parseInt(remote.updatedAt || Date.now(), 10);
+            localStorage.setItem('reset_lastUpdated', String(state.lastUpdated));
+
+            // Actualizare câmpuri Setări și UI complet
+            if (document.getElementById('set-quit-date')) document.getElementById('set-quit-date').value = state.quitDate;
+            if (document.getElementById('set-phase')) document.getElementById('set-phase').value = state.phase;
+            if (document.getElementById('set-daily-cost')) document.getElementById('set-daily-cost').value = state.dailyCost;
+            if (document.getElementById('set-daily-joints')) document.getElementById('set-daily-joints').value = state.dailyJoints;
+            if (document.getElementById('set-cig-limit')) document.getElementById('set-cig-limit').value = state.cigLimit;
+            if (document.getElementById('set-api-key')) document.getElementById('set-api-key').value = state.apiKey;
+            if (document.getElementById('set-gemini-model')) document.getElementById('set-gemini-model').value = state.geminiModel;
+            if (document.getElementById('set-tg-token')) document.getElementById('set-tg-token').value = state.tgToken;
+            if (document.getElementById('set-tg-chatid')) document.getElementById('set-tg-chatid').value = state.tgChatId;
+            if (document.getElementById('set-time-morning')) document.getElementById('set-time-morning').value = state.stepTimes.morning || "06:30";
+            if (document.getElementById('set-time-noon')) document.getElementById('set-time-noon').value = state.stepTimes.noon || "12:30";
+            if (document.getElementById('set-time-calm')) document.getElementById('set-time-calm').value = state.stepTimes.calm || "17:30";
+            if (document.getElementById('set-time-night')) document.getElementById('set-time-night').value = state.stepTimes.night || "20:30";
+            if (document.getElementById('walk-goal-select')) document.getElementById('walk-goal-select').value = String(state.moveStats.walkGoal || 30);
+
+            checkDayRollover();
+            applyAppearanceSettings();
+            updateWakeModeButtons();
+            updatePhaseUI();
+            updateProviderLabel();
+            updateTelegramBadges();
+            renderSupps();
+            renderCheckinCard();
+            renderMoveProgress();
+            renderExercises();
+            renderChatHistory();
+            updateDashboard();
+        }
+
+        function markStateDirtyAndSync() {
+            state.lastUpdated = Date.now();
+            localStorage.setItem('reset_lastUpdated', String(state.lastUpdated));
+            if (!state.cloudSyncUrl || !navigator.onLine) return;
+            if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+            syncDebounceTimer = setTimeout(() => {
+                pushCloudState();
+            }, 1200);
+        }
+
+        async function pushCloudState() {
+            if (!state.cloudSyncUrl || !navigator.onLine) return false;
+            try {
+                setCloudSyncStatus("⏳ Se salvează în cloud...");
+                const res = await fetch(state.cloudSyncUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ syncAction: "push", state: buildSyncPayload() })
+                });
+                const data = await res.json();
+                if (data && data.ok) {
+                    const hhmm = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                    setCloudSyncStatus(`✅ Sincronizat (${hhmm})`);
+                    return true;
+                }
+                setCloudSyncStatus("⚠️ Răspuns cloud invalid", true);
+            } catch (e) {
+                setCloudSyncStatus("❌ Eroare sync cloud", true);
+            }
+            return false;
+        }
+
+        async function pullCloudState(pushIfEmpty = false) {
+            if (!state.cloudSyncUrl || !navigator.onLine || isCloudSyncBusy) return;
+            isCloudSyncBusy = true;
+            try {
+                const sep = state.cloudSyncUrl.includes('?') ? '&' : '?';
+                const res = await fetch(`${state.cloudSyncUrl}${sep}action=pull&t=${Date.now()}`);
+                const data = await res.json();
+                if (data && data.ok) {
+                    if (data.state && data.state.updatedAt) {
+                        if (data.state.updatedAt > (state.lastUpdated || 0)) {
+                            applySyncedState(data.state);
+                            const hhmm = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                            setCloudSyncStatus(`✅ Preluat din cloud (${hhmm})`);
+                        } else {
+                            const hhmm = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                            setCloudSyncStatus(`✅ La zi (${hhmm})`);
+                        }
+                    } else if (pushIfEmpty) {
+                        await pushCloudState();
+                    }
+                }
+            } catch (e) {
+                setCloudSyncStatus("⚠️ Cloud offline", true);
+            } finally {
+                isCloudSyncBusy = false;
+            }
+        }
+
+        async function syncWithCloudNow() {
+            haptic(30);
+            const urlInput = document.getElementById('set-cloud-sync-url').value.trim();
+            if (!urlInput) {
+                setCloudSyncStatus("❌ Lipește URL-ul /exec mai întâi!", true);
+                return;
+            }
+            state.cloudSyncUrl = urlInput;
+            localStorage.setItem('reset_cloudSyncUrl', urlInput);
+            setCloudSyncStatus("⏳ Sincronizare în curs...");
+            await pullCloudState(true);
+            if (state.lastUpdated > 0) {
+                await pushCloudState();
+            }
         }
 
         function updatePhaseUI() {
@@ -2167,6 +2366,7 @@
 
             renderSupps();
             renderCheckinCard();
+            markStateDirtyAndSync();
         }
 
         async function encourageMeForStep(stepKey) {
@@ -2220,6 +2420,7 @@
             }
             localStorage.setItem('reset_cigsToday', state.cigsToday);
             updateDashboard();
+            markStateDirtyAndSync();
         }
 
         function toggleSupp(key) {
@@ -2253,6 +2454,7 @@
             localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
             renderMoveProgress();
             updateDashboard();
+            markStateDirtyAndSync();
         }
 
         function changeWalkGoal(val) {
@@ -2260,6 +2462,7 @@
             localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
             renderMoveProgress();
             updateDashboard();
+            markStateDirtyAndSync();
         }
 
         function addTaxiBreak() {
@@ -2268,6 +2471,7 @@
             localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
             renderMoveProgress();
             updateDashboard();
+            markStateDirtyAndSync();
         }
 
         function toggleWorkoutDone() {
@@ -2276,6 +2480,7 @@
             localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
             renderMoveProgress();
             updateDashboard();
+            markStateDirtyAndSync();
         }
 
         function renderMoveProgress() {
@@ -2886,17 +3091,18 @@ Structurează clar cu:
             const tgChat = (document.getElementById('set-tg-chatid').value || state.tgChatId || "PUNE_AICI_CHAT_ID").trim();
             const apiKey = (document.getElementById('set-api-key').value || state.apiKey || "PUNE_AICI_GEMINI_KEY").trim();
             const model = document.getElementById('set-gemini-model').value || state.geminiModel || "gemini-3.5-flash";
+            const cloudUrl = (document.getElementById('set-cloud-sync-url')?.value || state.cloudSyncUrl || "").trim();
             const tM = document.getElementById('set-time-morning').value || state.stepTimes.morning || "06:30";
             const tN = document.getElementById('set-time-noon').value || state.stepTimes.noon || "12:30";
             const tC = document.getElementById('set-time-calm').value || state.stepTimes.calm || "17:30";
             const tNi = document.getElementById('set-time-night').value || state.stepTimes.night || "20:30";
 
-            const script = `// === RESET NEURO v3.2 — SCRIPT ALARME & BOT TELEGRAM 24/7 ===
+            const script = `// === RESET NEURO v3.4 — SCRIPT ALARME, BOT TELEGRAM 24/7 & CLOUD SYNC ===
 const TG_TOKEN = "${tgToken}";
 const TG_CHAT_ID = "${tgChat}";
 const GEMINI_KEY = "${apiKey}";
 const GEMINI_MODEL = "${model}";
-const WEBAPP_URL = ""; // După Deploy, lipește aici URL-ul (/exec) și rulează setWebhook() o singură dată!
+const WEBAPP_URL = "${cloudUrl}"; // După Deploy, lipește aici URL-ul (/exec) și rulează setWebhook()!
 
 const STEPS = [
   { key: "morning", time: "${tM}", label: "☀️ Dimineața", msg: "Neața, camarade! Ai luat NAC + D3 (+ Creatină) și ai făcut 2 min de deblocare psoas drept înainte de volan?" },
@@ -2927,22 +3133,52 @@ function checkScheduleAndNotify() {
   });
 }
 
+function doGet(e) {
+  const action = e && e.parameter ? e.parameter.action : "";
+  if (action === "pull") {
+    const raw = PropertiesService.getScriptProperties().getProperty("RESET_CLOUD_STATE");
+    return ContentService.createTextOutput(JSON.stringify({ ok: true, state: raw ? JSON.parse(raw) : null }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput("RESET Bot 24/7 & Cloud Sync este activ!");
+}
+
 function doPost(e) {
-  const update = JSON.parse(e.postData.contents);
-  if (update.callback_query) {
-    const cb = update.callback_query;
+  const body = JSON.parse(e.postData.contents);
+  const props = PropertiesService.getScriptProperties();
+
+  if (body.syncAction === "push" && body.state) {
+    props.setProperty("RESET_CLOUD_STATE", JSON.stringify(body.state));
+    return ContentService.createTextOutput(JSON.stringify({ ok: true, savedAt: body.state.updatedAt }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (body.callback_query) {
+    const cb = body.callback_query;
     UrlFetchApp.fetch("https://api.telegram.org/bot" + TG_TOKEN + "/answerCallbackQuery", {
       method: "post", contentType: "application/json", payload: JSON.stringify({ callback_query_id: cb.id })
     });
     const [action, stepKey] = (cb.data || "").split(":");
     if (action === "step_done") {
-      sendTg("🔥 Bravo, camarade! Pas bifat! Ține ritmul curat azi.");
+      try {
+        const raw = props.getProperty("RESET_CLOUD_STATE");
+        if (raw) {
+          const st = JSON.parse(raw);
+          if (!st.stepsDone) st.stepsDone = {};
+          if (!st.supps) st.supps = {};
+          st.stepsDone[stepKey] = true;
+          st.supps[stepKey] = true;
+          st.updatedAt = Date.now();
+          props.setProperty("RESET_CLOUD_STATE", JSON.stringify(st));
+        }
+      } catch (err) {}
+      sendTg("🔥 Bravo, camarade! Pas bifat și sincronizat în aplicație! Ține ritmul curat azi.");
     } else if (action === "step_enc") {
       const reply = askGemini("Nu am făcut încă pasul " + stepKey + ". Sunt taximetrist 8-10h/zi cu psoas drept tensionat și sciatică stânga. Încurajează-mă cald fără reproșuri și dă-mi o micro-acțiune de 60 secunde.");
       sendTg("💪 " + reply);
     }
-  } else if (update.message && update.message.text && String(update.message.chat.id) === String(TG_CHAT_ID)) {
-    const reply = askGemini(update.message.text);
+  } else if (body.message && body.message.text && String(body.message.chat.id) === String(TG_CHAT_ID)) {
+    const reply = askGemini(body.message.text);
     sendTg(reply);
   }
   return ContentService.createTextOutput("OK");
@@ -2965,10 +3201,6 @@ function askGemini(userText) {
   });
   const data = JSON.parse(res.getContentText());
   return data.candidates?.[0]?.content?.parts?.[0]?.text || "Ține capul sus, respiră adânc și fă un pas mic acum!";
-}
-
-function doGet() {
-  return ContentService.createTextOutput("RESET Bot 24/7 este activ!");
 }
 
 function setWebhook() {
@@ -3008,6 +3240,7 @@ function setWebhook() {
             localStorage.setItem('reset_stepTimes', JSON.stringify(state.stepTimes));
             updateWakeModeButtons();
             renderCheckinCard();
+            markStateDirtyAndSync();
         }
 
         function updateWakeModeButtons() {
@@ -3398,6 +3631,7 @@ REGULI:
             state.geminiModel = document.getElementById('set-gemini-model').value;
             state.tgToken = document.getElementById('set-tg-token').value.trim();
             state.tgChatId = document.getElementById('set-tg-chatid').value.trim();
+            state.cloudSyncUrl = document.getElementById('set-cloud-sync-url').value.trim();
             state.stepTimes = {
                 morning: document.getElementById('set-time-morning').value || "06:30",
                 noon: document.getElementById('set-time-noon').value || "12:30",
@@ -3414,6 +3648,7 @@ REGULI:
             localStorage.setItem('reset_geminiModel', state.geminiModel);
             localStorage.setItem('reset_tgToken', state.tgToken);
             localStorage.setItem('reset_tgChatId', state.tgChatId);
+            localStorage.setItem('reset_cloudSyncUrl', state.cloudSyncUrl);
             localStorage.setItem('reset_stepTimes', JSON.stringify(state.stepTimes));
 
             updatePhaseUI();
@@ -3421,6 +3656,7 @@ REGULI:
             updateTelegramBadges();
             renderCheckinCard();
             updateDashboard();
+            markStateDirtyAndSync();
             switchTab('dash');
         }
 
