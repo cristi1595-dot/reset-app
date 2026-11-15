@@ -1236,7 +1236,7 @@
     </div>
 
     <!-- ==================== MODAL: ADAUGĂ / EDITEAZĂ REȚETĂ ==================== -->
-    <div id="add-recipe-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div id="add-recipe-modal" onclick="if(event.target===this) closeModal('add-recipe-modal')" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
         <div class="glass bg-[#090d16]/95 border border-orange-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 id="add-recipe-modal-title" class="text-sm font-extrabold text-orange-300 uppercase tracking-wider flex items-center gap-2">
@@ -1302,6 +1302,14 @@
                     <textarea id="manual-rec-steps" rows="4" placeholder="Taie puiul cubulețe...&#10;Coace 25 minute la 190°C..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500"></textarea>
                 </div>
                 <input id="manual-rec-notes" type="text" placeholder="Note / Sfaturi (opțional)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
+                <div class="flex items-center gap-2">
+                    <label class="flex-1 cursor-pointer bg-slate-900 border border-slate-700 hover:border-orange-500/60 rounded-xl px-3 py-2 text-xs text-slate-300 flex items-center gap-2">
+                        <input id="manual-rec-photo" type="file" accept="image/*" onchange="handleManualRecipePhoto(event)" class="hidden">
+                        <span>📷</span>
+                        <span id="manual-rec-photo-label" class="truncate">Adaugă poză mică (opțional)</span>
+                    </label>
+                    <img id="manual-rec-photo-preview" class="hidden w-10 h-10 rounded-xl object-cover border border-slate-700 shrink-0" alt="Poză rețetă">
+                </div>
             </div>
 
             <div class="flex items-center justify-between gap-2 text-xs">
@@ -1320,7 +1328,7 @@
     </div>
 
     <!-- ==================== MODAL: DETALIU REȚETĂ COMPLET ==================== -->
-    <div id="recipe-detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+    <div id="recipe-detail-modal" onclick="if(event.target===this) closeModal('recipe-detail-modal')" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
         <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-5 space-y-3.5 selectable">
             <!-- Header -->
             <div class="flex justify-between items-start gap-2 border-b border-slate-800 pb-3">
@@ -1333,9 +1341,12 @@
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
                     <button onclick="toggleCurrentRecipeFavorite()" id="detail-fav-btn" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-xl text-xs transition" title="Favorită">☆</button>
-                    <button onclick="toggleModal('recipe-detail-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+                    <button onclick="closeModal('recipe-detail-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
                 </div>
             </div>
+
+            <!-- Poză rețetă (dacă există) -->
+            <img id="detail-recipe-image" class="hidden w-full max-h-48 object-cover rounded-2xl border border-slate-800" alt="Poză rețetă">
 
             <!-- Timp Total / Pregătire / Gătire -->
             <div class="grid grid-cols-3 gap-2 text-center">
@@ -1410,6 +1421,31 @@
 
             <div id="detail-recipe-source-box" class="hidden text-[11px] text-slate-400 truncate"></div>
 
+            <!-- Adaugă în Meniu (Ziua Săptămânii) -->
+            <div class="bg-slate-900/80 border border-emerald-700/40 rounded-2xl p-3 space-y-2">
+                <div class="text-[11px] font-bold text-emerald-300">📅 Programează în Meniu (7 Zile)</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="detail-plan-day" class="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                        <option value="0">Luni</option>
+                        <option value="1">Marți</option>
+                        <option value="2">Miercuri</option>
+                        <option value="3">Joi</option>
+                        <option value="4">Vineri</option>
+                        <option value="5">Sâmbătă</option>
+                        <option value="6">Duminică</option>
+                    </select>
+                    <select id="detail-plan-slot" class="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                        <option value="☀️ Mic Dejun">☀️ Mic Dejun</option>
+                        <option value="🚕 Prânz / Caserolă">🚕 Prânz / Caserolă</option>
+                        <option value="🌙 Cină">🌙 Cină</option>
+                        <option value="🍎 Gustare">🍎 Gustare</option>
+                    </select>
+                </div>
+                <button onclick="addCurrentRecipeToWeeklyPlan()" class="w-full py-2 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs transition">
+                    ➕ Adaugă în ziua aleasă
+                </button>
+            </div>
+
             <!-- Acțiuni jos -->
             <div class="flex flex-wrap gap-2 pt-1">
                 <button onclick="sendCurrentRecipeToShopping()" class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs transition active:scale-95">
@@ -1481,7 +1517,7 @@
     </div>
 
     <!-- ==================== MODAL: CĂMARA ==================== -->
-    <div id="pantry-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div id="pantry-modal" onclick="if(event.target===this) closeModal('pantry-modal')" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
         <div class="glass bg-[#090d16]/95 border border-amber-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col overflow-hidden">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center">
                 <div>
@@ -1522,7 +1558,7 @@
     </div>
 
     <!-- ==================== MODAL: SELECTARE PRODUSE DE BAZĂ ÎN CĂMARĂ ==================== -->
-    <div id="pantry-staples-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[55] hidden flex items-center justify-center p-3">
+    <div id="pantry-staples-modal" onclick="if(event.target===this) closeModal('pantry-staples-modal')" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[55] hidden flex items-center justify-center p-3">
         <div class="glass bg-[#090d16]/95 border border-amber-500/50 rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col overflow-hidden">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center">
                 <div>
@@ -1546,7 +1582,7 @@
     </div>
 
     <!-- ==================== MODAL: LISTA DE CUMPĂRĂTURI ==================== -->
-    <div id="shopping-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div id="shopping-modal" onclick="if(event.target===this) closeModal('shopping-modal')" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
         <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col overflow-hidden">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center">
                 <div>
@@ -2447,7 +2483,8 @@
             shoppingList: JSON.parse(localStorage.getItem('reset_shoppingList') || '[]'),
             customExercises: JSON.parse(localStorage.getItem('reset_customExercises') || '[]'),
             workoutRoutines: JSON.parse(localStorage.getItem('reset_workoutRoutines') || '[]'),
-            moveHistory: JSON.parse(localStorage.getItem('reset_moveHistory') || '{}')
+            moveHistory: JSON.parse(localStorage.getItem('reset_moveHistory') || '{}'),
+            weeklyPlan: JSON.parse(localStorage.getItem('reset_weeklyPlan') || '{"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}')
         };
 
         if (!localStorage.getItem('reset_apiKey')) {
@@ -2737,7 +2774,8 @@
                 shoppingList: state.shoppingList || [],
                 customExercises: state.customExercises || [],
                 workoutRoutines: state.workoutRoutines || [],
-                moveHistory: state.moveHistory || {}
+                moveHistory: state.moveHistory || {},
+                weeklyPlan: state.weeklyPlan || {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}
             };
         }
 
@@ -2748,7 +2786,7 @@
                 'cigsToday', 'lastCigTime', 'supps', 'wakeMode', 'stepTimes', 'stepsDone',
                 'exerciseLevel', 'moveStats', 'tgToken', 'tgChatId', 'theme', 'fontSize',
                 'apiKey', 'geminiModel', 'chatHistory', 'recipes', 'pantry', 'shoppingList',
-                'customExercises', 'workoutRoutines', 'moveHistory'
+                'customExercises', 'workoutRoutines', 'moveHistory', 'weeklyPlan'
             ];
             keys.forEach(k => {
                 if (remote[k] === undefined || remote[k] === null) return;
@@ -2789,6 +2827,7 @@
             renderMoveProgress();
             renderExercises();
             renderMoveExtensions();
+            renderFoodMeals();
             renderRecipeCategories();
             renderRecipesList();
             updateNutritionBadges();
@@ -3224,10 +3263,51 @@
             document.getElementById('supp-score').innerText = `${count}/4 azi`;
         }
 
+        const BACK_CLOSABLE_MODALS = ['cooking-mode-modal', 'pantry-staples-modal', 'recipe-detail-modal', 'add-recipe-modal', 'pantry-modal', 'shopping-modal'];
+
+        function openModalWithHistory(modalId) {
+            const el = document.getElementById(modalId);
+            if (!el) return;
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                try { history.pushState({ resetModal: modalId }, ''); } catch {}
+            }
+        }
+
+        function closeModal(modalId, fromPopstate = false) {
+            if (modalId === 'cooking-mode-modal') {
+                closeCookingMode(fromPopstate);
+                return;
+            }
+            const el = document.getElementById(modalId);
+            if (!el || el.classList.contains('hidden')) return;
+            el.classList.add('hidden');
+            if (modalId === 'recipe-detail-modal') stopInlineStepTimer();
+            if (!fromPopstate && history.state && history.state.resetModal === modalId) {
+                try { history.back(); } catch {}
+            }
+        }
+
+        window.addEventListener('popstate', () => {
+            for (const mId of BACK_CLOSABLE_MODALS) {
+                const el = document.getElementById(mId);
+                if (el && !el.classList.contains('hidden')) {
+                    closeModal(mId, true);
+                    return;
+                }
+            }
+        });
+
         function toggleModal(modalId) {
             haptic(20);
             const el = document.getElementById(modalId);
-            el.classList.toggle('hidden');
+            if (!el) return;
+            if (el.classList.contains('hidden')) {
+                if (BACK_CLOSABLE_MODALS.includes(modalId)) openModalWithHistory(modalId);
+                else el.classList.remove('hidden');
+            } else {
+                closeModal(modalId);
+            }
         }
 
         // ==================== MIȘCARE, KINETO & EXERCIȚII CU VIDEO ====================
@@ -4623,6 +4703,7 @@
             localStorage.setItem('reset_recipes', JSON.stringify(state.recipes || []));
             localStorage.setItem('reset_pantry', JSON.stringify(state.pantry || []));
             localStorage.setItem('reset_shoppingList', JSON.stringify(state.shoppingList || []));
+            localStorage.setItem('reset_weeklyPlan', JSON.stringify(state.weeklyPlan || {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}));
             updateNutritionBadges();
             markStateDirtyAndSync();
         }
@@ -4715,41 +4796,91 @@
         function renderFoodMeals() {
             const dayObj = FOOD_PLAN_DB[selectedFoodDayIdx] || FOOD_PLAN_DB[0];
             const box = document.getElementById('food-meals-container');
-            box.innerHTML = dayObj.meals.map((meal, mIdx) => `
-                <div class="glass rounded-3xl p-4 space-y-2.5 selectable">
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">${escapeHtml(meal.slot)}</div>
-                            <h3 class="text-sm font-extrabold text-white mt-0.5">${escapeHtml(meal.name)}</h3>
-                        </div>
-                        <div class="text-right shrink-0">
-                            <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950/70 text-amber-300 border border-amber-700/60">${escapeHtml(meal.appliance)}</span>
-                            <div class="text-[10px] text-slate-400 font-mono mt-0.5">⏱️ ${escapeHtml(meal.prep)}</div>
-                        </div>
-                    </div>
-                    <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 space-y-1.5 text-xs text-slate-300">
-                        <div><strong class="text-cyan-300">🛒 Ingrediente:</strong> ${escapeHtml(meal.ingredients)}</div>
-                        <div><strong class="text-emerald-300">👨‍🍳 Preparare:</strong> ${escapeHtml(meal.steps)}</div>
-                    </div>
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="text-[11px] text-purple-300 bg-purple-950/30 border border-purple-800/40 rounded-xl p-2 flex-1">
-                            🧠 <strong>De ce ajută:</strong> ${escapeHtml(meal.nutrients)}
-                        </div>
-                        <button onclick="addPlanMealToShopping(${selectedFoodDayIdx}, ${mIdx})" class="px-2.5 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-800 border border-emerald-700/60 text-emerald-300 text-[11px] font-bold shrink-0 transition" title="Trimite ingredientele în Lista de Cumpărături">
-                            + 🛒
+            const plan = state.weeklyPlan || {};
+            const dayMeals = Array.isArray(plan[String(selectedFoodDayIdx)]) ? plan[String(selectedFoodDayIdx)] : [];
+
+            if (dayMeals.length === 0) {
+                box.innerHTML = `
+                    <div class="glass rounded-3xl p-6 text-center space-y-3 border-slate-800">
+                        <div class="text-3xl">📅</div>
+                        <div class="text-xs font-bold text-slate-300">Nicio rețetă programată pentru ${escapeHtml(dayObj.day)}.</div>
+                        <p class="text-[11px] text-slate-400">Deschide orice rețetă din <strong>📖 Rețete</strong> și apasă <strong>📅 Programează în Meniu</strong> pentru a o pune aici.</p>
+                        <button onclick="switchFoodSubTab('recipes')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs transition">
+                            📖 Alege din Rețete
                         </button>
-                    </div>
-                </div>
-            `).join('');
+                    </div>`;
+                return;
+            }
+
+            box.innerHTML = dayMeals.map(entry => {
+                const r = (state.recipes || []).find(x => x.id === entry.recipeId);
+                if (!r) {
+                    return `
+                        <div class="glass rounded-2xl p-3 flex items-center justify-between text-xs text-slate-400">
+                            <span>${escapeHtml(entry.slot)} • ${escapeHtml(entry.recipeTitle || 'Rețetă ștearsă')}</span>
+                            <button onclick="removeMealFromWeeklyPlan(${selectedFoodDayIdx}, '${escapeHtml(entry.id)}')" class="text-red-400 px-2">✕</button>
+                        </div>`;
+                }
+                const totalMins = (r.prepTimeMinutes || 0) + (r.cookTimeMinutes || 0);
+                const ingPreview = (r.ingredients || []).map(i => i.originalText || i.name).join(', ');
+                const prepPreview = (r.instructions || []).map(s => s.text || String(s)).join(' ');
+                return `
+                    <div onclick="openRecipeDetail('${escapeHtml(r.id)}')" class="glass rounded-3xl p-4 space-y-2.5 cursor-pointer hover:border-emerald-500/50 transition">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">${escapeHtml(entry.slot)}</div>
+                                <h3 class="text-sm font-extrabold text-white mt-0.5">${escapeHtml(r.title)}</h3>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                ${r.image ? `<img src="${r.image}" class="w-11 h-11 rounded-xl object-cover border border-slate-700" alt="">` : ''}
+                                <button onclick="event.stopPropagation(); addWeeklyEntryToShopping('${escapeHtml(r.id)}')" class="px-2 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-800 border border-emerald-700/60 text-emerald-300 text-[11px] font-bold" title="Trimite ingredientele în Cumpărături">+ 🛒</button>
+                                <button onclick="event.stopPropagation(); removeMealFromWeeklyPlan(${selectedFoodDayIdx}, '${escapeHtml(entry.id)}')" class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-red-900 text-slate-400 hover:text-red-300 text-[11px] font-bold" title="Scoate din zi">✕</button>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 space-y-1.5 text-xs text-slate-300">
+                            ${ingPreview ? `<div><strong class="text-cyan-300">🛒 Ingrediente:</strong> ${escapeHtml(ingPreview)}</div>` : ''}
+                            ${prepPreview ? `<div class="line-clamp-3"><strong class="text-emerald-300">👨‍🍳 Preparare:</strong> ${escapeHtml(prepPreview)}</div>` : ''}
+                        </div>
+                        ${totalMins > 0 ? `<div class="text-[10px] text-slate-400 font-mono">⏱️ ${totalMins} min • ${getCategoryIcon(r.category)} ${escapeHtml(r.category)}</div>` : ''}
+                    </div>`;
+            }).join('');
         }
 
-        function addPlanMealToShopping(dayIdx, mealIdx) {
-            haptic(25);
-            const meal = FOOD_PLAN_DB[dayIdx]?.meals[mealIdx];
-            if (!meal) return;
-            const parts = meal.ingredients.split(/[,;]+/).map(s => s.trim()).filter(Boolean);
-            addIngredientsArrayToShopping(parts.map(p => ({ originalText: p, name: p })), meal.name);
-            alert(`✅ ${parts.length} ingrediente din "${meal.name}" au fost adăugate în Lista de Cumpărături!`);
+        function addWeeklyEntryToShopping(recipeId) {
+            const r = (state.recipes || []).find(x => x.id === recipeId);
+            if (!r || !r.ingredients?.length) return;
+            addIngredientsArrayToShopping(r.ingredients, r.title);
+            alert(`✅ ${r.ingredients.length} ingrediente din "${r.title}" au fost adăugate în Lista de Cumpărături!`);
+        }
+
+        function removeMealFromWeeklyPlan(dayIdx, entryId) {
+            haptic(15);
+            const k = String(dayIdx);
+            if (!state.weeklyPlan) state.weeklyPlan = {};
+            state.weeklyPlan[k] = (state.weeklyPlan[k] || []).filter(e => e.id !== entryId);
+            saveNutritionState();
+            renderFoodMeals();
+        }
+
+        function addCurrentRecipeToWeeklyPlan() {
+            const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
+            if (!r) return;
+            const dayIdx = document.getElementById('detail-plan-day').value;
+            const slot = document.getElementById('detail-plan-slot').value;
+            if (!state.weeklyPlan) state.weeklyPlan = {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]};
+            if (!Array.isArray(state.weeklyPlan[dayIdx])) state.weeklyPlan[dayIdx] = [];
+            state.weeklyPlan[dayIdx].push({
+                id: 'wp-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5),
+                recipeId: r.id,
+                recipeTitle: r.title,
+                slot
+            });
+            saveNutritionState();
+            selectedFoodDayIdx = parseInt(dayIdx, 10);
+            renderFoodDays();
+            renderFoodMeals();
+            const dayName = (FOOD_PLAN_DB[selectedFoodDayIdx] || {}).day || 'Ziua aleasă';
+            alert(`✅ "${r.title}" a fost adăugată în ${dayName} (${slot})!`);
         }
 
         // ==================== REȚETE SALVATE & CATEGORII ====================
@@ -4810,19 +4941,23 @@
 
             box.innerHTML = recipes.map(r => {
                 const totalMins = (r.prepTimeMinutes || 0) + (r.cookTimeMinutes || 0);
+                const ingSummary = (r.ingredients || []).map(i => i.originalText || i.name).join(', ');
+                const prepSummary = (r.instructions || []).map(s => s.text || String(s)).join(' ');
                 return `
-                    <div onclick="openRecipeDetail('${escapeHtml(r.id)}')" class="glass rounded-2xl p-3.5 border border-slate-800 hover:border-orange-500/50 cursor-pointer transition active:scale-[0.99] space-y-1.5">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
+                    <div onclick="openRecipeDetail('${escapeHtml(r.id)}')" class="glass rounded-3xl p-4 border border-slate-800 hover:border-orange-500/50 cursor-pointer transition active:scale-[0.99] space-y-2.5">
+                        <div class="flex items-start justify-between gap-2.5">
+                            <div class="min-w-0 flex-1">
                                 <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-950/70 text-orange-300 border border-orange-700/50">${getCategoryIcon(r.category)} ${escapeHtml(r.category)}</span>
                                 <h4 class="text-sm font-extrabold text-white mt-1 leading-snug">${r.isFavorite ? '⭐ ' : ''}${escapeHtml(r.title)}</h4>
                             </div>
-                            <span class="text-xs text-slate-400 shrink-0">→</span>
+                            <div class="flex items-center gap-2 shrink-0">
+                                ${totalMins > 0 ? `<span class="text-[11px] text-slate-400 font-mono">⏱️ ${totalMins} min</span>` : ''}
+                                ${r.image ? `<img src="${r.image}" class="w-12 h-12 rounded-xl object-cover border border-slate-700" alt="">` : ''}
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3 text-[11px] text-slate-400">
-                            ${totalMins > 0 ? `<span>⏱️ ${totalMins} min</span>` : ''}
-                            <span>🥕 ${(r.ingredients || []).length} ingr.</span>
-                            <span>🍽️ ${r.servings || 4} porții</span>
+                        <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 space-y-1.5 text-xs text-slate-300">
+                            ${ingSummary ? `<div><strong class="text-cyan-300">🛒 Ingrediente:</strong> ${escapeHtml(ingSummary)}</div>` : ''}
+                            ${prepSummary ? `<div><strong class="text-emerald-300">👨‍🍳 Preparare:</strong> ${escapeHtml(prepSummary)}</div>` : ''}
                         </div>
                     </div>`;
             }).join('');
@@ -4983,6 +5118,18 @@
 
             document.getElementById('detail-recipe-notes-input').value = r.notes || '';
 
+            const imgEl = document.getElementById('detail-recipe-image');
+            if (r.image) {
+                imgEl.src = r.image;
+                imgEl.classList.remove('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                imgEl.src = '';
+            }
+
+            const daySel = document.getElementById('detail-plan-day');
+            if (daySel) daySel.value = String(selectedFoodDayIdx);
+
             const srcBox = document.getElementById('detail-recipe-source-box');
             if (r.sourceUrl) {
                 srcBox.innerHTML = `🔗 Sursă: <a href="${escapeHtml(r.sourceUrl)}" target="_blank" class="text-cyan-400 underline">${escapeHtml(r.sourceUrl)}</a>`;
@@ -4994,7 +5141,7 @@
             renderDetailPortionsAndNutrition(r);
             renderDetailIngredients(r);
             renderDetailSteps(r);
-            toggleModal('recipe-detail-modal');
+            openModalWithHistory('recipe-detail-modal');
         }
 
         function renderDetailPortionsAndNutrition(r) {
@@ -5201,7 +5348,7 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
                 return `<div>• ${escapeHtml(lbl)}</div>`;
             }).join('') || '<div>Niciun ingredient.</div>';
 
-            document.getElementById('cooking-mode-modal').classList.remove('hidden');
+            openModalWithHistory('cooking-mode-modal');
             renderCookingStep();
 
             try {
@@ -5214,7 +5361,7 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
             }
         }
 
-        function closeCookingMode() {
+        function closeCookingMode(fromPopstate = false) {
             if (cookTimerInterval) clearInterval(cookTimerInterval);
             cookTimerInterval = null;
             cookTimerRunning = false;
@@ -5223,6 +5370,9 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
                 cookWakeLock = null;
             }
             document.getElementById('cooking-mode-modal').classList.add('hidden');
+            if (!fromPopstate && history.state && history.state.resetModal === 'cooking-mode-modal') {
+                try { history.back(); } catch {}
+            }
         }
 
         function toggleCookIngredientsDrawer() {
@@ -5336,8 +5486,46 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
         }
 
         // ==================== IMPORT INTELIGENT & MANUAL REȚETE ====================
+        let pendingManualPhotoThumb = null;
+
+        function compressImageThumbnail(dataUrl, maxDim = 320) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                        else { w = Math.round(w * maxDim / h); h = maxDim; }
+                    }
+                    const c = document.createElement('canvas');
+                    c.width = w; c.height = h;
+                    c.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(c.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = () => resolve(null);
+                img.src = dataUrl;
+            });
+        }
+
+        function handleManualRecipePhoto(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            document.getElementById('manual-rec-photo-label').innerText = `📷 ${file.name}`;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                pendingManualPhotoThumb = await compressImageThumbnail(e.target.result, 320);
+                if (pendingManualPhotoThumb) {
+                    const prev = document.getElementById('manual-rec-photo-preview');
+                    prev.src = pendingManualPhotoThumb;
+                    prev.classList.remove('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
         function openAddRecipeModal() {
             editingRecipeId = null;
+            pendingManualPhotoThumb = null;
             document.getElementById('add-recipe-modal-title').innerHTML = '<span>📖</span> Adaugă Rețetă';
             document.getElementById('add-recipe-mode-tabs').classList.remove('hidden');
             document.getElementById('add-recipe-submit-btn').innerText = '✨ Extrage și Salvează Rețeta';
@@ -5355,6 +5543,9 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
             document.getElementById('manual-rec-ingredients').value = '';
             document.getElementById('manual-rec-steps').value = '';
             document.getElementById('manual-rec-notes').value = '';
+            document.getElementById('manual-rec-photo').value = '';
+            document.getElementById('manual-rec-photo-label').innerText = 'Adaugă poză mică (opțional)';
+            document.getElementById('manual-rec-photo-preview').classList.add('hidden');
             pendingRecipeImageDataUrl = null;
             switchAddRecipeMode('paste');
             toggleModal('add-recipe-modal');
@@ -5364,7 +5555,8 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
             const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
             if (!r) return;
             editingRecipeId = r.id;
-            toggleModal('recipe-detail-modal');
+            pendingManualPhotoThumb = r.image || null;
+            closeModal('recipe-detail-modal');
             document.getElementById('add-recipe-modal-title').innerHTML = '<span>✏️</span> Editează Rețeta';
             document.getElementById('add-recipe-mode-tabs').classList.add('hidden');
             document.getElementById('add-recipe-submit-btn').innerText = '💾 Salvează Modificările';
@@ -5377,6 +5569,16 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
             document.getElementById('manual-rec-ingredients').value = (r.ingredients || []).map(i => i.originalText || `${i.amount || ''} ${i.unit || ''} ${i.name}`.trim()).join('\n');
             document.getElementById('manual-rec-steps').value = (r.instructions || []).map(s => s.text || String(s)).join('\n');
             document.getElementById('manual-rec-notes').value = r.notes || '';
+            document.getElementById('manual-rec-photo').value = '';
+            if (r.image) {
+                document.getElementById('manual-rec-photo-label').innerText = '📷 Poză atașată (apasă pentru a schimba)';
+                const prev = document.getElementById('manual-rec-photo-preview');
+                prev.src = r.image;
+                prev.classList.remove('hidden');
+            } else {
+                document.getElementById('manual-rec-photo-label').innerText = 'Adaugă poză mică (opțional)';
+                document.getElementById('manual-rec-photo-preview').classList.add('hidden');
+            }
             switchAddRecipeMode('manual');
             toggleModal('add-recipe-modal');
         }
@@ -5627,9 +5829,11 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
                     }];
                     const raw = await callGeminiWithFallback(state.apiKey.trim(), RECIPE_EXTRACTOR_PROMPT, contents);
                     extracted = parseRecipeJsonFromAI(raw);
+                    extracted.image = await compressImageThumbnail(pendingRecipeImageDataUrl, 320);
                 }
 
                 if (overrideCat !== 'auto') extracted.category = overrideCat;
+                if (addRecipeMode === 'manual' && pendingManualPhotoThumb) extracted.image = pendingManualPhotoThumb;
 
                 if (editingRecipeId) {
                     const idx = (state.recipes || []).findIndex(x => x.id === editingRecipeId);
