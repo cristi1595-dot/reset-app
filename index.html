@@ -331,23 +331,30 @@
 
         <!-- Mini Sumar Mișcare & Nutriție Azi -->
         <div class="grid grid-cols-2 gap-2.5">
-            <button onclick="switchTab('move')" class="glass rounded-2xl p-3 text-left hover:border-cyan-500/50 transition space-y-1">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-cyan-300">🏋️ Mișcare Azi</span>
-                    <span id="dash-walk-val" class="text-[11px] font-mono text-white font-bold">0/30m</span>
+            <div onclick="switchTab('move')" role="button" tabindex="0" class="glass rounded-2xl p-3 text-left hover:border-cyan-500/50 transition space-y-1.5 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-cyan-300">🏋️ Mișcare Azi</span>
+                        <span id="dash-walk-val" class="text-[11px] font-mono text-white font-bold">0/30m</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-1.5">
+                        <div id="dash-walk-bar" class="bg-cyan-400 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                    <div id="dash-move-sub" class="text-[10px] text-slate-400 truncate">0 pauze taxi • Deblocare psoas</div>
                 </div>
-                <div class="w-full bg-slate-900 rounded-full h-1.5">
-                    <div id="dash-walk-bar" class="bg-cyan-400 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                <button id="dash-quick-workout-btn" onclick="event.stopPropagation(); startFavoriteOrLastWorkout()" class="hidden w-full py-1 px-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-800/80 border border-cyan-700/60 text-cyan-200 text-[10px] font-bold truncate transition text-center">
+                    ▶ Start Antrenament
+                </button>
+            </div>
+            <button onclick="switchTab('food')" class="glass rounded-2xl p-3 text-left hover:border-amber-500/50 transition space-y-1 flex flex-col justify-between">
+                <div class="space-y-1 w-full">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-300">🍲 Meniu Azi</span>
+                        <span id="dash-food-day" class="text-[10px] font-mono text-slate-300">Azi</span>
+                    </div>
+                    <div id="dash-food-preview" class="text-[10px] text-slate-200 font-semibold truncate">Nicio masă programată</div>
                 </div>
-                <div id="dash-move-sub" class="text-[10px] text-slate-400 truncate">0 pauze taxi • Deblocare psoas</div>
-            </button>
-            <button onclick="switchTab('food')" class="glass rounded-2xl p-3 text-left hover:border-amber-500/50 transition space-y-1">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-amber-300">🍲 Meniu Azi</span>
-                    <span id="dash-food-day" class="text-[10px] font-mono text-slate-300">Azi</span>
-                </div>
-                <div id="dash-food-preview" class="text-[10px] text-slate-200 font-semibold truncate">Caserolă Taxi + Instant Pot</div>
-                <div class="text-[10px] text-slate-400 truncate">Apasă pentru rețete & Chef AI →</div>
+                <div id="dash-food-sub" class="text-[10px] text-slate-400 truncate w-full">Apasă pentru rețete & Chef AI →</div>
             </button>
         </div>
 
@@ -713,6 +720,19 @@
             <!-- Selector Zi -->
             <div class="flex gap-1.5 overflow-x-auto pb-1" id="food-days-bar"></div>
 
+            <!-- Bară acțiuni rapide Meniu -->
+            <div class="grid grid-cols-3 gap-1.5">
+                <button onclick="openQuickMealModal()" class="py-2 px-2 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-700/50 text-emerald-300 text-[11px] font-bold transition active:scale-95">
+                    ➕ Adaugă masă
+                </button>
+                <button onclick="openCopyDayModal()" class="py-2 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/70 text-cyan-300 text-[11px] font-bold transition active:scale-95">
+                    📋 Copiază ziua
+                </button>
+                <button onclick="generateWeeklyShoppingList()" class="py-2 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-amber-700/50 text-amber-300 text-[11px] font-bold transition active:scale-95">
+                    🛒 Cumpărături săpt.
+                </button>
+            </div>
+
             <!-- Cardurile Mesei Zilei -->
             <div id="food-meals-container" class="space-y-3"></div>
         </div>
@@ -794,7 +814,17 @@
         <div class="glass border-red-800/60 rounded-3xl p-5 text-center space-y-4">
             <div class="flex justify-between items-center">
                 <span class="text-[11px] uppercase tracking-wider font-bold text-red-400 bg-red-950/80 px-2.5 py-1 rounded-full border border-red-800">Protocol Anti-Craving</span>
-                <span id="sos-timer" class="text-xl font-mono font-bold text-white">05:00</span>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="setSosDuration(120)" id="sos-dur-120" class="px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-400">2m</button>
+                    <button type="button" onclick="setSosDuration(300)" id="sos-dur-300" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-[10px] font-bold text-white">5m</button>
+                    <span id="sos-timer" class="text-xl font-mono font-bold text-white ml-1">05:00</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" onclick="setSosBreathMode('sigh')" id="sos-mode-sigh" class="py-1.5 px-2 rounded-xl bg-emerald-600/90 text-white text-[10px] font-bold border border-emerald-400 transition">🫁 Oftat Fiz.</button>
+                <button type="button" onclick="setSosBreathMode('box')" id="sos-mode-box" class="py-1.5 px-2 rounded-xl bg-slate-900 text-slate-300 text-[10px] font-bold border border-slate-800 transition">🟦 Box 4-4-4-4</button>
+                <button type="button" onclick="setSosBreathMode('478')" id="sos-mode-478" class="py-1.5 px-2 rounded-xl bg-slate-900 text-slate-300 text-[10px] font-bold border border-slate-800 transition">🌙 4-7-8 Somn</button>
             </div>
 
             <div class="py-4 flex flex-col items-center justify-center">
@@ -1138,7 +1168,10 @@
 
         <!-- 5. Backup & Restaurare -->
         <div class="glass rounded-3xl p-4 space-y-3">
-            <h2 class="text-sm font-bold text-purple-400 uppercase tracking-wider">5. Salvare & Backup (Anti-Pierdere Date)</h2>
+            <div class="flex items-center justify-between gap-2">
+                <h2 class="text-sm font-bold text-purple-400 uppercase tracking-wider">5. Salvare & Backup (Anti-Pierdere Date)</h2>
+                <span id="last-backup-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Niciun backup</span>
+            </div>
             <p class="text-xs text-slate-300">
                 Toate datele tale trăiesc pe dispozitivul tău. Descarcă un fișier de backup pentru a nu-ți pierde progresul când schimbi telefonul.
             </p>
@@ -1479,28 +1512,25 @@
 
             <div id="detail-recipe-source-box" class="hidden text-[11px] text-slate-400 truncate"></div>
 
-            <!-- Adaugă în Meniu (Ziua Săptămânii) -->
-            <div class="bg-slate-900/80 border border-emerald-700/40 rounded-2xl p-3 space-y-2">
-                <div class="text-[11px] font-bold text-emerald-300">📅 Programează în Meniu (7 Zile)</div>
-                <div class="grid grid-cols-2 gap-2">
-                    <select id="detail-plan-day" class="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
-                        <option value="0">Luni</option>
-                        <option value="1">Marți</option>
-                        <option value="2">Miercuri</option>
-                        <option value="3">Joi</option>
-                        <option value="4">Vineri</option>
-                        <option value="5">Sâmbătă</option>
-                        <option value="6">Duminică</option>
-                    </select>
-                    <select id="detail-plan-slot" class="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
-                        <option value="☀️ Mic Dejun">☀️ Mic Dejun</option>
-                        <option value="🚕 Prânz / Caserolă">🚕 Prânz / Caserolă</option>
-                        <option value="🌙 Cină">🌙 Cină</option>
-                        <option value="🍎 Gustare">🍎 Gustare</option>
-                    </select>
+            <!-- Adaugă în Meniu (Zile Multiple) -->
+            <div class="bg-slate-900/80 border border-emerald-700/40 rounded-2xl p-3 space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="text-[11px] font-bold text-emerald-300">📅 Programează în Meniu (7 Zile)</div>
+                    <div class="flex gap-1">
+                        <button type="button" onclick="setDetailPlanDaysPreset('weekdays')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-slate-300 transition">L–V</button>
+                        <button type="button" onclick="setDetailPlanDaysPreset('weekend')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-slate-300 transition">S–D</button>
+                        <button type="button" onclick="setDetailPlanDaysPreset('all')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-slate-300 transition">Toate</button>
+                    </div>
                 </div>
-                <button onclick="addCurrentRecipeToWeeklyPlan()" class="w-full py-2 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs transition">
-                    ➕ Adaugă în ziua aleasă
+                <div id="detail-plan-days-pills" class="grid grid-cols-7 gap-1"></div>
+                <select id="detail-plan-slot" onchange="renderDetailPlanDaysPills()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                    <option value="☀️ Mic Dejun">☀️ Mic Dejun</option>
+                    <option value="🚕 Prânz / Caserolă">🚕 Prânz / Caserolă</option>
+                    <option value="🌙 Cină">🌙 Cină</option>
+                    <option value="🍎 Gustare">🍎 Gustare</option>
+                </select>
+                <button id="detail-plan-add-btn" onclick="addCurrentRecipeToWeeklyPlan()" class="w-full py-2 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs transition active:scale-[0.99]">
+                    ➕ Adaugă în zilele alese
                 </button>
             </div>
 
@@ -1668,6 +1698,63 @@
                 <input id="shopping-new-amount" type="text" placeholder="Cant." class="w-16 bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white text-center focus:outline-none focus:border-emerald-500">
                 <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs">+</button>
             </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: ADAUGĂ MASĂ RAPID ÎN MENIU ==================== -->
+    <div id="quick-meal-modal" onclick="if(event.target===this) closeModal('quick-meal-modal')" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-emerald-500/40 rounded-3xl max-w-lg w-full max-h-[88dvh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="text-sm font-extrabold text-emerald-300">➕ Adaugă Masă Rapid</h3>
+                <button onclick="closeModal('quick-meal-modal')" class="text-slate-400 hover:text-white text-lg px-2">✕</button>
+            </div>
+            <div class="p-4 space-y-3 overflow-y-auto flex-1">
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold text-slate-300">1. Zilele dorite:</span>
+                        <div class="flex gap-1">
+                            <button type="button" onclick="setQuickMealDaysPreset('weekdays')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-300">L–V</button>
+                            <button type="button" onclick="setQuickMealDaysPreset('weekend')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-300">S–D</button>
+                            <button type="button" onclick="setQuickMealDaysPreset('all')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-300">Toate</button>
+                        </div>
+                    </div>
+                    <div id="quick-meal-days-pills" class="grid grid-cols-7 gap-1"></div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-300 block mb-1">2. Momentul zilei:</label>
+                    <select id="quick-meal-slot" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                        <option value="☀️ Mic Dejun">☀️ Mic Dejun</option>
+                        <option value="🚕 Prânz / Caserolă">🚕 Prânz / Caserolă</option>
+                        <option value="🌙 Cină">🌙 Cină</option>
+                        <option value="🍎 Gustare">🍎 Gustare</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-300 block mb-1">3. Alege rețeta (apasă pentru adăugare):</label>
+                    <input id="quick-meal-search" type="text" oninput="renderQuickMealRecipesList()" placeholder="🔍 Caută rețetă..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 mb-2">
+                    <div id="quick-meal-recipes-list" class="space-y-1.5 max-h-60 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: COPIAZĂ ZIUA ÎN ALTE ZILE ==================== -->
+    <div id="copy-day-modal" onclick="if(event.target===this) closeModal('copy-day-modal')" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-cyan-500/40 rounded-3xl max-w-md w-full p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="copy-day-title" class="text-sm font-extrabold text-cyan-300">📋 Copiază Ziua</h3>
+                <button onclick="closeModal('copy-day-modal')" class="text-slate-400 hover:text-white text-lg px-2">✕</button>
+            </div>
+            <p class="text-xs text-slate-300">Selectează zilele în care vrei să copiezi toate mesele din <strong id="copy-day-source-name" class="text-white">Luni</strong>:</p>
+            <div class="flex gap-1.5 justify-end">
+                <button type="button" onclick="setCopyDayPreset('weekdays')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-300">L–V</button>
+                <button type="button" onclick="setCopyDayPreset('weekend')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-300">S–D</button>
+                <button type="button" onclick="setCopyDayPreset('all')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-300">Toate</button>
+            </div>
+            <div id="copy-day-targets-pills" class="grid grid-cols-7 gap-1"></div>
+            <button onclick="confirmCopyDayMeals()" class="w-full py-2.5 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition">
+                📋 Copiază mesele în zilele bifate
+            </button>
         </div>
     </div>
 
@@ -2555,6 +2642,7 @@
             shoppingList: JSON.parse(localStorage.getItem('reset_shoppingList') || '[]'),
             customExercises: JSON.parse(localStorage.getItem('reset_customExercises') || '[]'),
             workoutRoutines: JSON.parse(localStorage.getItem('reset_workoutRoutines') || '[]'),
+            favoriteRoutineId: localStorage.getItem('reset_favoriteRoutineId') || "",
             moveHistory: JSON.parse(localStorage.getItem('reset_moveHistory') || '{}'),
             weeklyPlan: JSON.parse(localStorage.getItem('reset_weeklyPlan') || '{"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}'),
             healthProfile: Object.assign({}, DEFAULT_HEALTH_PROFILE, JSON.parse(localStorage.getItem('reset_healthProfile') || '{}')),
@@ -3187,10 +3275,45 @@
             document.getElementById('dash-move-sub').innerText = `${state.moveStats.taxiBreaksToday} pauze taxi • ${state.moveStats.workoutDoneToday ? 'Antrenament ✅' : 'Nivel ' + state.exerciseLevel.replace('level', '')}`;
 
             const todayFood = FOOD_PLAN_DB[selectedFoodDayIdx];
+            const dayMeals = Array.isArray((state.weeklyPlan || {})[String(selectedFoodDayIdx)])
+                ? state.weeklyPlan[String(selectedFoodDayIdx)]
+                : [];
             if (todayFood) {
                 document.getElementById('dash-food-day').innerText = todayFood.day;
-                document.getElementById('dash-food-preview').innerText = todayFood.meals[1].name;
             }
+            const foodPrevEl = document.getElementById('dash-food-preview');
+            const foodSubEl = document.getElementById('dash-food-sub');
+            if (dayMeals.length > 0) {
+                const firstR = (state.recipes || []).find(x => x.id === dayMeals[0].recipeId);
+                const firstTitle = firstR ? firstR.title : (dayMeals[0].recipeTitle || 'Masă programată');
+                if (foodPrevEl) foodPrevEl.innerText = dayMeals.length === 1 ? firstTitle : `${dayMeals.length} mese • ${firstTitle}`;
+                if (foodSubEl) foodSubEl.innerText = dayMeals.map(m => m.slot.split(' ').slice(1).join(' ') || m.slot).join(' • ');
+            } else {
+                if (foodPrevEl) foodPrevEl.innerText = 'Nicio masă programată azi';
+                if (foodSubEl) foodSubEl.innerText = 'Apasă pentru a planifica meniul →';
+            }
+
+            const quickWoBtn = document.getElementById('dash-quick-workout-btn');
+            if (quickWoBtn) {
+                const routines = typeof getAllWorkoutRoutines === 'function' ? getAllWorkoutRoutines() : (state.workoutRoutines || []);
+                const fav = routines.find(r => r.id === state.favoriteRoutineId) || routines[0];
+                if (fav) {
+                    quickWoBtn.innerText = `▶ ${fav.title}`;
+                    quickWoBtn.classList.remove('hidden');
+                } else {
+                    quickWoBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        function startFavoriteOrLastWorkout() {
+            const routines = typeof getAllWorkoutRoutines === 'function' ? getAllWorkoutRoutines() : (state.workoutRoutines || []);
+            const fav = routines.find(r => r.id === state.favoriteRoutineId) || routines[0];
+            if (!fav) {
+                switchTab('move');
+                return;
+            }
+            startWorkoutPlayerById(fav.id);
         }
 
         // ==================== CHECK-IN CAMARAD PAS CU PAS ====================
@@ -4336,6 +4459,15 @@
             return [...(state.workoutRoutines || []), ...PRESET_WORKOUT_ROUTINES];
         }
 
+        function toggleFavoriteRoutine(routineId) {
+            haptic(20);
+            state.favoriteRoutineId = state.favoriteRoutineId === routineId ? "" : routineId;
+            localStorage.setItem('reset_favoriteRoutineId', state.favoriteRoutineId);
+            renderWorkoutsList();
+            updateDashboard();
+            showToast(state.favoriteRoutineId ? '⭐ Rutină fixată pe Dashboard!' : 'Rutină scoasă de la favorite.');
+        }
+
         function renderWorkoutsList() {
             const cont = document.getElementById('workouts-container');
             if (!cont) return;
@@ -4359,9 +4491,10 @@
                 const validExs = (r.exerciseIds || []).map(id => allExMap[id]).filter(Boolean);
                 const previewNames = validExs.slice(0, 3).map(e => e.name).join(' • ');
                 const extra = validExs.length > 3 ? ` +${validExs.length - 3}` : '';
+                const isFav = state.favoriteRoutineId === r.id;
 
                 return `
-                <div class="glass rounded-3xl p-4 space-y-2.5 border-slate-700/60">
+                <div class="glass rounded-3xl p-4 space-y-2.5 ${isFav ? 'border-amber-500/60' : 'border-slate-700/60'}">
                     <div class="flex items-start justify-between gap-2">
                         <div class="space-y-1 min-w-0">
                             <div class="flex items-center gap-1.5 flex-wrap">
@@ -4372,11 +4505,12 @@
                             <h4 class="text-sm font-extrabold text-white leading-snug">${escapeHtml(r.title)}</h4>
                             <div class="text-[11px] text-cyan-300">${escapeHtml(r.targetBody || '')}</div>
                         </div>
-                        ${!r.isPreset ? `
                         <div class="flex gap-1 shrink-0">
+                            <button onclick="toggleFavoriteRoutine('${r.id}')" title="Fixează pe Dashboard" class="p-1.5 rounded-xl ${isFav ? 'bg-amber-950/80 text-amber-300 border border-amber-600/60' : 'bg-slate-800 hover:bg-slate-700 text-slate-400'} text-xs transition">${isFav ? '⭐' : '☆'}</button>
+                            ${!r.isPreset ? `
                             <button onclick="openWorkoutBuilder('${r.id}')" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs">✏️</button>
-                            <button onclick="deleteWorkoutRoutine('${r.id}')" class="p-1.5 rounded-xl bg-red-950/70 hover:bg-red-900/80 text-xs text-red-300">🗑️</button>
-                        </div>` : ''}
+                            <button onclick="deleteWorkoutRoutine('${r.id}')" class="p-1.5 rounded-xl bg-red-950/70 hover:bg-red-900/80 text-xs text-red-300">🗑️</button>` : ''}
+                        </div>
                     </div>
                     <p class="text-[11px] text-slate-400 leading-relaxed">${escapeHtml(previewNames)}${extra}</p>
                     <div class="flex items-center justify-between text-[10px] text-slate-400 px-1">
@@ -4889,9 +5023,12 @@
 
         function renderFoodDays() {
             const bar = document.getElementById('food-days-bar');
+            const plan = state.weeklyPlan || {};
             bar.innerHTML = FOOD_PLAN_DB.map((d, idx) => {
                 const active = idx === selectedFoodDayIdx;
-                return `<button onclick="selectFoodDay(${idx})" class="px-3.5 py-2 rounded-2xl text-xs font-bold shrink-0 border transition ${active ? 'bg-emerald-600 border-emerald-400 text-white shadow' : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white'}">${escapeHtml(d.day)}</button>`;
+                const count = Array.isArray(plan[String(idx)]) ? plan[String(idx)].length : 0;
+                const badge = count > 0 ? ` <span class="opacity-80 text-[10px]">(${count})</span>` : '';
+                return `<button onclick="selectFoodDay(${idx})" class="px-3.5 py-2 rounded-2xl text-xs font-bold shrink-0 border transition ${active ? 'bg-emerald-600 border-emerald-400 text-white shadow' : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white'}">${escapeHtml(d.day)}${badge}</button>`;
             }).join('');
         }
 
@@ -4960,7 +5097,7 @@
             const r = (state.recipes || []).find(x => x.id === recipeId);
             if (!r || !r.ingredients?.length) return;
             addIngredientsArrayToShopping(r.ingredients, r.title);
-            alert(`✅ ${r.ingredients.length} ingrediente din "${r.title}" au fost adăugate în Lista de Cumpărături!`);
+            showToast(`🛒 +${r.ingredients.length} ingrediente din "${r.title}" adăugate!`);
         }
 
         function removeMealFromWeeklyPlan(dayIdx, entryId) {
@@ -4969,28 +5106,339 @@
             if (!state.weeklyPlan) state.weeklyPlan = {};
             state.weeklyPlan[k] = (state.weeklyPlan[k] || []).filter(e => e.id !== entryId);
             saveNutritionState();
+            renderFoodDays();
             renderFoodMeals();
+        }
+
+        let detailSelectedPlanDays = new Set([0]);
+        let appToastTimer = null;
+
+        function showToast(msg, durationMs = 2800) {
+            const el = document.getElementById('app-toast');
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.remove('hidden', 'opacity-0');
+            el.classList.add('opacity-100');
+            if (appToastTimer) clearTimeout(appToastTimer);
+            appToastTimer = setTimeout(() => {
+                el.classList.remove('opacity-100');
+                el.classList.add('opacity-0');
+                setTimeout(() => el.classList.add('hidden'), 200);
+            }, durationMs);
+        }
+
+        function toggleDetailPlanDay(idx) {
+            haptic(15);
+            if (detailSelectedPlanDays.has(idx)) {
+                detailSelectedPlanDays.delete(idx);
+            } else {
+                detailSelectedPlanDays.add(idx);
+            }
+            renderDetailPlanDaysPills();
+        }
+
+        function setDetailPlanDaysPreset(preset) {
+            haptic(20);
+            if (preset === 'weekdays') detailSelectedPlanDays = new Set([0, 1, 2, 3, 4]);
+            else if (preset === 'weekend') detailSelectedPlanDays = new Set([5, 6]);
+            else if (preset === 'all') detailSelectedPlanDays = new Set([0, 1, 2, 3, 4, 5, 6]);
+            renderDetailPlanDaysPills();
+        }
+
+        function renderDetailPlanDaysPills() {
+            const box = document.getElementById('detail-plan-days-pills');
+            if (!box) return;
+            const shortLabels = ['L', 'Ma', 'Mi', 'J', 'V', 'S', 'D'];
+            const slot = document.getElementById('detail-plan-slot')?.value || '';
+            const plan = state.weeklyPlan || {};
+
+            box.innerHTML = FOOD_PLAN_DB.map((d, idx) => {
+                const selected = detailSelectedPlanDays.has(idx);
+                const dayEntries = Array.isArray(plan[String(idx)]) ? plan[String(idx)] : [];
+                const alreadyInSlot = currentRecipeDetailId && dayEntries.some(e => e.recipeId === currentRecipeDetailId && e.slot === slot);
+                const cls = selected
+                    ? 'bg-emerald-600 border-emerald-400 text-white shadow-sm'
+                    : 'bg-slate-950 border-slate-700 text-slate-400 hover:text-white';
+                return `
+                    <button type="button" onclick="toggleDetailPlanDay(${idx})" title="${escapeHtml(d.day)}${alreadyInSlot ? ' (deja programată)' : ''}" class="relative py-2 rounded-xl border text-[11px] font-bold transition ${cls}">
+                        ${shortLabels[idx] || escapeHtml(d.day.slice(0, 2))}
+                        ${alreadyInSlot ? '<span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-300"></span>' : ''}
+                    </button>`;
+            }).join('');
+
+            const btn = document.getElementById('detail-plan-add-btn');
+            if (btn) {
+                const count = detailSelectedPlanDays.size;
+                if (count === 0) {
+                    btn.textContent = 'Selectează cel puțin o zi';
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else if (count === 1) {
+                    const onlyIdx = Array.from(detailSelectedPlanDays)[0];
+                    const dayName = (FOOD_PLAN_DB[onlyIdx] || {}).day || 'ziua aleasă';
+                    btn.textContent = `➕ Adaugă în ${dayName}`;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    btn.textContent = `➕ Adaugă în ${count} zile`;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
         }
 
         function addCurrentRecipeToWeeklyPlan() {
             const r = (state.recipes || []).find(x => x.id === currentRecipeDetailId);
             if (!r) return;
-            const dayIdx = document.getElementById('detail-plan-day').value;
+            const days = Array.from(detailSelectedPlanDays).sort((a, b) => a - b);
+            if (days.length === 0) {
+                showToast('Selectează cel puțin o zi!');
+                return;
+            }
             const slot = document.getElementById('detail-plan-slot').value;
             if (!state.weeklyPlan) state.weeklyPlan = {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]};
-            if (!Array.isArray(state.weeklyPlan[dayIdx])) state.weeklyPlan[dayIdx] = [];
-            state.weeklyPlan[dayIdx].push({
-                id: 'wp-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5),
-                recipeId: r.id,
-                recipeTitle: r.title,
-                slot
+
+            let addedDays = [];
+            let skippedDays = [];
+            days.forEach(idx => {
+                const k = String(idx);
+                if (!Array.isArray(state.weeklyPlan[k])) state.weeklyPlan[k] = [];
+                const exists = state.weeklyPlan[k].some(e => e.recipeId === r.id && e.slot === slot);
+                const dayName = (FOOD_PLAN_DB[idx] || {}).day || k;
+                if (exists) {
+                    skippedDays.push(dayName);
+                    return;
+                }
+                state.weeklyPlan[k].push({
+                    id: 'wp-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2, 5),
+                    recipeId: r.id,
+                    recipeTitle: r.title,
+                    slot
+                });
+                addedDays.push(dayName);
             });
+
+            if (addedDays.length === 0) {
+                showToast(`ℹ️ "${r.title}" este deja programată (${slot}) în zilele selectate.`);
+                return;
+            }
+
             saveNutritionState();
-            selectedFoodDayIdx = parseInt(dayIdx, 10);
+            selectedFoodDayIdx = days[0];
             renderFoodDays();
             renderFoodMeals();
-            const dayName = (FOOD_PLAN_DB[selectedFoodDayIdx] || {}).day || 'Ziua aleasă';
-            alert(`✅ "${r.title}" a fost adăugată în ${dayName} (${slot})!`);
+            renderDetailPlanDaysPills();
+            updateDashboard();
+
+            const skipNote = skippedDays.length > 0 ? ` (${skippedDays.length} sărite, deja existente)` : '';
+            showToast(`✅ Adăugată în ${addedDays.join(', ')}${skipNote}`);
+        }
+
+        function buildDayPresetSet(preset, excludeIdx = -1) {
+            let arr = [];
+            if (preset === 'weekdays') arr = [0, 1, 2, 3, 4];
+            else if (preset === 'weekend') arr = [5, 6];
+            else if (preset === 'all') arr = [0, 1, 2, 3, 4, 5, 6];
+            return new Set(arr.filter(i => i !== excludeIdx));
+        }
+
+        function renderSimpleDayPills(containerId, selectedSet, toggleFnName, disabledIdx = -1) {
+            const box = document.getElementById(containerId);
+            if (!box) return;
+            const shortLabels = ['L', 'Ma', 'Mi', 'J', 'V', 'S', 'D'];
+            box.innerHTML = FOOD_PLAN_DB.map((d, idx) => {
+                if (idx === disabledIdx) {
+                    return `<button type="button" disabled title="${escapeHtml(d.day)} (sursă)" class="py-2 rounded-xl border border-slate-800 bg-slate-900/40 text-slate-600 text-[11px] font-bold cursor-not-allowed">${shortLabels[idx]}</button>`;
+                }
+                const selected = selectedSet.has(idx);
+                const cls = selected
+                    ? 'bg-emerald-600 border-emerald-400 text-white shadow-sm'
+                    : 'bg-slate-950 border-slate-700 text-slate-400 hover:text-white';
+                return `<button type="button" onclick="${toggleFnName}(${idx})" title="${escapeHtml(d.day)}" class="py-2 rounded-xl border text-[11px] font-bold transition ${cls}">${shortLabels[idx]}</button>`;
+            }).join('');
+        }
+
+        let quickMealDays = new Set([0]);
+        function openQuickMealModal() {
+            quickMealDays = new Set([selectedFoodDayIdx]);
+            const inp = document.getElementById('quick-meal-search');
+            if (inp) inp.value = '';
+            renderQuickMealDaysPills();
+            renderQuickMealRecipesList();
+            openModalWithHistory('quick-meal-modal');
+        }
+        function toggleQuickMealDay(idx) {
+            haptic(15);
+            if (quickMealDays.has(idx)) quickMealDays.delete(idx);
+            else quickMealDays.add(idx);
+            renderQuickMealDaysPills();
+        }
+        function setQuickMealDaysPreset(preset) {
+            haptic(20);
+            quickMealDays = buildDayPresetSet(preset);
+            renderQuickMealDaysPills();
+        }
+        function renderQuickMealDaysPills() {
+            renderSimpleDayPills('quick-meal-days-pills', quickMealDays, 'toggleQuickMealDay');
+        }
+        function renderQuickMealRecipesList() {
+            const box = document.getElementById('quick-meal-recipes-list');
+            if (!box) return;
+            const q = (document.getElementById('quick-meal-search')?.value || '').toLowerCase().trim();
+            const list = (state.recipes || []).filter(r => !q || (r.title + ' ' + r.category).toLowerCase().includes(q));
+            if (list.length === 0) {
+                box.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">Nicio rețetă găsită.</div>`;
+                return;
+            }
+            box.innerHTML = list.slice(0, 40).map(r => `
+                <button type="button" onclick="addQuickMealRecipe('${escapeHtml(r.id)}')" class="w-full text-left p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 flex items-center justify-between gap-2 transition">
+                    <div class="min-w-0">
+                        <div class="text-xs font-bold text-white truncate">${r.isFavorite ? '⭐ ' : ''}${escapeHtml(r.title)}</div>
+                        <div class="text-[10px] text-slate-400">${getCategoryIcon(r.category)} ${escapeHtml(r.category)}</div>
+                    </div>
+                    <span class="text-[11px] font-bold text-emerald-400 shrink-0">+ Adaugă</span>
+                </button>`).join('');
+        }
+        function addQuickMealRecipe(recipeId) {
+            const r = (state.recipes || []).find(x => x.id === recipeId);
+            if (!r) return;
+            const days = Array.from(quickMealDays).sort((a, b) => a - b);
+            if (days.length === 0) { showToast('Selectează cel puțin o zi!'); return; }
+            const slot = document.getElementById('quick-meal-slot')?.value || '☀️ Mic Dejun';
+            if (!state.weeklyPlan) state.weeklyPlan = {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]};
+            let added = 0;
+            days.forEach(idx => {
+                const k = String(idx);
+                if (!Array.isArray(state.weeklyPlan[k])) state.weeklyPlan[k] = [];
+                if (state.weeklyPlan[k].some(e => e.recipeId === r.id && e.slot === slot)) return;
+                state.weeklyPlan[k].push({
+                    id: 'wp-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2, 5),
+                    recipeId: r.id,
+                    recipeTitle: r.title,
+                    slot
+                });
+                added++;
+            });
+            if (added === 0) { showToast(`ℹ️ "${r.title}" există deja pe acest slot.`); return; }
+            saveNutritionState();
+            renderFoodDays();
+            renderFoodMeals();
+            updateDashboard();
+            closeModal('quick-meal-modal');
+            showToast(`✅ "${r.title}" adăugată în ${added} ${added === 1 ? 'zi' : 'zile'}!`);
+        }
+
+        let copyDayTargetDays = new Set();
+        function openCopyDayModal() {
+            const srcMeals = (state.weeklyPlan || {})[String(selectedFoodDayIdx)] || [];
+            if (srcMeals.length === 0) {
+                showToast('Ziua curentă nu are mese de copiat.');
+                return;
+            }
+            copyDayTargetDays = new Set();
+            const dayName = (FOOD_PLAN_DB[selectedFoodDayIdx] || {}).day || 'Ziua curentă';
+            const srcEl = document.getElementById('copy-day-source-name');
+            if (srcEl) srcEl.innerText = dayName;
+            renderCopyDayTargetPills();
+            openModalWithHistory('copy-day-modal');
+        }
+        function toggleCopyTargetDay(idx) {
+            haptic(15);
+            if (copyDayTargetDays.has(idx)) copyDayTargetDays.delete(idx);
+            else copyDayTargetDays.add(idx);
+            renderCopyDayTargetPills();
+        }
+        function setCopyDayPreset(preset) {
+            haptic(20);
+            copyDayTargetDays = buildDayPresetSet(preset, selectedFoodDayIdx);
+            renderCopyDayTargetPills();
+        }
+        function renderCopyDayTargetPills() {
+            renderSimpleDayPills('copy-day-targets-pills', copyDayTargetDays, 'toggleCopyTargetDay', selectedFoodDayIdx);
+        }
+        function confirmCopyDayMeals() {
+            const srcMeals = (state.weeklyPlan || {})[String(selectedFoodDayIdx)] || [];
+            const targets = Array.from(copyDayTargetDays).sort((a, b) => a - b);
+            if (targets.length === 0) { showToast('Selectează cel puțin o zi destinație!'); return; }
+            if (!state.weeklyPlan) state.weeklyPlan = {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]};
+            let totalAdded = 0;
+            targets.forEach(idx => {
+                const k = String(idx);
+                if (!Array.isArray(state.weeklyPlan[k])) state.weeklyPlan[k] = [];
+                srcMeals.forEach(m => {
+                    if (state.weeklyPlan[k].some(e => e.recipeId === m.recipeId && e.slot === m.slot)) return;
+                    state.weeklyPlan[k].push({
+                        id: 'wp-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2, 6),
+                        recipeId: m.recipeId,
+                        recipeTitle: m.recipeTitle,
+                        slot: m.slot
+                    });
+                    totalAdded++;
+                });
+            });
+            saveNutritionState();
+            renderFoodDays();
+            renderFoodMeals();
+            updateDashboard();
+            closeModal('copy-day-modal');
+            showToast(totalAdded > 0 ? `✅ Copiate ${totalAdded} mese în ${targets.length} zile!` : 'ℹ️ Mesele existau deja în zilele alese.');
+        }
+
+        function generateWeeklyShoppingList() {
+            const plan = state.weeklyPlan || {};
+            const recipeIds = new Set();
+            Object.values(plan).forEach(arr => {
+                if (Array.isArray(arr)) arr.forEach(e => { if (e.recipeId) recipeIds.add(e.recipeId); });
+            });
+            if (recipeIds.size === 0) {
+                showToast('Nu ai rețete programate în Meniu 7 Zile.');
+                return;
+            }
+            const toAdd = [];
+            let skippedInPantry = 0;
+            recipeIds.forEach(rid => {
+                const r = (state.recipes || []).find(x => x.id === rid);
+                if (!r || !Array.isArray(r.ingredients)) return;
+                r.ingredients.forEach(ing => {
+                    const ingName = ing.name || ing.originalText || '';
+                    if (isIngredientInPantry(ingName)) {
+                        skippedInPantry++;
+                        return;
+                    }
+                    toAdd.push({ ing, title: r.title });
+                });
+            });
+            if (toAdd.length === 0) {
+                showToast(`🥫 Toate ingredientele (${skippedInPantry}) sunt deja în Cămară!`);
+                return;
+            }
+            const list = state.shoppingList || [];
+            const existingNames = new Set(list.map(i => (i.name || '').toLowerCase().trim()));
+            const newItems = [];
+            toAdd.forEach(({ ing, title }, idx) => {
+                const rawName = ing.originalText || ing.name || String(ing);
+                const norm = rawName.toLowerCase().trim();
+                if (existingNames.has(norm)) return;
+                existingNames.add(norm);
+                const amountStr = ing.amount ? `${ing.amount}${ing.unit ? ' ' + ing.unit : ''}` : '';
+                newItems.push({
+                    id: 'shop-wk-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2, 5),
+                    name: rawName,
+                    amount: ing.originalText ? '' : amountStr,
+                    aisle: classifyAisle(rawName),
+                    recipeTitle: title,
+                    checked: false,
+                    createdAt: Date.now()
+                });
+            });
+            if (newItems.length === 0) {
+                showToast('🛒 Ingredientele săptămânii sunt deja pe lista de cumpărături!');
+                return;
+            }
+            state.shoppingList = [...newItems, ...list];
+            saveNutritionState();
+            const pantryNote = skippedInPantry > 0 ? ` (${skippedInPantry} deja în Cămară)` : '';
+            showToast(`🛒 +${newItems.length} ingrediente adăugate pentru săptămână${pantryNote}!`);
         }
 
         // ==================== REȚETE SALVATE & CATEGORII ====================
@@ -5237,8 +5685,8 @@
                 imgEl.src = '';
             }
 
-            const daySel = document.getElementById('detail-plan-day');
-            if (daySel) daySel.value = String(selectedFoodDayIdx);
+            detailSelectedPlanDays = new Set([selectedFoodDayIdx]);
+            renderDetailPlanDaysPills();
 
             const srcBox = document.getElementById('detail-recipe-source-box');
             if (r.sourceUrl) {
@@ -7289,38 +7737,97 @@ function setWebhook() {
                 : "p-2.5 rounded-2xl border border-slate-700 bg-slate-900 text-left text-xs opacity-75 transition";
         }
 
-        // ==================== PROTOCOL SOS: OFTATUL FIZIOLOGIC ====================
+        // ==================== PROTOCOL SOS: RESPIRAȚIE GHIDATĂ ====================
+        const SOS_BREATH_MODES = {
+            sigh: {
+                label: "Oftatul Fiziologic",
+                steps: [
+                    { text: "1. Inspiră adânc pe nas...", ms: 2500, scale: "1.22", color: "#34d399", vib: 40 },
+                    { text: "2. Încă un tras scurt pe nas! (Maxim)", ms: 1600, scale: "1.38", color: "#22d3ee", vib: [40, 60, 40] },
+                    { text: "3. Expiră luuung pe gură...", ms: 5000, scale: "0.92", color: "#818cf8", vib: 80 }
+                ]
+            },
+            box: {
+                label: "Box Breathing 4-4-4-4",
+                steps: [
+                    { text: "1. Inspiră pe nas (4s)", ms: 4000, scale: "1.28", color: "#34d399", vib: 40 },
+                    { text: "2. Ține aerul (4s)", ms: 4000, scale: "1.28", color: "#22d3ee", vib: 25 },
+                    { text: "3. Expiră lent (4s)", ms: 4000, scale: "0.92", color: "#818cf8", vib: 60 },
+                    { text: "4. Pauză cu plămânii goi (4s)", ms: 4000, scale: "0.92", color: "#64748b", vib: 25 }
+                ]
+            },
+            '478': {
+                label: "4-7-8 Relaxare / Somn",
+                steps: [
+                    { text: "1. Inspiră liniștit pe nas (4s)", ms: 4000, scale: "1.26", color: "#34d399", vib: 40 },
+                    { text: "2. Ține respirația (7s)", ms: 7000, scale: "1.26", color: "#f59e0b", vib: 25 },
+                    { text: "3. Expiră complet pe gură (8s)", ms: 8000, scale: "0.90", color: "#818cf8", vib: 80 }
+                ]
+            }
+        };
+        let sosBreathMode = 'sigh';
+        let sosDurationSec = 300;
         let sosInterval = null;
         let breathTimeout = null;
         let sosSeconds = 300;
 
-        function runBreathingCycle() {
+        function setSosBreathMode(mode) {
+            if (!SOS_BREATH_MODES[mode]) return;
+            haptic(20);
+            sosBreathMode = mode;
+            ['sigh', 'box', '478'].forEach(k => {
+                const b = document.getElementById(`sos-mode-${k}`);
+                if (!b) return;
+                b.className = k === mode
+                    ? 'py-1.5 px-2 rounded-xl bg-emerald-600/90 text-white text-[10px] font-bold border border-emerald-400 transition'
+                    : 'py-1.5 px-2 rounded-xl bg-slate-900 text-slate-300 text-[10px] font-bold border border-slate-800 transition';
+            });
+            if (sosInterval) {
+                clearTimeout(breathTimeout);
+                runBreathingCycle(0);
+            } else {
+                const txt = document.getElementById('breath-text');
+                if (txt) txt.innerText = `Apasă Start pentru ${SOS_BREATH_MODES[mode].label}`;
+            }
+        }
+
+        function setSosDuration(sec) {
+            haptic(15);
+            sosDurationSec = sec;
+            [120, 300].forEach(d => {
+                const b = document.getElementById(`sos-dur-${d}`);
+                if (!b) return;
+                b.className = d === sec
+                    ? 'px-2 py-0.5 rounded-lg bg-emerald-600 text-[10px] font-bold text-white'
+                    : 'px-2 py-0.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-400';
+            });
+            if (!sosInterval) {
+                sosSeconds = sec;
+                const m = String(Math.floor(sec / 60)).padStart(2, '0');
+                const s = String(sec % 60).padStart(2, '0');
+                const tEl = document.getElementById('sos-timer');
+                const btn = document.getElementById('sos-btn');
+                if (tEl) tEl.innerText = `${m}:${s}`;
+                if (btn) btn.innerText = `▶ Pornește Respirația + Cronometrul (${Math.round(sec / 60)} Min)`;
+            }
+        }
+
+        function runBreathingCycle(stepIdx = 0) {
             if (!sosInterval) return;
+            const steps = (SOS_BREATH_MODES[sosBreathMode] || SOS_BREATH_MODES.sigh).steps;
+            const st = steps[stepIdx % steps.length];
             const box = document.getElementById('breath-box');
             const txt = document.getElementById('breath-text');
+            if (!box || !txt) return;
 
-            txt.innerText = "1. Inspiră adânc pe nas...";
-            box.style.transform = "scale(1.22)";
-            box.style.borderColor = "#34d399";
-            haptic(40);
+            txt.innerText = st.text;
+            box.style.transform = `scale(${st.scale})`;
+            box.style.borderColor = st.color;
+            haptic(st.vib);
 
             breathTimeout = setTimeout(() => {
-                if (!sosInterval) return;
-                txt.innerText = "2. Încă un tras scurt pe nas! (Maxim)";
-                box.style.transform = "scale(1.38)";
-                box.style.borderColor = "#22d3ee";
-                haptic([40, 60, 40]);
-
-                breathTimeout = setTimeout(() => {
-                    if (!sosInterval) return;
-                    txt.innerText = "3. Expiră luuung pe gură...";
-                    box.style.transform = "scale(0.92)";
-                    box.style.borderColor = "#818cf8";
-                    haptic(80);
-
-                    breathTimeout = setTimeout(runBreathingCycle, 5000);
-                }, 1600);
-            }, 2500);
+                runBreathingCycle((stepIdx + 1) % steps.length);
+            }, st.ms);
         }
 
         function toggleSosProtocol() {
@@ -7328,19 +7835,23 @@ function setWebhook() {
             const btn = document.getElementById('sos-btn');
             const box = document.getElementById('breath-box');
             const txt = document.getElementById('breath-text');
+            const minsLabel = Math.round(sosDurationSec / 60);
 
             if (sosInterval) {
                 clearInterval(sosInterval);
                 clearTimeout(breathTimeout);
                 sosInterval = null;
-                sosSeconds = 300;
-                document.getElementById('sos-timer').innerText = "05:00";
+                sosSeconds = sosDurationSec;
+                const m = String(Math.floor(sosDurationSec / 60)).padStart(2, '0');
+                const s = String(sosDurationSec % 60).padStart(2, '0');
+                document.getElementById('sos-timer').innerText = `${m}:${s}`;
                 box.style.transform = "scale(1)";
-                txt.innerText = "Apasă Start pentru Oftatul Fiziologic";
-                btn.innerText = "▶ Pornește Respirația + Cronometrul (5 Min)";
+                txt.innerText = `Apasă Start pentru ${(SOS_BREATH_MODES[sosBreathMode] || SOS_BREATH_MODES.sigh).label}`;
+                btn.innerText = `▶ Pornește Respirația + Cronometrul (${minsLabel} Min)`;
                 return;
             }
 
+            sosSeconds = sosDurationSec;
             btn.innerText = "⏹ Oprește / Resetează Protocolul";
             sosInterval = setInterval(() => {
                 sosSeconds--;
@@ -7351,15 +7862,15 @@ function setWebhook() {
                     clearInterval(sosInterval);
                     clearTimeout(breathTimeout);
                     sosInterval = null;
-                    sosSeconds = 300;
+                    sosSeconds = sosDurationSec;
                     txt.innerText = "AI TRECUT PESTE VAL! 🎉";
-                    btn.innerText = "▶ Pornește Respirația + Cronometrul (5 Min)";
+                    btn.innerText = `▶ Pornește Respirația + Cronometrul (${minsLabel} Min)`;
                     box.style.transform = "scale(1)";
                     haptic([100, 50, 100, 50, 200]);
                 }
             }, 1000);
 
-            runBreathingCycle();
+            runBreathingCycle(0);
         }
 
         function triggerSOSChat(presetMessage) {
@@ -7780,13 +8291,35 @@ REGULI:
             const tsDiv = document.createElement('div');
             tsDiv.className = sender === 'user'
                 ? "chat-msg-ts text-[9px] text-emerald-100/80 text-right mt-1 font-mono"
-                : "chat-msg-ts text-[9px] text-slate-400 text-right mt-1 font-mono";
-            tsDiv.innerText = formatChatTimestamp(msgTs);
+                : "chat-msg-ts text-[9px] text-slate-400 text-right mt-1 font-mono flex items-center justify-between gap-2";
+
+            if (sender === 'ai' && text && text.length > 120 && /(ingrediente|preparare|rețet|mod de preparare|grame|\b\d+\s*g\b|\b\d+\s*ml\b|lingur)/i.test(text)) {
+                const saveBtn = document.createElement('button');
+                saveBtn.type = 'button';
+                saveBtn.className = "px-2 py-0.5 rounded-lg bg-orange-950/70 hover:bg-orange-900 border border-orange-700/60 text-orange-300 text-[10px] font-sans font-bold transition";
+                saveBtn.innerText = "📖 Salvează ca rețetă";
+                saveBtn.onclick = () => saveChatMessageAsRecipe(textDiv.innerText);
+                tsDiv.appendChild(saveBtn);
+            } else if (sender === 'ai') {
+                tsDiv.appendChild(document.createElement('span'));
+            }
+
+            const tsSpan = document.createElement('span');
+            tsSpan.innerText = formatChatTimestamp(msgTs);
+            tsDiv.appendChild(tsSpan);
             div.appendChild(tsDiv);
 
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
             return id;
+        }
+
+        function saveChatMessageAsRecipe(msgText) {
+            haptic(20);
+            openAddRecipeModal();
+            const ta = document.getElementById('add-recipe-text');
+            if (ta) ta.value = msgText || '';
+            showToast('📖 Textul a fost preluat! Apasă "Extrage și Salvează Rețeta".');
         }
 
         function switchTab(tab) {
@@ -7892,12 +8425,28 @@ REGULI:
             }
         }
 
+        function updateLastBackupBadge() {
+            const el = document.getElementById('last-backup-badge');
+            if (!el) return;
+            const iso = localStorage.getItem('reset_lastBackupDate');
+            if (!iso) {
+                el.innerText = '⚠️ Fără backup';
+                el.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950/70 text-amber-300 border border-amber-700/60';
+                return;
+            }
+            const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+            el.innerText = days <= 0 ? '✅ Backup azi' : `📅 Acum ${days} ${days === 1 ? 'zi' : 'zile'}`;
+            el.className = days > 7
+                ? 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950/70 text-amber-300 border border-amber-700/60'
+                : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-700/60';
+        }
+
         // BACKUP & RESTAURARE DATE
         function exportDataBackup() {
             haptic(40);
             const backup = {
                 app: "RESET_NEURO",
-                version: "3.0",
+                version: "3.1",
                 exportDate: new Date().toISOString(),
                 state: {
                     quitDate: state.quitDate,
@@ -7919,7 +8468,17 @@ REGULI:
                     fontSize: state.fontSize,
                     apiKey: state.apiKey,
                     geminiModel: state.geminiModel,
-                    chatHistory: state.chatHistory
+                    chatHistory: state.chatHistory,
+                    recipes: state.recipes,
+                    pantry: state.pantry,
+                    shoppingList: state.shoppingList,
+                    weeklyPlan: state.weeklyPlan,
+                    customExercises: state.customExercises,
+                    workoutRoutines: state.workoutRoutines,
+                    favoriteRoutineId: state.favoriteRoutineId,
+                    moveHistory: state.moveHistory,
+                    healthProfile: state.healthProfile,
+                    dailyHistory: state.dailyHistory
                 }
             };
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
@@ -7931,6 +8490,9 @@ REGULI:
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            localStorage.setItem('reset_lastBackupDate', new Date().toISOString());
+            updateLastBackupBadge();
+            showToast('📥 Backup complet descărcat!');
         }
 
         function importDataBackup(event) {
@@ -7999,6 +8561,8 @@ REGULI:
         }
 
         initApp();
+        updateLastBackupBadge();
     </script>
+    <div id="app-toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-[80] hidden max-w-[90vw] px-4 py-2.5 rounded-2xl bg-slate-900/95 border border-emerald-500/60 text-white text-xs font-bold shadow-2xl backdrop-blur-md text-center pointer-events-none transition-opacity duration-200"></div>
 </body>
 </html>
