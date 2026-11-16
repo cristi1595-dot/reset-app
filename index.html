@@ -865,12 +865,24 @@
 
         <div id="chat-box" class="chat-scroll p-4 space-y-3 selectable"></div>
 
+        <div id="chat-photo-preview" class="hidden px-3 pt-2 bg-[#090d16]/95 border-t border-slate-800 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+                <img id="chat-photo-thumb" src="" alt="Previzualizare" class="w-10 h-10 rounded-xl object-cover border border-emerald-500/50">
+                <span class="text-[11px] text-emerald-300 truncate">Poză atașată (AI va extrage automat datele relevante)</span>
+            </div>
+            <button onclick="clearChatPhoto()" class="text-xs text-red-400 hover:text-red-300 px-2 py-1 font-bold">✕</button>
+        </div>
+
         <div class="p-3 bg-[#090d16]/95 border-t border-slate-800 flex gap-2 items-center sticky bottom-16">
-            <button onclick="startVoiceInput()" id="mic-btn" class="w-11 h-11 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg active:scale-90 transition" title="Recunoaștere vocală">
+            <input type="file" id="chat-photo-input" accept="image/*" class="hidden" onchange="handleChatPhotoSelect(event)">
+            <button onclick="document.getElementById('chat-photo-input').click()" class="w-11 h-11 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg active:scale-90 transition shrink-0" title="Trimite poză (somn, cântar BMI, smartwatch, analize)">
+                📷
+            </button>
+            <button onclick="startVoiceInput()" id="mic-btn" class="w-11 h-11 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg active:scale-90 transition shrink-0" title="Recunoaștere vocală">
                 🎙️
             </button>
-            <input id="chat-input" type="text" placeholder="Scrie sau apasă microfonul..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500" onkeypress="if(event.key==='Enter') sendMessage()">
-            <button onclick="sendMessage()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition">
+            <input id="chat-input" type="text" placeholder="Scrie, dictează sau trimite o poză..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500" onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition shrink-0">
                 Trimite
             </button>
         </div>
@@ -1041,6 +1053,40 @@
                 </button>
             </div>
             <div id="api-test-result" class="hidden text-xs p-3 rounded-xl font-mono whitespace-pre-wrap"></div>
+        </div>
+
+        <!-- 3b. Profil Medical, Cântar & Memorie AI -->
+        <div class="glass rounded-3xl p-4 space-y-3 border-purple-500/40">
+            <h2 class="text-sm font-bold text-purple-300 uppercase tracking-wider">3b. 🩺 Profil Medical & Memorie AI</h2>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                AI-ul (atât în aplicație, cât și pe Telegram) ține cont automat de aceste date, de istoricul ultimelor zile și de pozele trimise (cântar BMI, somn, smartwatch, analize).
+            </p>
+            <div>
+                <label class="text-[11px] text-slate-400 block mb-1">Condiții medicale, dureri, recuperare</label>
+                <textarea id="set-health-conditions" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></textarea>
+            </div>
+            <div>
+                <label class="text-[11px] text-slate-400 block mb-1">Job, program & aparatură bucătărie</label>
+                <textarea id="set-health-lifestyle" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></textarea>
+            </div>
+            <div>
+                <label class="text-[11px] text-slate-400 block mb-1">Alergii, medicație sau restricții alimentare</label>
+                <textarea id="set-health-restrictions" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></textarea>
+            </div>
+            <div>
+                <label class="text-[11px] text-slate-400 block mb-1">Note medicale / analize / ținte (se actualizează și din poze)</label>
+                <textarea id="set-health-notes" rows="2" placeholder="Ex: Tensiune 125/80, Vitamina D 28 ng/ml, țintă greutate 80 kg..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></textarea>
+            </div>
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] text-slate-400">🧠 Memorie pe termen lung (rezumat AI)</label>
+                    <button onclick="clearAiMemory()" class="text-[10px] text-red-400 hover:text-red-300 font-semibold">Resetează memoria</button>
+                </div>
+                <textarea id="set-ai-memory" rows="3" placeholder="Se completează automat pe măsură ce vorbești cu AI-ul sau îi trimiți poze..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[11px] text-emerald-300 font-mono"></textarea>
+            </div>
+            <button onclick="saveSettings()" class="w-full py-2.5 bg-purple-600/85 hover:bg-purple-500 text-white font-bold rounded-xl text-xs shadow">
+                💾 Salvează Profil & Sincronizează
+            </button>
         </div>
 
         <!-- 4. Configurare Start & Faze -->
@@ -2462,6 +2508,19 @@
 
         const DEFAULT_STEP_TIMES = { morning: "09:00", noon: "12:30", calm: "17:30", night: "20:30" };
         const DEFAULT_MOVE_STATS = { walkMinsToday: 0, walkGoal: 30, taxiBreaksToday: 0, workoutDoneToday: false, completedExercises: {} };
+        const DEFAULT_HEALTH_PROFILE = {
+            conditions: "Psoas major drept foarte tensionat/scurtat (de la pedale), sciatică pe partea stângă, postură înclinată spre stânga și musculatură slabă în refacere.",
+            lifestyle: "Taximetrist, lucrez 8–10 ore pe zi la volan, 5–7 zile/săptămână. Gătesc cu Instant Pot (Multicooker), Airfryer, Blender, Aragaz/Cuptor.",
+            restrictions: "Prefer mâncăruri românești reinterpretate sănătos și caserole practice pentru prânzul în mașină + cină caldă acasă.",
+            medicalNotes: ""
+        };
+
+        function getLocalDateYMD(d = new Date()) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
 
         let state = {
             quitDate: localStorage.getItem('reset_quitDate') || getLocalNowISO(),
@@ -2472,6 +2531,7 @@
             cigsToday: parseInt(localStorage.getItem('reset_cigsToday') || "0"),
             lastCigTime: parseInt(localStorage.getItem('reset_lastCigTime') || "0"),
             lastDate: localStorage.getItem('reset_lastDate') || new Date().toDateString(),
+            lastDateYMD: localStorage.getItem('reset_lastDateYMD') || getLocalDateYMD(),
             supps: JSON.parse(localStorage.getItem('reset_supps') || '{"morning":false,"noon":false,"calm":false,"night":false}'),
             wakeMode: localStorage.getItem('reset_wakeMode') || "start",
             stepTimes: JSON.parse(localStorage.getItem('reset_stepTimes') || JSON.stringify(DEFAULT_STEP_TIMES)),
@@ -2496,7 +2556,11 @@
             customExercises: JSON.parse(localStorage.getItem('reset_customExercises') || '[]'),
             workoutRoutines: JSON.parse(localStorage.getItem('reset_workoutRoutines') || '[]'),
             moveHistory: JSON.parse(localStorage.getItem('reset_moveHistory') || '{}'),
-            weeklyPlan: JSON.parse(localStorage.getItem('reset_weeklyPlan') || '{"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}')
+            weeklyPlan: JSON.parse(localStorage.getItem('reset_weeklyPlan') || '{"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}'),
+            healthProfile: Object.assign({}, DEFAULT_HEALTH_PROFILE, JSON.parse(localStorage.getItem('reset_healthProfile') || '{}')),
+            dailyHistory: JSON.parse(localStorage.getItem('reset_dailyHistory') || '{}'),
+            todayExternalMetrics: JSON.parse(localStorage.getItem('reset_todayExternalMetrics') || '[]'),
+            aiMemorySummary: localStorage.getItem('reset_aiMemorySummary') || ""
         };
 
         if (!localStorage.getItem('reset_apiKey')) {
@@ -2533,23 +2597,48 @@
 
         function checkDayRollover() {
             const currentToday = new Date().toDateString();
+            const currentYMD = getLocalDateYMD();
             if (state.lastDate !== currentToday) {
+                // Arhivăm ziua anterioară în dailyHistory (păstrăm ultimele 60 de zile)
+                try {
+                    const prevKey = state.lastDateYMD || getLocalDateYMD(new Date(state.lastDate));
+                    state.dailyHistory = state.dailyHistory || {};
+                    state.dailyHistory[prevKey] = {
+                        cigs: state.cigsToday || 0,
+                        stepsDone: Object.assign({}, state.stepsDone || {}),
+                        walkMins: state.moveStats?.walkMinsToday || 0,
+                        taxiBreaks: state.moveStats?.taxiBreaksToday || 0,
+                        workoutDone: Boolean(state.moveStats?.workoutDoneToday),
+                        externalMetrics: (state.todayExternalMetrics || []).slice(0, 8)
+                    };
+                    const keys = Object.keys(state.dailyHistory).sort();
+                    while (keys.length > 60) {
+                        const oldest = keys.shift();
+                        delete state.dailyHistory[oldest];
+                    }
+                    localStorage.setItem('reset_dailyHistory', JSON.stringify(state.dailyHistory));
+                } catch (e) {}
+
                 state.cigsToday = 0;
                 state.supps = { morning: false, noon: false, calm: false, night: false };
                 state.stepsDone = { morning: false, noon: false, calm: false, night: false };
                 state.tgSentStepsToday = {};
+                state.todayExternalMetrics = [];
                 state.moveStats.walkMinsToday = 0;
                 state.moveStats.taxiBreaksToday = 0;
                 state.moveStats.workoutDoneToday = false;
                 state.moveStats.completedExercises = {};
                 state.lastDate = currentToday;
+                state.lastDateYMD = currentYMD;
 
                 localStorage.setItem('reset_cigsToday', "0");
                 localStorage.setItem('reset_supps', JSON.stringify(state.supps));
                 localStorage.setItem('reset_stepsDone', JSON.stringify(state.stepsDone));
                 localStorage.setItem('reset_tgSentStepsToday', JSON.stringify({}));
+                localStorage.setItem('reset_todayExternalMetrics', JSON.stringify([]));
                 localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
                 localStorage.setItem('reset_lastDate', currentToday);
+                localStorage.setItem('reset_lastDateYMD', currentYMD);
 
                 activeCheckinStep = detectCurrentRecommendedStep();
                 renderSupps();
@@ -2586,6 +2675,7 @@
             document.getElementById('set-time-calm').value = state.stepTimes.calm || "17:30";
             document.getElementById('set-time-night').value = state.stepTimes.night || "20:30";
             document.getElementById('walk-goal-select').value = String(state.moveStats.walkGoal || 30);
+            populateHealthProfileFields();
 
             activeCheckinStep = detectCurrentRecommendedStep();
 
@@ -2761,6 +2851,7 @@
             return {
                 updatedAt: state.lastUpdated || Date.now(),
                 lastDate: state.lastDate,
+                lastDateYMD: state.lastDateYMD || getLocalDateYMD(),
                 quitDate: state.quitDate,
                 phase: state.phase,
                 dailyCost: state.dailyCost,
@@ -2787,18 +2878,23 @@
                 customExercises: state.customExercises || [],
                 workoutRoutines: state.workoutRoutines || [],
                 moveHistory: state.moveHistory || {},
-                weeklyPlan: state.weeklyPlan || {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}
+                weeklyPlan: state.weeklyPlan || {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]},
+                healthProfile: state.healthProfile || DEFAULT_HEALTH_PROFILE,
+                dailyHistory: state.dailyHistory || {},
+                todayExternalMetrics: state.todayExternalMetrics || [],
+                aiMemorySummary: state.aiMemorySummary || ""
             };
         }
 
         function applySyncedState(remote) {
             if (!remote || typeof remote !== 'object') return;
             const keys = [
-                'lastDate', 'quitDate', 'phase', 'dailyCost', 'dailyJoints', 'cigLimit',
+                'lastDate', 'lastDateYMD', 'quitDate', 'phase', 'dailyCost', 'dailyJoints', 'cigLimit',
                 'cigsToday', 'lastCigTime', 'supps', 'wakeMode', 'stepTimes', 'stepsDone',
                 'exerciseLevel', 'moveStats', 'tgToken', 'tgChatId', 'theme', 'fontSize',
                 'apiKey', 'geminiModel', 'chatHistory', 'recipes', 'pantry', 'shoppingList',
-                'customExercises', 'workoutRoutines', 'moveHistory', 'weeklyPlan'
+                'customExercises', 'workoutRoutines', 'moveHistory', 'weeklyPlan',
+                'healthProfile', 'dailyHistory', 'todayExternalMetrics', 'aiMemorySummary'
             ];
             keys.forEach(k => {
                 if (remote[k] === undefined || remote[k] === null) return;
@@ -2827,6 +2923,8 @@
             if (document.getElementById('set-time-calm')) document.getElementById('set-time-calm').value = state.stepTimes.calm || "17:30";
             if (document.getElementById('set-time-night')) document.getElementById('set-time-night').value = state.stepTimes.night || "20:30";
             if (document.getElementById('walk-goal-select')) document.getElementById('walk-goal-select').value = String(state.moveStats.walkGoal || 30);
+            populateHealthProfileFields();
+            if (typeof renderChatHistory === 'function') renderChatHistory();
 
             checkDayRollover();
             applyAppearanceSettings();
@@ -6690,7 +6788,7 @@ Structurează clar cu:
             const tNi = document.getElementById('set-time-night').value || state.stepTimes.night || "20:30";
             const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Bucharest";
 
-            generatedCloudScripts.cf = `// === RESET NEURO v3.5 — CLOUDFLARE WORKER (INSTANT, ZERO DUBLURI, SYNC) ===
+            generatedCloudScripts.cf = `// === RESET NEURO v4.0 — CLOUDFLARE WORKER (MEMORIE + POZE + CHECK-IN ADAPTIV + SYNC) ===
 const TG_TOKEN = "${tgToken}";
 const TG_CHAT_ID = "${tgChat}";
 const GEMINI_KEY = "${apiKey}";
@@ -6732,7 +6830,7 @@ export default {
     }
 
     if (request.method === "GET") {
-      return new Response("⚡ RESET Bot 24/7 (Cloudflare) este activ!", { headers: CORS });
+      return new Response("⚡ RESET Bot 24/7 v4.0 (Cloudflare) este activ!", { headers: CORS });
     }
 
     if (request.method === "POST") {
@@ -6762,56 +6860,204 @@ export default {
   }
 };
 
+function getNowParts() {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false
+  }).formatToParts(new Date());
+  const getP = (t) => fmt.find(p => p.type === t)?.value || "00";
+  const todayStr = getP("year") + "-" + getP("month") + "-" + getP("day");
+  const hmStr = getP("hour") + ":" + getP("minute");
+  const curMins = parseInt(getP("hour"), 10) * 60 + parseInt(getP("minute"), 10);
+  return { todayStr, hmStr, curMins };
+}
+
+async function loadCloudState(env) {
+  if (!env.RESET_KV) return {};
+  const raw = await env.RESET_KV.get("RESET_CLOUD_STATE");
+  try { return raw ? JSON.parse(raw) : {}; } catch (e) { return {}; }
+}
+
+async function saveCloudState(env, st) {
+  if (!env.RESET_KV || !st) return;
+  st.updatedAt = Date.now();
+  await env.RESET_KV.put("RESET_CLOUD_STATE", JSON.stringify(st));
+}
+
+function buildWorkerSystemPrompt(st, todayStr) {
+  const hp = (st && st.healthProfile) || {};
+  const cond = hp.conditions || "Psoas major drept foarte tensionat/scurtat, sciatică pe stânga, postură înclinată spre stânga.";
+  const life = hp.lifestyle || "Taximetrist 8-10h/zi la volan. Gătesc cu Instant Pot, Airfryer, Blender.";
+  const rest = hp.restrictions || "Mâncăruri românești reinterpretate sănătos și caserole practice.";
+  const notes = hp.medicalNotes ? "\\n- Note medicale/analize: " + hp.medicalNotes : "";
+  const mem = st && st.aiMemorySummary ? "\\nMEMORIE PE TERMEN LUNG:\\n" + st.aiMemorySummary : "";
+  const isTodayState = st && (st.lastDateYMD === todayStr || !st.lastDateYMD);
+  const doneKeys = isTodayState && st.stepsDone ? Object.keys(st.stepsDone).filter(k => st.stepsDone[k]).join(", ") : "";
+  const extToday = isTodayState && Array.isArray(st.todayExternalMetrics) && st.todayExternalMetrics.length
+    ? st.todayExternalMetrics.join(" | ") : "niciuna azi";
+  const cigs = isTodayState && st.cigsToday !== undefined ? st.cigsToday : 0;
+
+  const hist = (st && st.dailyHistory) || {};
+  const hKeys = Object.keys(hist).sort().slice(-5);
+  const histTxt = hKeys.length
+    ? hKeys.map(k => {
+        const d = hist[k] || {};
+        const cnt = Object.values(d.stepsDone || {}).filter(Boolean).length;
+        const ext = (d.externalMetrics && d.externalMetrics.length) ? " | " + d.externalMetrics.join("; ") : "";
+        return "• " + k + ": " + cnt + "/4 pași, " + (d.cigs || 0) + " țigări, " + (d.walkMins || 0) + " min mers" + ext;
+      }).join("\\n")
+    : "încă fără zile arhivate";
+
+  return "Ești cel mai bun prieten și camaradul meu pragmatic în renunțarea la THC și tutun. Vorbim în română, cald, direct și fără clișee.\\n\\n"
+    + "PROFIL REAL & MEDICAL:\\n- Job & Stil: " + life + "\\n- Condiții medicale: " + cond + "\\n- Restricții & preferințe: " + rest + notes + mem + "\\n\\n"
+    + "ISTORIC RECENT:\\n" + histTxt + "\\n\\n"
+    + "AZI (" + todayStr + "):\\n- Pași bifați azi: " + (doneKeys || "niciunul încă") + "\\n- Țigări azi: " + cigs + "\\n- Date din poze/cântar/aplicații azi: " + extToday + "\\n\\n"
+    + "REGULI:\\n"
+    + "1. Dacă trimit o poză (cântar smart cu BMI/grăsime/mușchi, somn, smartwatch, pași, analize medicale, mâncare sau exerciții) sau o informație medicală nouă, analizeaz-o clar și, dacă sunt cifre/fapte de reținut pe viitor, adaugă la final pe o linie nouă: [MEMORIE: rezumat telegrafic max 180 caractere]\\n"
+    + "2. Fii scurt și ușor de citit pe telefon (2-3 paragrafe).";
+}
+
+function extractAndApplyMemory(st, rawReply, todayStr, hmStr) {
+  const m = rawReply.match(/\\[MEMORIE:\\s*([\\s\\S]+?)\\]/i);
+  const clean = rawReply.replace(/\\[MEMORIE:\\s*[\\s\\S]+?\\]/gi, "").trim();
+  if (m && m[1]) {
+    const fact = m[1].trim();
+    st.todayExternalMetrics = Array.isArray(st.todayExternalMetrics) ? st.todayExternalMetrics : [];
+    st.todayExternalMetrics.push(hmStr + ": " + fact);
+    if (st.todayExternalMetrics.length > 10) st.todayExternalMetrics = st.todayExternalMetrics.slice(-10);
+    const prev = (st.aiMemorySummary || "").trim();
+    const entry = "[" + todayStr + "] " + fact;
+    const comb = prev ? prev + "\\n" + entry : entry;
+    st.aiMemorySummary = comb.length > 1000 ? comb.slice(-1000) : comb;
+  }
+  return clean;
+}
+
 async function handleTelegramUpdate(body, env) {
+  const { todayStr, hmStr } = getNowParts();
+  const st = await loadCloudState(env);
+
   if (body.callback_query) {
     const cb = body.callback_query;
+    const chatId = String(cb.message?.chat?.id || TG_CHAT_ID);
     await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/answerCallbackQuery", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ callback_query_id: cb.id })
     });
     const [action, stepKey] = (cb.data || "").split(":");
     if (action === "step_done") {
-      if (env.RESET_KV) {
-        const raw = await env.RESET_KV.get("RESET_CLOUD_STATE");
-        if (raw) {
-          const st = JSON.parse(raw);
-          st.stepsDone = st.stepsDone || {};
-          st.supps = st.supps || {};
-          st.stepsDone[stepKey] = true;
-          st.supps[stepKey] = true;
-          st.updatedAt = Date.now();
-          await env.RESET_KV.put("RESET_CLOUD_STATE", JSON.stringify(st));
-        }
-      }
-      await sendTg("🔥 Bravo, camarade! Pas bifat și sincronizat! Ține ritmul curat azi.");
+      st.stepsDone = st.stepsDone || {};
+      st.supps = st.supps || {};
+      st.stepsDone[stepKey] = true;
+      st.supps[stepKey] = true;
+      st.lastDateYMD = todayStr;
+      await saveCloudState(env, st);
+      await sendTg("🔥 Bravo, camarade! Pas bifat și sincronizat! Ține ritmul curat azi.", null, chatId);
     } else if (action === "step_enc") {
-      const reply = await askGemini("Nu am făcut încă pasul " + stepKey + ". Sunt taximetrist 8-10h/zi cu psoas drept tensionat și sciatică stânga. Încurajează-mă cald fără reproșuri și dă-mi o micro-acțiune de 60 secunde.");
-      await sendTg("💪 " + reply);
+      const sys = buildWorkerSystemPrompt(st, todayStr);
+      const reply = await askGeminiWithHistory(sys, [{ role: "user", parts: [{ text: "Nu am făcut încă pasul " + stepKey + ". Încurajează-mă cald fără reproșuri și dă-mi o micro-acțiune de 60 secunde ținând cont de profilul meu." }] }]);
+      await sendTg("💪 " + reply, null, chatId);
     }
-  } else if (body.message && body.message.text && String(body.message.chat.id) === String(TG_CHAT_ID)) {
-    const reply = await askGemini(body.message.text);
-    await sendTg(reply);
+    return;
+  }
+
+  if (!body.message) return;
+  const incomingChatId = String(body.message.chat?.id || "");
+  const allowedChatId = (TG_CHAT_ID && !TG_CHAT_ID.startsWith("PUNE_")) ? String(TG_CHAT_ID) : incomingChatId;
+  if (incomingChatId !== allowedChatId) return;
+
+  const text = (body.message.text || body.message.caption || "").trim();
+  if (text === "/start") {
+    await sendTg("Salut, camarade! Botul RESET Neuro 24/7 (Cloudflare) este activ. Îmi poți scrie orice sau îmi poți trimite poze (cântar BMI, somn, smartwatch, analize, mâncare) și țin minte tot!", null, incomingChatId);
+    return;
+  }
+
+  let imagePart = null;
+  if (Array.isArray(body.message.photo) && body.message.photo.length > 0) {
+    const bestPhoto = body.message.photo[body.message.photo.length - 1];
+    imagePart = await downloadTelegramPhotoAsPart(bestPhoto.file_id);
+  }
+
+  if (!text && !imagePart) return;
+
+  const sys = buildWorkerSystemPrompt(st, todayStr);
+  const hist = Array.isArray(st.chatHistory) ? st.chatHistory.slice(-10) : [];
+  const contents = hist.map(m => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content || "" }]
+  }));
+
+  const userParts = [];
+  if (imagePart) userParts.push(imagePart);
+  userParts.push({ text: text || "Analizează această poză (cântar BMI, somn, smartwatch, analize medicale, mâncare sau exerciții), extrage cifrele importante și spune-mi ce recomandare ai pentru mine azi." });
+  contents.push({ role: "user", parts: userParts });
+
+  const rawReply = await askGeminiWithHistory(sys, contents);
+  const cleanReply = extractAndApplyMemory(st, rawReply, todayStr, hmStr);
+
+  st.chatHistory = Array.isArray(st.chatHistory) ? st.chatHistory : [];
+  st.chatHistory.push({ role: "user", content: "[Telegram] " + (imagePart ? "📷 " : "") + (text || "Poză trimisă") });
+  st.chatHistory.push({ role: "assistant", content: cleanReply });
+  if (st.chatHistory.length > 20) st.chatHistory = st.chatHistory.slice(-20);
+  st.lastDateYMD = todayStr;
+  await saveCloudState(env, st);
+
+  await sendTg(cleanReply, null, incomingChatId);
+}
+
+async function downloadTelegramPhotoAsPart(fileId) {
+  try {
+    const infoRes = await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/getFile?file_id=" + encodeURIComponent(fileId));
+    const info = await infoRes.json();
+    const filePath = info?.result?.file_path;
+    if (!filePath) return null;
+    const fileRes = await fetch("https://api.telegram.org/file/bot" + TG_TOKEN + "/" + filePath);
+    const buf = await fileRes.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    const chunk = 8192;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    const b64 = btoa(binary);
+    return { inlineData: { mimeType: "image/jpeg", data: b64 } };
+  } catch (e) {
+    return null;
   }
 }
 
 async function runScheduledCheckins(env) {
-  const now = new Date();
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", hour12: false
-  }).formatToParts(now);
-  const getPart = (t) => fmt.find(p => p.type === t)?.value || "00";
-  const todayStr = getPart("year") + "-" + getPart("month") + "-" + getPart("day");
-  const curMins = parseInt(getPart("hour"), 10) * 60 + parseInt(getPart("minute"), 10);
+  const { todayStr, curMins } = getNowParts();
+  const st = await loadCloudState(env);
+  const isTodayState = st && st.lastDateYMD === todayStr;
 
   for (const s of STEPS) {
     const [hh, mm] = s.time.split(":").map(Number);
     const targetMins = hh * 60 + mm;
     const sentKey = "sent_" + todayStr + "_" + s.key;
     const already = env.RESET_KV ? await env.RESET_KV.get(sentKey) : null;
+
     if (curMins >= targetMins && curMins <= targetMins + 25 && !already) {
       if (env.RESET_KV) await env.RESET_KV.put(sentKey, "1", { expirationTtl: 172800 });
-      await sendTg(s.label + "\\n\\n" + s.msg, {
+
+      // Dacă pasul a fost deja bifat azi în aplicație, sărim peste alarmă!
+      if (isTodayState && st.stepsDone && st.stepsDone[s.key] === true) {
+        continue;
+      }
+
+      let messageText = s.msg;
+      if (GEMINI_KEY && !GEMINI_KEY.startsWith("PUNE_")) {
+        try {
+          const sys = buildWorkerSystemPrompt(st, todayStr);
+          const aiMsg = await askGeminiWithHistory(sys, [{
+            role: "user",
+            parts: [{ text: "Generează mesajul scurt de check-in (2-3 propoziții) pentru pasul " + s.label + " (ora " + s.time + "). Adaptează-l la ce am făcut azi și în ultimele zile, la măsurătorile din poze și profilul meu medical. Întrebarea de bază era: " + s.msg }]
+          }]);
+          if (aiMsg && !aiMsg.startsWith("❌")) messageText = aiMsg;
+        } catch (e) {}
+      }
+
+      await sendTg(s.label + "\\n\\n" + messageText, {
         inline_keyboard: [[
           { text: "✅ Am făcut pasul!", callback_data: "step_done:" + s.key },
           { text: "💪 Nu încă, încurajează-mă!", callback_data: "step_enc:" + s.key }
@@ -6821,23 +7067,45 @@ async function runScheduledCheckins(env) {
   }
 }
 
-async function sendTg(text, replyMarkup) {
-  const payload = { chat_id: TG_CHAT_ID, text: text };
+async function sendTg(text, replyMarkup, chatIdOverride) {
+  const targetChat = chatIdOverride || TG_CHAT_ID;
+  if (!targetChat || String(targetChat).startsWith("PUNE_")) return;
+  const payload = { chat_id: targetChat, text: text };
   if (replyMarkup) payload.reply_markup = replyMarkup;
   await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
   });
 }
 
-async function askGemini(userText) {
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY;
-  const sys = "Ești camaradul meu pragmatic în renunțarea la THC și tutun. Sunt taximetrist 8-10h/zi, am psoas drept tensionat și sciatică pe stânga, gătesc cu Instant Pot/Airfryer/Blender. Răspunde scurt, cald și încurajator în română.";
-  const res = await fetch(url, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: [{ role: "user", parts: [{ text: userText }] }] })
-  });
-  const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "Ține capul sus, respiră adânc și fă un pas mic acum!";
+async function askGeminiWithHistory(systemPrompt, contents) {
+  if (!GEMINI_KEY || GEMINI_KEY.startsWith("PUNE_")) {
+    return "❌ Lipsește cheia Gemini API în Cloudflare Worker (GEMINI_KEY).";
+  }
+  const models = [GEMINI_MODEL, "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-flash-latest"]
+    .filter((v, i, a) => v && a.indexOf(v) === i);
+
+  let lastErr = "";
+  for (const mdl of models) {
+    try {
+      const url = "https://generativelanguage.googleapis.com/v1beta/models/" + mdl + ":generateContent?key=" + GEMINI_KEY;
+      const res = await fetch(url, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: contents,
+          generationConfig: { temperature: 0.7 }
+        })
+      });
+      const data = await res.json();
+      if (res.ok && !data.error) {
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Ține capul sus, respiră adânc și fă un pas mic acum!";
+      }
+      lastErr = data.error?.message || ("HTTP " + res.status);
+    } catch (e) {
+      lastErr = e.message;
+    }
+  }
+  return "❌ Eroare AI: " + (lastErr || "nu am primit răspuns de la Gemini.");
 }`;
 
             generatedCloudScripts.gas = `// === RESET NEURO v3.5 — GOOGLE APPS SCRIPT ===
@@ -7138,12 +7406,45 @@ function setWebhook() {
             rec.start();
         }
 
+        function populateHealthProfileFields() {
+            const hp = state.healthProfile || DEFAULT_HEALTH_PROFILE;
+            if (document.getElementById('set-health-conditions')) document.getElementById('set-health-conditions').value = hp.conditions || "";
+            if (document.getElementById('set-health-lifestyle')) document.getElementById('set-health-lifestyle').value = hp.lifestyle || "";
+            if (document.getElementById('set-health-restrictions')) document.getElementById('set-health-restrictions').value = hp.restrictions || "";
+            if (document.getElementById('set-health-notes')) document.getElementById('set-health-notes').value = hp.medicalNotes || "";
+            if (document.getElementById('set-ai-memory')) document.getElementById('set-ai-memory').value = state.aiMemorySummary || "";
+        }
+
+        function clearAiMemory() {
+            if (!confirm("Ștergi memoria pe termen lung a AI-ului? Istoricul zilnic rămâne.")) return;
+            state.aiMemorySummary = "";
+            state.todayExternalMetrics = [];
+            localStorage.setItem('reset_aiMemorySummary', "");
+            localStorage.setItem('reset_todayExternalMetrics', JSON.stringify([]));
+            populateHealthProfileFields();
+            markStateDirtyAndSync();
+        }
+
+        function buildHistorySummaryText() {
+            const hist = state.dailyHistory || {};
+            const keys = Object.keys(hist).sort().slice(-7);
+            if (keys.length === 0) return "Încă nu există zile arhivate (azi e prima zi urmărită).";
+            return keys.map(k => {
+                const d = hist[k] || {};
+                const doneCount = Object.values(d.stepsDone || {}).filter(Boolean).length;
+                const ext = (d.externalMetrics && d.externalMetrics.length) ? ` | Date externe: ${d.externalMetrics.join('; ')}` : "";
+                return `  • ${k}: ${doneCount}/4 pași, ${d.cigs ?? 0} țigări, ${d.walkMins ?? 0} min mers, antrenament: ${d.workoutDone ? 'da' : 'nu'}${ext}`;
+            }).join('\n');
+        }
+
         function buildSystemPrompt() {
             const { totalHours, currentDayNum, isFuture, countdownMs, daysUntilStart } = getProgressStats();
             const bio = TIMELINE_DB.find(item => currentDayNum <= item.maxDay) || TIMELINE_DB[TIMELINE_DB.length - 1];
             const nowHour = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
             const suppsTaken = Object.entries(state.supps).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'niciunul încă';
             const stepsDoneStr = Object.entries(state.stepsDone).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'niciunul încă';
+            const hp = state.healthProfile || DEFAULT_HEALTH_PROFILE;
+            const todayExt = (state.todayExternalMetrics || []).length ? state.todayExternalMetrics.join(' | ') : 'niciuna azi';
 
             const statusLine = isFuture
                 ? `- MOD PREGĂTIRE (Start programat pe ${(state.quitDate || "").replace('T', ' ')}): mai sunt ${daysUntilStart} zile (${Math.ceil(countdownMs / (1000 * 60 * 60))} ore) până la Zero THC.`
@@ -7155,16 +7456,20 @@ function setWebhook() {
             return `Ești cel mai bun prieten și camaradul meu pragmatic în renunțarea la THC și fumat (Faza ${state.phase}: ${state.phase === "1" ? "Zero THC, țigări sub pacing" : "Zero THC + Zero Nicotină"}).
 Vorbim în română, direct, cald și încurajator, ca doi tovarăși, fără limbaj de lemn și fără clișee terapeutice corporatiste.
 
-PROFILUL MEU REAL:
-- Job: Taximetrist, lucrez 8–10 ore pe zi la volan, 5–7 zile/săptămână (țintesc trezire matinală la ${state.stepTimes.morning}).
-- Probleme fizice cunoscute: Psoas major drept foarte tensionat/scurtat (de la pedale), sciatică pe partea stângă, postură înclinată spre stânga și musculatură slabă în refacere.
-- Aparatură bucătărie: Instant Pot (Multicooker), Airfryer, Blender, Aragaz/Cuptor. Prefer mâncăruri românești reinterpretate sănătos și caserole practice pentru prânzul în mașină + cină caldă acasă.
+PROFILUL MEU REAL & MEDICAL:
+- Job & Stil de viață: ${hp.lifestyle || DEFAULT_HEALTH_PROFILE.lifestyle} (țintesc trezire la ${state.stepTimes.morning}).
+- Condiții medicale & fizice: ${hp.conditions || DEFAULT_HEALTH_PROFILE.conditions}
+- Restricții, alergii & preferințe: ${hp.restrictions || DEFAULT_HEALTH_PROFILE.restrictions}
+${hp.medicalNotes ? `- Note medicale / analize: ${hp.medicalNotes}\n` : ''}
+MEMORIE PE TERMEN LUNG & ISTORIC RECENT:
+${state.aiMemorySummary ? `- Rezumat memorie: ${state.aiMemorySummary}\n` : ''}- Ultimele zile:\n${buildHistorySummaryText()}
 
-DATELE MELE ÎN TIMP REAL:
+DATELE MELE ÎN TIMP REAL (AZI):
 ${statusLine}
 - Țigări fumate azi: ${state.cigsToday} din limita de ${state.cigLimit}.
 - Pași & Suplimente bifate azi: ${stepsDoneStr} (suplimente: ${suppsTaken}).
 - Mișcare azi: ${state.moveStats.walkMinsToday}/${state.moveStats.walkGoal} min mers pe jos, ${state.moveStats.taxiBreaksToday} pauze decompresie taxi, nivel exerciții activ: ${state.exerciseLevel}.
+- Măsurători/poze extrase azi (cântar BMI, somn, smartwatch, analize): ${todayExt}.
 - Ora exactă: ${nowHour}.
 ${bioLine}
 - Stoc suplimente disponibile: NAC, Magneziu Bisglicinat, Myo-Inositol, L-Theanină, Krill Oil, Vitamina D3, Creatină.
@@ -7172,8 +7477,10 @@ ${bioLine}
 REGULI:
 1. Dacă încerc să negociez ("trag doar două fumuri să dorm", "am avut o tură grea"), demontează-mi capcana instant! Amintește-mi de "Play the Tape Forward": 5 minute de ușurare falsă urmate de tahicardie, ceață mentală, vinovăție și resetarea receptorilor CB1. (Dacă sunt în Modul Pregătire înainte de Start, ajută-mă să reduc doza și să pregătesc terenul pentru data fixată fără să amân startul!)
 2. Dacă spun că nu am făcut un pas (vitamine, mișcare, mers), NU mă certa niciodată — validează oboseala de pe taxi, încurajează-mă cu căldură și propune o micro-acțiune de 60 de secunde!
-3. Când propui exerciții sau rețete, ține cont de psoasul drept, sciatica stângă și de Instant Pot / Airfryer / Blender / caserola de taxi.
-4. Fii scurt și percutant (2-3 paragrafe ușor de citit pe telefon) și încheie cu o întrebare scurtă sau o provocare clară.`;
+3. Când propui exerciții, suplimente sau rețete, ține cont strict de condițiile medicale, restricțiile, măsurătorile recente (cântar/BMI, somn, analize) și aparatura mea.
+4. Dacă utilizatorul îți trimite o poză (cântar smart cu greutate/BMI/grăsime/masă musculară, captură de somn/pași/smartwatch, analize medicale, mâncare sau exerciții) sau îți spune o condiție medicală nouă / măsurătoare importantă, interpreteaz-o clar și, DOAR dacă există date concrete de reținut pe viitor, adaugă chiar la finalul răspunsului, pe o linie nouă, un singur tag scurt:
+[MEMORIE: rezumat telegrafic de max 180 caractere cu cifrele/faptele cheie]
+5. Fii scurt și percutant (2-3 paragrafe ușor de citit pe telefon) și încheie cu o întrebare scurtă sau o provocare clară.`;
         }
 
         async function trySingleGeminiModel(key, mdl, systemPrompt, contents) {
@@ -7235,7 +7542,7 @@ REGULI:
             if (provider.type === "gemini") {
                 const contents = messagesArray.map(m => ({
                     role: m.role === "assistant" ? "model" : "user",
-                    parts: [{ text: m.content }]
+                    parts: Array.isArray(m.parts) ? m.parts : [{ text: m.content }]
                 }));
                 return await callGeminiWithFallback(key, systemPrompt, contents);
             } else {
@@ -7290,27 +7597,117 @@ REGULI:
             }
         }
 
+        let pendingChatPhotoDataUrl = null;
+
+        function compressImageDataUrl(dataUrl, maxDim = 1024, quality = 0.82) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                        else { w = Math.round(w * maxDim / h); h = maxDim; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = () => resolve(dataUrl);
+                img.src = dataUrl;
+            });
+        }
+
+        function handleChatPhotoSelect(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                pendingChatPhotoDataUrl = await compressImageDataUrl(ev.target.result);
+                const preview = document.getElementById('chat-photo-preview');
+                const thumb = document.getElementById('chat-photo-thumb');
+                if (thumb) thumb.src = pendingChatPhotoDataUrl;
+                if (preview) preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function clearChatPhoto() {
+            pendingChatPhotoDataUrl = null;
+            const preview = document.getElementById('chat-photo-preview');
+            if (preview) preview.classList.add('hidden');
+        }
+
+        function applyMemoryTagFromReply(rawReply) {
+            const match = rawReply.match(/\[MEMORIE:\s*([\s\S]+?)\]/i);
+            const cleanReply = rawReply.replace(/\[MEMORIE:\s*[\s\S]+?\]/gi, '').trim();
+            if (match && match[1]) {
+                const fact = match[1].trim();
+                const stamp = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                const dateStamp = getLocalDateYMD();
+                state.todayExternalMetrics = state.todayExternalMetrics || [];
+                state.todayExternalMetrics.push(`${stamp}: ${fact}`);
+                if (state.todayExternalMetrics.length > 10) state.todayExternalMetrics = state.todayExternalMetrics.slice(-10);
+                localStorage.setItem('reset_todayExternalMetrics', JSON.stringify(state.todayExternalMetrics));
+
+                const prevMem = (state.aiMemorySummary || "").trim();
+                const entry = `[${dateStamp}] ${fact}`;
+                const combined = prevMem ? `${prevMem}\n${entry}` : entry;
+                state.aiMemorySummary = combined.length > 1000 ? combined.slice(-1000) : combined;
+                localStorage.setItem('reset_aiMemorySummary', state.aiMemorySummary);
+                populateHealthProfileFields();
+            }
+            return cleanReply;
+        }
+
         async function sendMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
-            if (!text) return;
+            const photoUrl = pendingChatPhotoDataUrl;
+            if (!text && !photoUrl) return;
 
-            appendBubble(text, 'user', true);
+            const userDisplayText = photoUrl
+                ? (text ? `📷 [Poză atașată] ${text}` : "📷 [Poză atașată pentru analiză]")
+                : text;
+
+            appendBubble(userDisplayText, 'user', true);
             input.value = '';
+            clearChatPhoto();
 
             if (!state.apiKey) {
                 appendBubble("⚠️ Nu ai salvat cheia API! Mergi în ⚙️ Setări, lipește cheia și apasă Salvează.", 'ai', false);
                 return;
             }
 
-            const loadingId = appendBubble("Scrie...", 'ai', false);
+            const loadingId = appendBubble(photoUrl ? "Analizez poza..." : "Scrie...", 'ai', false);
 
             try {
-                const reply = await callUniversalAI(state.apiKey, buildSystemPrompt(), state.chatHistory.slice(-10));
+                let messagesToSend = state.chatHistory.slice(-10);
+                if (photoUrl) {
+                    const m = photoUrl.match(/^data:([^;]+);base64,(.+)$/);
+                    if (m) {
+                        const promptText = text || "Analizează această poză (cântar BMI, somn, smartwatch, analize medicale, mâncare sau exerciții), extrage cifrele importante și spune-mi ce recomandare ai pentru mine azi.";
+                        messagesToSend = [
+                            ...state.chatHistory.slice(-9, -1),
+                            {
+                                role: "user",
+                                parts: [
+                                    { inlineData: { mimeType: m[1], data: m[2] } },
+                                    { text: promptText }
+                                ]
+                            }
+                        ];
+                    }
+                }
+                const rawReply = await callUniversalAI(state.apiKey, buildSystemPrompt(), messagesToSend);
+                const reply = applyMemoryTagFromReply(rawReply);
                 document.getElementById(loadingId).innerText = reply;
-                
+
                 state.chatHistory.push({ role: "assistant", content: reply });
                 localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory.slice(-20)));
+                markStateDirtyAndSync();
                 speakText(reply);
             } catch (err) {
                 document.getElementById(loadingId).innerText = `❌ ${err.message}`;
@@ -7381,6 +7778,15 @@ REGULI:
                 calm: document.getElementById('set-time-calm').value || "17:30",
                 night: document.getElementById('set-time-night').value || "20:30"
             };
+            state.healthProfile = {
+                conditions: (document.getElementById('set-health-conditions')?.value || "").trim() || DEFAULT_HEALTH_PROFILE.conditions,
+                lifestyle: (document.getElementById('set-health-lifestyle')?.value || "").trim() || DEFAULT_HEALTH_PROFILE.lifestyle,
+                restrictions: (document.getElementById('set-health-restrictions')?.value || "").trim() || DEFAULT_HEALTH_PROFILE.restrictions,
+                medicalNotes: (document.getElementById('set-health-notes')?.value || "").trim()
+            };
+            if (document.getElementById('set-ai-memory')) {
+                state.aiMemorySummary = document.getElementById('set-ai-memory').value.trim();
+            }
 
             localStorage.setItem('reset_quitDate', state.quitDate);
             localStorage.setItem('reset_phase', state.phase);
@@ -7393,6 +7799,8 @@ REGULI:
             localStorage.setItem('reset_tgChatId', state.tgChatId);
             localStorage.setItem('reset_cloudSyncUrl', state.cloudSyncUrl);
             localStorage.setItem('reset_stepTimes', JSON.stringify(state.stepTimes));
+            localStorage.setItem('reset_healthProfile', JSON.stringify(state.healthProfile));
+            localStorage.setItem('reset_aiMemorySummary', state.aiMemorySummary);
 
             updatePhaseUI();
             updateProviderLabel();
