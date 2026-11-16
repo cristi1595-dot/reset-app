@@ -2707,12 +2707,12 @@
             }, 1000);
 
             setInterval(() => {
-                if (state.tgToken && state.tgChatId && !telegramWebhookConflict) {
+                if (state.tgToken && state.tgChatId && !state.cloudSyncUrl && !telegramWebhookConflict) {
                     pollTelegramUpdates();
                 }
             }, 6000);
 
-            if (state.tgToken && state.tgChatId) {
+            if (state.tgToken && state.tgChatId && !state.cloudSyncUrl) {
                 setTimeout(pollTelegramUpdates, 1200);
             }
 
@@ -6657,7 +6657,7 @@ Structurează clar cu:
                     state.tgSentStepsToday[k] = true;
                     localStorage.setItem('reset_tgSentStepsToday', JSON.stringify(state.tgSentStepsToday));
 
-                    if (state.tgToken && state.tgChatId) {
+                    if (state.tgToken && state.tgChatId && !state.cloudSyncUrl) {
                         sendStepCheckinTelegram(k).catch(() => {});
                     }
                     if ('Notification' in window && Notification.permission === 'granted') {
@@ -6818,6 +6818,23 @@ export default {
       const r = await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/setWebhook?url=" + encodeURIComponent(hookUrl));
       const data = await r.json();
       return new Response(JSON.stringify({ webhookUrl: hookUrl, telegram: data }, null, 2), {
+        headers: { "Content-Type": "application/json", ...CORS }
+      });
+    }
+
+    if (request.method === "GET" && url.pathname === "/status") {
+      const whRes = await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/getWebhookInfo");
+      const wh = await whRes.json();
+      const st = await loadCloudState(env);
+      return new Response(JSON.stringify({
+        ok: true,
+        kvBound: Boolean(env.RESET_KV),
+        hasGeminiKey: Boolean(GEMINI_KEY && !GEMINI_KEY.startsWith("PUNE_")),
+        hasChatId: Boolean(TG_CHAT_ID && !TG_CHAT_ID.startsWith("PUNE_")),
+        stepTimes: st.stepTimes || STEPS.reduce((a, s) => (a[s.key] = s.time, a), {}),
+        chatHistoryCount: Array.isArray(st.chatHistory) ? st.chatHistory.length : 0,
+        telegramWebhook: wh.result || wh
+      }, null, 2), {
         headers: { "Content-Type": "application/json", ...CORS }
       });
     }
@@ -6992,17 +7009,22 @@ async function handleTelegramUpdate(body, env) {
   userParts.push({ text: text || "Analizează această poză (cântar BMI, somn, smartwatch, analize medicale, mâncare sau exerciții), extrage cifrele importante și spune-mi ce recomandare ai pentru mine azi." });
   contents.push({ role: "user", parts: userParts });
 
-  const rawReply = await askGeminiWithHistory(sys, contents);
-  const cleanReply = extractAndApplyMemory(st, rawReply, todayStr, hmStr);
+  try {
+    const rawReply = await askGeminiWithHistory(sys, contents);
+    const cleanReply = extractAndApplyMemory(st, rawReply, todayStr, hmStr);
 
-  st.chatHistory = Array.isArray(st.chatHistory) ? st.chatHistory : [];
-  st.chatHistory.push({ role: "user", content: "[Telegram] " + (imagePart ? "📷 " : "") + (text || "Poză trimisă") });
-  st.chatHistory.push({ role: "assistant", content: cleanReply });
-  if (st.chatHistory.length > 20) st.chatHistory = st.chatHistory.slice(-20);
-  st.lastDateYMD = todayStr;
-  await saveCloudState(env, st);
+    const nowTs = Date.now();
+    st.chatHistory = Array.isArray(st.chatHistory) ? st.chatHistory : [];
+    st.chatHistory.push({ role: "user", content: "[Telegram] " + (imagePart ? "📷 " : "") + (text || "Poză trimisă"), ts: nowTs });
+    st.chatHistory.push({ role: "assistant", content: cleanReply, ts: nowTs });
+    if (st.chatHistory.length > 20) st.chatHistory = st.chatHistory.slice(-20);
+    st.lastDateYMD = todayStr;
+    await saveCloudState(env, st);
 
-  await sendTg(cleanReply, null, incomingChatId);
+    await sendTg(cleanReply, null, incomingChatId);
+  } catch (err) {
+    await sendTg("❌ Eroare Worker: " + (err && err.message ? err.message : String(err)), null, incomingChatId);
+  }
 }
 
 async function downloadTelegramPhotoAsPart(fileId) {
@@ -7032,7 +7054,8 @@ async function runScheduledCheckins(env) {
   const isTodayState = st && st.lastDateYMD === todayStr;
 
   for (const s of STEPS) {
-    const [hh, mm] = s.time.split(":").map(Number);
+    const stepTimeStr = (st && st.stepTimes && st.stepTimes[s.key]) ? st.stepTimes[s.key] : s.time;
+    const [hh, mm] = stepTimeStr.split(":").map(Number);
     const targetMins = hh * 60 + mm;
     const sentKey = "sent_" + todayStr + "_" + s.key;
     const already = env.RESET_KV ? await env.RESET_KV.get(sentKey) : null;
@@ -7353,7 +7376,7 @@ function setWebhook() {
                 appendBubble("Salut, camarade! Îți văd în timp real progresul receptorilor CB1, pașii zilnici, mersul pe jos, planul de kineto pentru psoas/sciatică și meniul de taximetrist. Cum te simți azi?", 'ai', false);
             } else {
                 state.chatHistory.forEach(msg => {
-                    appendBubble(msg.content, msg.role === 'user' ? 'user' : 'ai', false);
+                    appendBubble(msg.content, msg.role === 'user' ? 'user' : 'ai', false, msg.ts || null);
                 });
             }
         }
@@ -7703,20 +7726,43 @@ REGULI:
                 }
                 const rawReply = await callUniversalAI(state.apiKey, buildSystemPrompt(), messagesToSend);
                 const reply = applyMemoryTagFromReply(rawReply);
-                document.getElementById(loadingId).innerText = reply;
+                const replyTs = Date.now();
+                const bubbleEl = document.getElementById(loadingId);
+                if (bubbleEl) {
+                    const txtEl = bubbleEl.querySelector('.chat-msg-text');
+                    const tsEl = bubbleEl.querySelector('.chat-msg-ts');
+                    if (txtEl) txtEl.innerText = reply;
+                    else bubbleEl.innerText = reply;
+                    if (tsEl) tsEl.innerText = formatChatTimestamp(replyTs);
+                }
 
-                state.chatHistory.push({ role: "assistant", content: reply });
+                state.chatHistory.push({ role: "assistant", content: reply, ts: replyTs });
                 localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory.slice(-20)));
                 markStateDirtyAndSync();
                 speakText(reply);
             } catch (err) {
-                document.getElementById(loadingId).innerText = `❌ ${err.message}`;
+                const bubbleEl = document.getElementById(loadingId);
+                const txtEl = bubbleEl?.querySelector('.chat-msg-text');
+                if (txtEl) txtEl.innerText = `❌ ${err.message}`;
+                else if (bubbleEl) bubbleEl.innerText = `❌ ${err.message}`;
             }
         }
 
-        function appendBubble(text, sender, saveToStorage = false) {
+        function formatChatTimestamp(ts) {
+            if (!ts) return "";
+            const d = new Date(ts);
+            if (isNaN(d.getTime())) return "";
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+            return `${dd}.${mm} • ${hh}:${min}`;
+        }
+
+        function appendBubble(text, sender, saveToStorage = false, ts = null) {
+            const msgTs = ts || (saveToStorage ? Date.now() : null);
             if (saveToStorage && sender === 'user') {
-                state.chatHistory.push({ role: "user", content: text });
+                state.chatHistory.push({ role: "user", content: text, ts: msgTs });
                 localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory.slice(-20)));
             }
             const box = document.getElementById('chat-box');
@@ -7724,9 +7770,20 @@ REGULI:
             const id = 'msg-' + Date.now() + Math.random().toString(36).substr(2, 4);
             div.id = id;
             div.className = sender === 'user'
-                ? "bg-emerald-600 text-white p-3.5 rounded-2xl rounded-tr-none text-xs max-w-[85%] ml-auto leading-relaxed whitespace-pre-wrap shadow select-text"
-                : "glass text-slate-200 p-3.5 rounded-2xl rounded-tl-none text-xs max-w-[88%] leading-relaxed whitespace-pre-wrap shadow select-text";
-            div.innerText = text;
+                ? "bg-emerald-600 text-white p-3.5 rounded-2xl rounded-tr-none text-xs max-w-[85%] ml-auto leading-relaxed shadow select-text"
+                : "glass text-slate-200 p-3.5 rounded-2xl rounded-tl-none text-xs max-w-[88%] leading-relaxed shadow select-text";
+            const textDiv = document.createElement('div');
+            textDiv.className = "chat-msg-text whitespace-pre-wrap";
+            textDiv.innerText = text;
+            div.appendChild(textDiv);
+
+            const tsDiv = document.createElement('div');
+            tsDiv.className = sender === 'user'
+                ? "chat-msg-ts text-[9px] text-emerald-100/80 text-right mt-1 font-mono"
+                : "chat-msg-ts text-[9px] text-slate-400 text-right mt-1 font-mono";
+            tsDiv.innerText = formatChatTimestamp(msgTs);
+            div.appendChild(tsDiv);
+
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
             return id;
