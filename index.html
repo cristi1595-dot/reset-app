@@ -760,14 +760,19 @@
             <div class="glass rounded-3xl p-4 space-y-3 border-emerald-500/40">
                 <div>
                     <h2 class="text-sm font-extrabold text-emerald-300 flex items-center gap-1.5">
-                        <span>🤖</span> Chef AI • Rețetă Sănătoasă din Frigider
+                        <span>🤖</span> Chef AI • Rețetă la Cerere sau din Frigider
                     </h2>
-                    <p class="text-[11px] text-slate-400">Alege ce ingrediente ai prin casă și ce aparat vrei să folosești. AI-ul face o rețetă gustoasă, bogată în nutrienți.</p>
+                    <p class="text-[11px] text-slate-400">Spune-i ce rețetă vrei să îți facă SAU bifează ce ai prin casă. Rețeta se salvează automat în categoria potrivită.</p>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-bold text-emerald-300 uppercase block mb-1">✨ Ce rețetă vrei să îți facă Chef AI? (opțional)</label>
+                    <input id="fridge-recipe-request" type="text" placeholder="ex: Ciorbă de perișoare, Shaorma la Airfryer, Papanași proteici..." class="w-full bg-slate-900 border border-emerald-700/60 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-400">
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <div class="text-[11px] font-bold text-slate-400 uppercase">1. Bifează ce ai în casă:</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase">Sau bifează ce ai în casă:</div>
                         <button onclick="loadPantryIntoChefAI()" class="text-[11px] font-bold text-amber-300 hover:text-amber-200 bg-amber-950/50 border border-amber-700/50 px-2.5 py-1 rounded-xl transition">
                             🥫 Încarcă din Cămară
                         </button>
@@ -776,14 +781,15 @@
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Alte ingrediente (opțional):</label>
-                    <input id="fridge-extra-input" type="text" placeholder="ex: dovlecel, ceapă verde, smântână, pătrunjel..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Alte ingrediente / preferințe (opțional):</label>
+                    <input id="fridge-extra-input" type="text" placeholder="ex: dovlecel, fără zahăr, picant, rapid..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-[10px] text-slate-400 block mb-1">Aparat de gătit:</label>
                         <select id="fridge-appliance" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
+                            <option value="Oricare (cel mai potrivit pentru rețetă)">Oricare (optim)</option>
                             <option value="Instant Pot">Instant Pot (ciorbă/tocăniță)</option>
                             <option value="Airfryer">Airfryer (rapid & crocant)</option>
                             <option value="Blender">Blender (smoothie/supă)</option>
@@ -796,12 +802,13 @@
                             <option value="Caserolă Taxi (Prânz la volan, nu curge)">Caserolă Taxi (Prânz)</option>
                             <option value="Cină Caldă Acasă (refacere & somn)">Cină Caldă Acasă</option>
                             <option value="Mic Dejun / Start Energic">Mic Dejun Rapid</option>
+                            <option value="Gustare / Desert Sănătos">Gustare / Desert</option>
                         </select>
                     </div>
                 </div>
 
                 <button onclick="generateFridgeRecipe()" id="fridge-gen-btn" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white font-bold rounded-2xl text-xs shadow-lg transition">
-                    👨‍🍳 Generează Rețetă Sănătoasă cu AI
+                    👨‍🍳 Generează & Salvează Rețeta cu AI
                 </button>
             </div>
 
@@ -6461,46 +6468,54 @@ Returnează EXCLUSIV JSON valid: {"calories": 420, "protein": 32, "carbs": 28, "
             haptic(40);
             const resBox = document.getElementById('fridge-recipe-result');
             const btn = document.getElementById('fridge-gen-btn');
-            const extra = document.getElementById('fridge-extra-input').value.trim();
+            const recipeRequest = (document.getElementById('fridge-recipe-request')?.value || '').trim();
+            const extra = (document.getElementById('fridge-extra-input')?.value || '').trim();
             const appliance = document.getElementById('fridge-appliance').value;
             const slot = document.getElementById('fridge-meal-slot').value;
             const ingredients = [...selectedFridgeChips, ...(extra ? [extra] : [])].join(', ');
 
-            if (!ingredients) {
-                alert("Selectează măcar 1–2 ingrediente sau scrie ce ai în frigider!");
+            if (!recipeRequest && !ingredients) {
+                showToast("Scrie ce rețetă vrei SAU bifează 1–2 ingrediente!");
                 return;
             }
 
             if (!state.apiKey) {
-                alert("Configurează cheia API în Setări mai întâi!");
+                showToast("Configurează cheia API în Setări mai întâi!");
                 return;
             }
 
             resBox.classList.remove('hidden');
-            resBox.innerHTML = `<div class="text-cyan-300 font-mono">⏳ Chef AI pregătește rețeta sănătoasă pentru ${escapeHtml(appliance)}...</div>`;
+            const waitLabel = recipeRequest ? `"${escapeHtml(recipeRequest)}"` : `ingredientele pentru ${escapeHtml(appliance)}`;
+            resBox.innerHTML = `<div class="text-cyan-300 font-mono">⏳ Chef AI pregătește rețeta ${waitLabel}...</div>`;
             btn.disabled = true;
 
             try {
-                const userPrompt = `Creează o rețetă sănătoasă, gustoasă, cu gust românesc/tradițional adaptat sănătos, plină de nutrienți (proteine, vitamine, antiinflamatoare pentru sciatică și recuperare după THC).
-Ingrediente disponibile: ${ingredients}
+                const requestLine = recipeRequest
+                    ? `Rețetă cerută de utilizator: "${recipeRequest}". Creează exact această rețetă într-o variantă gustoasă și nutritivă.`
+                    : `Creează o rețetă sănătoasă, gustoasă, cu gust românesc/tradițional adaptat sănătos, plină de nutrienți.`;
+                const ingLine = ingredients
+                    ? `Ingrediente disponibile / preferințe: ${ingredients}.`
+                    : `Alege tu ingredientele complete și cantitățile exacte potrivite pentru această rețetă.`;
+
+                const userPrompt = `${requestLine}
+${ingLine}
 Aparat ales: ${appliance}
-Tip masă: ${slot} (ținem cont că lucrez 8-10 ore pe zi ca taximetrist).
+Tip masă: ${slot} (ținem cont că lucrez 8-10 ore pe zi ca taximetrist; nutrienți pentru mușchi, nervi/sciatică, somn sau energie).
 Structurează clar cu:
 1. Nume rețetă
 2. Timp de pregătire & gătire
 3. Cantități exacte
 4. Pași simpli pentru ${appliance}
-5. Beneficiile nutriționale (pentru mușchi, nervi/sciatică, somn sau energie la volan).`;
+5. Beneficiile nutriționale.`;
 
                 const reply = await callUniversalAI(state.apiKey, buildSystemPrompt(), [{ role: "user", content: userPrompt }]);
                 lastChefRecipeText = reply;
                 resBox.innerHTML = `
                     <div class="space-y-2">${formatSafeTextToHtml(reply)}</div>
-                    <div class="pt-2 border-t border-slate-800 flex gap-2">
-                        <button onclick="saveLastChefRecipe()" id="save-chef-recipe-btn" class="flex-1 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-xs transition">
-                            💾 Salvează în Rețetele Mele
-                        </button>
+                    <div id="chef-save-footer" class="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-[11px] text-cyan-300 font-mono">⏳ Se salvează automat în categoria ei...</span>
                     </div>`;
+                await saveLastChefRecipe(true);
             } catch (err) {
                 resBox.innerHTML = `<div class="text-red-300">❌ Eroare: ${escapeHtml(err.message)}</div>`;
             } finally {
@@ -6508,8 +6523,9 @@ Structurează clar cu:
             }
         }
 
-        async function saveLastChefRecipe() {
+        async function saveLastChefRecipe(isAuto = false) {
             if (!lastChefRecipeText) return;
+            const footer = document.getElementById('chef-save-footer');
             const btn = document.getElementById('save-chef-recipe-btn');
             if (btn) { btn.disabled = true; btn.innerText = '⏳ Se salvează...'; }
             try {
@@ -6523,10 +6539,26 @@ Structurează clar cu:
                 };
                 state.recipes = [newRecipe, ...(state.recipes || [])];
                 saveNutritionState();
-                if (btn) btn.innerText = `✅ Salvată în ${newRecipe.category}!`;
+                if (typeof renderRecipeCategories === 'function') renderRecipeCategories();
+                if (typeof renderRecipesList === 'function') renderRecipesList();
+
+                const icon = typeof getCategoryIcon === 'function' ? getCategoryIcon(newRecipe.category) : '🍽️';
+                if (footer) {
+                    footer.innerHTML = `
+                        <span class="text-[11px] font-bold text-emerald-300">✅ Salvată automat în: ${icon} ${escapeHtml(newRecipe.category)}</span>
+                        <button onclick="openRecipeDetail('${escapeHtml(newRecipe.id)}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-[11px] transition">
+                            📖 Deschide / Programează
+                        </button>`;
+                }
+                showToast(`✅ "${newRecipe.title}" salvată în ${newRecipe.category}!`);
             } catch (err) {
-                alert('❌ Eroare la salvare: ' + err.message);
-                if (btn) { btn.disabled = false; btn.innerText = '💾 Salvează în Rețetele Mele'; }
+                if (footer) {
+                    footer.innerHTML = `
+                        <button onclick="saveLastChefRecipe(false)" id="save-chef-recipe-btn" class="flex-1 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-xs transition">
+                            💾 Salvează în Rețetele Mele
+                        </button>`;
+                }
+                if (!isAuto) showToast('❌ Eroare la salvare: ' + err.message);
             }
         }
 
