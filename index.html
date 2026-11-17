@@ -34,7 +34,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        .chat-scroll { height: calc(100dvh - 245px); overflow-y: auto; }
+        .chat-scroll { height: calc(100dvh - 288px); overflow-y: auto; }
         .breath-circle { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -305,6 +305,9 @@
                     Vezi exercițiile / masa →
                 </button>
             </div>
+            <button onclick="trigger360AnalysisPlan()" class="w-full py-2.5 px-3 bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+                <span>🧠</span><span>Analiză 360° & Plan Tactic pe Ore (Toate Datele)</span>
+            </button>
         </div>
 
         <!-- Timer Principal & Statistici -->
@@ -356,6 +359,49 @@
                 </div>
                 <div id="dash-food-sub" class="text-[10px] text-slate-400 truncate w-full">Apasă pentru rețete & Chef AI →</div>
             </button>
+        </div>
+
+        <!-- Card Biometrie & Health (Brățară Google Fitbit Air & Cântar Smart) -->
+        <div id="biometrics-dash-card" class="glass rounded-3xl p-4 space-y-3 border-cyan-500/40">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-lg shrink-0">⌚</span>
+                    <div class="min-w-0">
+                        <h3 class="text-xs font-extrabold text-cyan-300 uppercase tracking-wider truncate">Biometrie & Health Azi</h3>
+                        <p id="bio-card-updated" class="text-[10px] text-slate-400 truncate">Brățară & Cântar Smart (necompletat azi)</p>
+                    </div>
+                </div>
+                <button onclick="openBiometricsModal()" class="text-[10px] px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 font-bold shrink-0 transition">
+                    ✏️ Edit / BLE
+                </button>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 text-center">
+                <button onclick="openBiometricsModal()" class="bg-slate-900/75 hover:border-red-500/50 border border-slate-800 rounded-2xl p-2 transition">
+                    <div class="text-[10px] text-slate-400">❤️ Puls</div>
+                    <div id="bio-card-hr" class="text-xs font-extrabold font-mono text-white mt-0.5">—</div>
+                </button>
+                <button onclick="openBiometricsModal()" class="bg-slate-900/75 hover:border-emerald-500/50 border border-slate-800 rounded-2xl p-2 transition">
+                    <div class="text-[10px] text-slate-400">👣 Pași</div>
+                    <div id="bio-card-steps" class="text-xs font-extrabold font-mono text-emerald-300 mt-0.5">—</div>
+                </button>
+                <button onclick="openBiometricsModal()" class="bg-slate-900/75 hover:border-purple-500/50 border border-slate-800 rounded-2xl p-2 transition">
+                    <div class="text-[10px] text-slate-400">😴 Somn</div>
+                    <div id="bio-card-sleep" class="text-xs font-extrabold font-mono text-purple-300 mt-0.5">—</div>
+                </button>
+                <button onclick="openBiometricsModal()" class="bg-slate-900/75 hover:border-amber-500/50 border border-slate-800 rounded-2xl p-2 transition">
+                    <div class="text-[10px] text-slate-400">⚖️ Cântar</div>
+                    <div id="bio-card-body" class="text-[10px] font-extrabold font-mono text-amber-300 mt-0.5 leading-tight">—</div>
+                </button>
+            </div>
+            <input type="file" id="bio-photo-input" accept="image/*" class="hidden" onchange="handleBiometricPhotoScan(event)">
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="document.getElementById('bio-photo-input').click()" id="bio-scan-btn" class="py-2 px-2.5 rounded-2xl bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-600/50 text-cyan-200 text-[11px] font-bold transition flex items-center justify-center gap-1.5">
+                    <span>📷</span><span>Scanează Captură Health</span>
+                </button>
+                <button onclick="openBiometricsModal()" class="py-2 px-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-bold transition flex items-center justify-center gap-1.5">
+                    <span>📡</span><span>Introdu / Bluetooth</span>
+                </button>
+            </div>
         </div>
 
         <!-- Semaforul de Țigări / Pacing sau Zero Nicotină -->
@@ -733,6 +779,10 @@
                 </button>
             </div>
 
+            <button onclick="promptQuickEatenMeal()" class="w-full py-2 px-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-emerald-600/40 text-emerald-300 text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5">
+                <span>🍽️</span><span>Notează rapid ce ai mâncat azi (sau bifează pe mese)</span>
+            </button>
+
             <!-- Cardurile Mesei Zilei -->
             <div id="food-meals-container" class="space-y-3"></div>
         </div>
@@ -888,6 +938,14 @@
                 </button>
             </div>
         </div>
+
+        <div id="sos-today-summary" class="glass rounded-2xl p-3 text-xs text-slate-300 space-y-1.5 border-slate-800">
+            <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-300">📋 Jurnal SOS Azi</span>
+                <span id="sos-today-count" class="text-[11px] font-mono text-amber-300">0 sesiuni</span>
+            </div>
+            <div id="sos-today-list" class="text-[11px] text-slate-400">Nicio criză sau sesiune SOS înregistrată azi.</div>
+        </div>
     </main>
 
     <!-- ==================== TAB 5: CHAT CU CAMARADUL ==================== -->
@@ -901,6 +959,18 @@
         </div>
 
         <div id="chat-box" class="chat-scroll p-4 space-y-3 selectable"></div>
+
+        <div class="px-3 py-1.5 bg-[#090d16]/95 border-t border-slate-800/80 flex gap-1.5 overflow-x-auto no-scrollbar">
+            <button onclick="trigger360AnalysisPlan()" class="shrink-0 px-3 py-1.5 rounded-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white text-[11px] font-bold active:scale-95 transition">
+                🧠 Analiză 360° & Plan
+            </button>
+            <button onclick="sendQuickChatPrompt('Ce îmi recomanzi să mănânc la următoarea masă, ținând cont de ora actuală, de ce am mâncat azi, ce am în Meniu/Cămară și de procentul meu de proteine de pe cântar?')" class="shrink-0 px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-amber-300 text-[11px] font-bold active:scale-95 transition">
+                🍲 Ce să mănânc acum?
+            </button>
+            <button onclick="sendQuickChatPrompt('Sunt după sau în pauză de tură pe taxi. Ce exercițiu de 2 minute să fac chiar acum din cele pe care nu le-am bifat încă azi pentru psoas și sciatică?')" class="shrink-0 px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold active:scale-95 transition">
+                🧘‍♂️ Decompresie 2 min
+            </button>
+        </div>
 
         <div id="chat-photo-preview" class="hidden px-3 pt-2 bg-[#090d16]/95 border-t border-slate-800 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
@@ -2035,6 +2105,97 @@
         </div>
     </div>
 
+    <!-- ==================== MODAL: BIOMETRIE & BRĂȚARĂ HEALTH ==================== -->
+    <div id="biometrics-modal" onclick="if(event.target===this) closeModal('biometrics-modal')" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="glass bg-[#090d16]/95 border border-cyan-500/40 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div>
+                    <h3 class="text-sm font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                        <span>⌚</span> Biometrie & Health (Brățară & Cântar)
+                    </h3>
+                    <p class="text-[10px] text-slate-400">Compatibil cu Google Fitbit Air / Health Connect / Cântar Smart</p>
+                </div>
+                <button onclick="closeModal('biometrics-modal')" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <div class="bg-cyan-950/30 border border-cyan-700/50 rounded-2xl p-3 space-y-2">
+                <div class="text-xs font-bold text-cyan-200">📡 Citire Directă Bluetooth BLE / Captură Ecran</div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                    Google Fitbit Air sincronizează datele în telefon fără cont Fitbit dedicat. Poți citi pulsul live via Bluetooth (dacă brățara emite BLE Heart Rate) sau poți scana direct un screenshot din aplicația de pe telefon!
+                </p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="connectBleHeartRate()" class="py-2 px-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[11px] transition">
+                        📡 Puls Live (Bluetooth)
+                    </button>
+                    <button type="button" onclick="closeModal('biometrics-modal'); document.getElementById('bio-photo-input').click();" class="py-2 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-200 font-bold text-[11px] transition">
+                        📷 Scanează Screenshot
+                    </button>
+                </div>
+                <div id="bio-ble-status" class="hidden text-[11px] font-mono text-emerald-300 bg-slate-950/70 rounded-xl p-2 border border-slate-800"></div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date Zilnice Brățară (Azi)</div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">❤️ Puls Curent (bpm)</label>
+                        <input id="bio-in-hr" type="number" min="35" max="220" placeholder="ex: 86" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">🩺 Puls Repaus / RHR (bpm)</label>
+                        <input id="bio-in-rhr" type="number" min="35" max="150" placeholder="ex: 68" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">👣 Pași Azi</label>
+                        <input id="bio-in-steps" type="number" min="0" max="100000" placeholder="ex: 5400" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">😴 Somn Azi-Noapte (ore)</label>
+                        <input id="bio-in-sleep" type="number" step="0.1" min="0" max="24" placeholder="ex: 6.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5 items-end">
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">🌙 Scor Somn (opțional, 0-100)</label>
+                        <input id="bio-in-sleepscore" type="number" min="0" max="100" placeholder="ex: 78" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono">
+                    </div>
+                    <label class="flex items-center gap-2 bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2 cursor-pointer">
+                        <input id="bio-sync-walk-check" type="checkbox" checked class="accent-emerald-500 w-4 h-4">
+                        <span class="text-[11px] text-emerald-300 font-semibold leading-tight">Actualizează și minutele de mers din pași</span>
+                    </label>
+                </div>
+
+                <div class="pt-2 border-t border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Compoziție Corporală (Cântar Smart)</div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[10px] text-slate-300 block mb-1">⚖️ Greutate (kg)</label>
+                        <input id="bio-in-weight" type="number" step="0.1" min="30" max="250" placeholder="78.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-300 block mb-1">🔥 Grăsime (%)</label>
+                        <input id="bio-in-fat" type="number" step="0.1" min="3" max="60" placeholder="16.8" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-300 block mb-1">🫀 Viscerală</label>
+                        <input id="bio-in-visceral" type="number" step="0.5" min="1" max="30" placeholder="4" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-300 block mb-1">🥩 Proteine (%)</label>
+                        <input id="bio-in-protein" type="number" step="0.1" min="5" max="40" placeholder="11" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-300 block mb-1">💪 Mușchi (%)</label>
+                        <input id="bio-in-muscle" type="number" step="0.1" min="10" max="90" placeholder="78" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white font-mono">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="saveBiometricsFromModal()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-lg transition">
+                💾 Salvează Biometria & Sincronizează cu Camaradul
+            </button>
+        </div>
+    </div>
+
     <!-- NAVIGARE JOS (5 TABURI OPTIMIZATE TELEFON) -->
     <nav class="fixed bottom-0 left-0 right-0 bg-[#090d16]/95 border-t border-slate-800/90 flex justify-around py-2 px-1 z-30 backdrop-blur-md">
         <button onclick="switchTab('dash')" id="nav-dash" class="flex flex-col items-center text-emerald-400 text-[10px] font-semibold py-1 px-2 rounded-2xl">
@@ -2601,7 +2762,12 @@
         }
 
         const DEFAULT_STEP_TIMES = { morning: "09:00", noon: "12:30", calm: "17:30", night: "20:30" };
-        const DEFAULT_MOVE_STATS = { walkMinsToday: 0, walkGoal: 30, taxiBreaksToday: 0, workoutDoneToday: false, completedExercises: {} };
+        const DEFAULT_MOVE_STATS = { walkMinsToday: 0, walkGoal: 30, taxiBreaksToday: 0, workoutDoneToday: false, completedExercises: {}, completedWorkoutsToday: [] };
+        const DEFAULT_BIOMETRICS = {
+            hr: null, rhr: null, steps: null, sleepHours: null, sleepScore: null,
+            weightKg: null, bodyFatPct: null, visceralFat: null, proteinPct: null, musclePct: null,
+            updatedAt: null
+        };
         const DEFAULT_HEALTH_PROFILE = {
             conditions: "Psoas major drept foarte tensionat/scurtat (de la pedale), sciatică pe partea stângă, postură înclinată spre stânga și musculatură slabă în refacere.",
             lifestyle: "Taximetrist, lucrez 8–10 ore pe zi la volan, 5–7 zile/săptămână. Gătesc cu Instant Pot (Multicooker), Airfryer, Blender, Aragaz/Cuptor.",
@@ -2655,7 +2821,10 @@
             healthProfile: Object.assign({}, DEFAULT_HEALTH_PROFILE, JSON.parse(localStorage.getItem('reset_healthProfile') || '{}')),
             dailyHistory: JSON.parse(localStorage.getItem('reset_dailyHistory') || '{}'),
             todayExternalMetrics: JSON.parse(localStorage.getItem('reset_todayExternalMetrics') || '[]'),
-            aiMemorySummary: localStorage.getItem('reset_aiMemorySummary') || ""
+            aiMemorySummary: localStorage.getItem('reset_aiMemorySummary') || "",
+            biometricsToday: Object.assign({}, DEFAULT_BIOMETRICS, JSON.parse(localStorage.getItem('reset_biometricsToday') || '{}')),
+            mealsEatenToday: JSON.parse(localStorage.getItem('reset_mealsEatenToday') || '[]'),
+            sosLogsToday: JSON.parse(localStorage.getItem('reset_sosLogsToday') || '[]')
         };
 
         if (!localStorage.getItem('reset_apiKey')) {
@@ -2704,6 +2873,11 @@
                         walkMins: state.moveStats?.walkMinsToday || 0,
                         taxiBreaks: state.moveStats?.taxiBreaksToday || 0,
                         workoutDone: Boolean(state.moveStats?.workoutDoneToday),
+                        completedExercises: typeof getCompletedExerciseNamesToday === 'function' ? getCompletedExerciseNamesToday().doneNames : [],
+                        completedWorkouts: (state.moveStats?.completedWorkoutsToday || []).slice(0, 10),
+                        mealsEaten: (state.mealsEatenToday || []).map(m => m.title),
+                        sosLogs: (state.sosLogsToday || []).slice(0, 10),
+                        biometrics: Object.assign({}, state.biometricsToday || {}),
                         externalMetrics: (state.todayExternalMetrics || []).slice(0, 8)
                     };
                     const keys = Object.keys(state.dailyHistory).sort();
@@ -2719,10 +2893,22 @@
                 state.stepsDone = { morning: false, noon: false, calm: false, night: false };
                 state.tgSentStepsToday = {};
                 state.todayExternalMetrics = [];
+                state.mealsEatenToday = [];
+                state.sosLogsToday = [];
+                const prevBio = state.biometricsToday || {};
+                state.biometricsToday = Object.assign({}, DEFAULT_BIOMETRICS, {
+                    weightKg: prevBio.weightKg ?? null,
+                    bodyFatPct: prevBio.bodyFatPct ?? null,
+                    visceralFat: prevBio.visceralFat ?? null,
+                    proteinPct: prevBio.proteinPct ?? null,
+                    musclePct: prevBio.musclePct ?? null,
+                    updatedAt: prevBio.updatedAt || null
+                });
                 state.moveStats.walkMinsToday = 0;
                 state.moveStats.taxiBreaksToday = 0;
                 state.moveStats.workoutDoneToday = false;
                 state.moveStats.completedExercises = {};
+                state.moveStats.completedWorkoutsToday = [];
                 state.lastDate = currentToday;
                 state.lastDateYMD = currentYMD;
 
@@ -2731,6 +2917,9 @@
                 localStorage.setItem('reset_stepsDone', JSON.stringify(state.stepsDone));
                 localStorage.setItem('reset_tgSentStepsToday', JSON.stringify({}));
                 localStorage.setItem('reset_todayExternalMetrics', JSON.stringify([]));
+                localStorage.setItem('reset_mealsEatenToday', JSON.stringify([]));
+                localStorage.setItem('reset_sosLogsToday', JSON.stringify([]));
+                localStorage.setItem('reset_biometricsToday', JSON.stringify(state.biometricsToday));
                 localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
                 localStorage.setItem('reset_lastDate', currentToday);
                 localStorage.setItem('reset_lastDateYMD', currentYMD);
@@ -2740,6 +2929,9 @@
                 renderCheckinCard();
                 renderMoveProgress();
                 renderExercises();
+                if (typeof renderBiometricsCard === 'function') renderBiometricsCard();
+                if (typeof renderSosTodaySummary === 'function') renderSosTodaySummary();
+                if (typeof renderFoodMeals === 'function') renderFoodMeals();
                 if (typeof renderMoveExtensions === 'function') renderMoveExtensions();
                 updateDashboard();
             }
@@ -2792,6 +2984,8 @@
             renderRecipeCategories();
             renderRecipesList();
             updateNutritionBadges();
+            renderBiometricsCard();
+            renderSosTodaySummary();
             renderChatHistory();
             updateDashboard();
 
@@ -2977,7 +3171,10 @@
                 healthProfile: state.healthProfile || DEFAULT_HEALTH_PROFILE,
                 dailyHistory: state.dailyHistory || {},
                 todayExternalMetrics: state.todayExternalMetrics || [],
-                aiMemorySummary: state.aiMemorySummary || ""
+                aiMemorySummary: state.aiMemorySummary || "",
+                biometricsToday: state.biometricsToday || DEFAULT_BIOMETRICS,
+                mealsEatenToday: state.mealsEatenToday || [],
+                sosLogsToday: state.sosLogsToday || []
             };
         }
 
@@ -2989,7 +3186,8 @@
                 'exerciseLevel', 'moveStats', 'tgToken', 'tgChatId', 'theme', 'fontSize',
                 'apiKey', 'geminiModel', 'chatHistory', 'recipes', 'pantry', 'shoppingList',
                 'customExercises', 'workoutRoutines', 'moveHistory', 'weeklyPlan',
-                'healthProfile', 'dailyHistory', 'todayExternalMetrics', 'aiMemorySummary'
+                'healthProfile', 'dailyHistory', 'todayExternalMetrics', 'aiMemorySummary',
+                'biometricsToday', 'mealsEatenToday', 'sosLogsToday'
             ];
             keys.forEach(k => {
                 if (remote[k] === undefined || remote[k] === null) return;
@@ -3036,6 +3234,8 @@
             renderRecipeCategories();
             renderRecipesList();
             updateNutritionBadges();
+            renderBiometricsCard();
+            renderSosTodaySummary();
             renderChatHistory();
             updateDashboard();
         }
@@ -3290,14 +3490,16 @@
             }
             const foodPrevEl = document.getElementById('dash-food-preview');
             const foodSubEl = document.getElementById('dash-food-sub');
+            const eatenCount = (state.mealsEatenToday || []).length;
             if (dayMeals.length > 0) {
                 const firstR = (state.recipes || []).find(x => x.id === dayMeals[0].recipeId);
                 const firstTitle = firstR ? firstR.title : (dayMeals[0].recipeTitle || 'Masă programată');
                 if (foodPrevEl) foodPrevEl.innerText = dayMeals.length === 1 ? firstTitle : `${dayMeals.length} mese • ${firstTitle}`;
-                if (foodSubEl) foodSubEl.innerText = dayMeals.map(m => m.slot.split(' ').slice(1).join(' ') || m.slot).join(' • ');
+                const slotsText = dayMeals.map(m => m.slot.split(' ').slice(1).join(' ') || m.slot).join(' • ');
+                if (foodSubEl) foodSubEl.innerText = eatenCount > 0 ? `✅ ${eatenCount} mâncate azi • ${slotsText}` : slotsText;
             } else {
-                if (foodPrevEl) foodPrevEl.innerText = 'Nicio masă programată azi';
-                if (foodSubEl) foodSubEl.innerText = 'Apasă pentru a planifica meniul →';
+                if (foodPrevEl) foodPrevEl.innerText = eatenCount > 0 ? `${eatenCount} mese notate azi` : 'Nicio masă programată azi';
+                if (foodSubEl) foodSubEl.innerText = eatenCount > 0 ? (state.mealsEatenToday || []).map(m => m.title).join(', ') : 'Apasă pentru a planifica meniul →';
             }
 
             const quickWoBtn = document.getElementById('dash-quick-workout-btn');
@@ -3503,7 +3705,7 @@
             document.getElementById('supp-score').innerText = `${count}/4 azi`;
         }
 
-        const BACK_CLOSABLE_MODALS = ['cooking-mode-modal', 'pantry-staples-modal', 'recipe-detail-modal', 'add-recipe-modal', 'pantry-modal', 'shopping-modal'];
+        const BACK_CLOSABLE_MODALS = ['biometrics-modal', 'cooking-mode-modal', 'pantry-staples-modal', 'recipe-detail-modal', 'add-recipe-modal', 'pantry-modal', 'shopping-modal'];
 
         function openModalWithHistory(modalId) {
             const el = document.getElementById(modalId);
@@ -3760,12 +3962,35 @@
             container.innerHTML = html;
         }
 
+        function getCompletedExerciseNamesToday() {
+            const doneMap = state.moveStats?.completedExercises || {};
+            const allKnown = [];
+            Object.keys(EXERCISES_DB).forEach(lvl => {
+                (EXERCISES_DB[lvl].items || []).forEach(it => allKnown.push({ ...it, level: lvl }));
+            });
+            if (typeof getAllExercisesCombined === 'function') {
+                getAllExercisesCombined().forEach(it => {
+                    if (!allKnown.some(x => x.id === it.id)) allKnown.push(it);
+                });
+            }
+            const doneNames = [];
+            Object.entries(doneMap).forEach(([id, val]) => {
+                if (!val) return;
+                const found = allKnown.find(x => x.id === id);
+                doneNames.push(found ? found.name : id);
+            });
+            const activeLevelItems = (EXERCISES_DB[state.exerciseLevel || 'level1']?.items || []);
+            const pendingActiveNames = activeLevelItems.filter(it => !doneMap[it.id]).map(it => it.name);
+            return { doneNames, pendingActiveNames };
+        }
+
         function toggleExerciseDone(exId) {
             haptic(30);
             if (!state.moveStats.completedExercises) state.moveStats.completedExercises = {};
             state.moveStats.completedExercises[exId] = !state.moveStats.completedExercises[exId];
             localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
             renderExercises();
+            markStateDirtyAndSync();
         }
 
         function toggleExerciseVideo(exId, videoId) {
@@ -3829,6 +4054,7 @@
                     state.moveStats.completedExercises[exId] = true;
                     localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
                     renderExercises();
+                    markStateDirtyAndSync();
                 } else {
                     updateLbl();
                 }
@@ -4880,6 +5106,10 @@
 
             const minsEarned = Math.max(5, Math.round(playerState.totalSecondsElapsed / 60) || playerState.routine?.durationMin || 10);
             state.moveStats.workoutDoneToday = true;
+            if (!Array.isArray(state.moveStats.completedWorkoutsToday)) state.moveStats.completedWorkoutsToday = [];
+            if (playerState.routine?.title && !state.moveStats.completedWorkoutsToday.includes(playerState.routine.title)) {
+                state.moveStats.completedWorkoutsToday.push(playerState.routine.title);
+            }
             localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
             recordMoveActivity(minsEarned, true);
 
@@ -5047,14 +5277,93 @@
             updateDashboard();
         }
 
+        function isMealEatenToday(entryId) {
+            return (state.mealsEatenToday || []).some(m => m.entryId === entryId);
+        }
+
+        function toggleMealEatenToday(dayIdx, entryId) {
+            haptic(25);
+            if (!Array.isArray(state.mealsEatenToday)) state.mealsEatenToday = [];
+            const idx = state.mealsEatenToday.findIndex(m => m.entryId === entryId);
+            if (idx >= 0) {
+                state.mealsEatenToday.splice(idx, 1);
+                showToast('↩️ Masă scoasă din jurnalul de azi.');
+            } else {
+                const plan = state.weeklyPlan || {};
+                const entry = (plan[String(dayIdx)] || []).find(e => e.id === entryId);
+                if (!entry) return;
+                const r = (state.recipes || []).find(x => x.id === entry.recipeId);
+                const nowHm = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                state.mealsEatenToday.push({
+                    id: 'eaten-' + Date.now(),
+                    entryId: entry.id,
+                    recipeId: entry.recipeId || null,
+                    slot: entry.slot || 'Masă',
+                    title: r ? r.title : (entry.recipeTitle || 'Masă din meniu'),
+                    protein: r?.nutrition?.protein ?? null,
+                    calories: r?.nutrition?.calories ?? null,
+                    time: nowHm
+                });
+                showToast(`✅ Notat în jurnal: "${r ? r.title : entry.recipeTitle}"!`);
+            }
+            localStorage.setItem('reset_mealsEatenToday', JSON.stringify(state.mealsEatenToday));
+            renderFoodMeals();
+            updateDashboard();
+            markStateDirtyAndSync();
+        }
+
+        function promptQuickEatenMeal() {
+            const text = prompt('Ce ai mâncat azi? (ex: Omletă cu 3 ouă și telemea, Ciorbă de pui, Iaurt grecesc cu nuci)');
+            if (!text || !text.trim()) return;
+            if (!Array.isArray(state.mealsEatenToday)) state.mealsEatenToday = [];
+            const nowHm = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            state.mealsEatenToday.push({
+                id: 'eaten-' + Date.now(),
+                entryId: null,
+                recipeId: null,
+                slot: '🍽️ Notat rapid',
+                title: text.trim(),
+                protein: null,
+                calories: null,
+                time: nowHm
+            });
+            localStorage.setItem('reset_mealsEatenToday', JSON.stringify(state.mealsEatenToday));
+            renderFoodMeals();
+            updateDashboard();
+            markStateDirtyAndSync();
+            showToast(`✅ Adăugat la mesele de azi (${nowHm})!`);
+        }
+
+        function removeQuickEatenMeal(eatenId) {
+            state.mealsEatenToday = (state.mealsEatenToday || []).filter(m => m.id !== eatenId);
+            localStorage.setItem('reset_mealsEatenToday', JSON.stringify(state.mealsEatenToday));
+            renderFoodMeals();
+            updateDashboard();
+            markStateDirtyAndSync();
+        }
+
         function renderFoodMeals() {
             const dayObj = FOOD_PLAN_DB[selectedFoodDayIdx] || FOOD_PLAN_DB[0];
             const box = document.getElementById('food-meals-container');
             const plan = state.weeklyPlan || {};
             const dayMeals = Array.isArray(plan[String(selectedFoodDayIdx)]) ? plan[String(selectedFoodDayIdx)] : [];
 
+            const extraEaten = (state.mealsEatenToday || []).filter(m => !m.entryId);
+            const eatenSummaryHtml = (state.mealsEatenToday || []).length > 0 ? `
+                <div class="glass rounded-2xl p-3 border border-emerald-600/40 bg-emerald-950/20 space-y-1.5">
+                    <div class="text-[11px] font-extrabold text-emerald-300 uppercase tracking-wider">✅ Mâncat Azi (${state.mealsEatenToday.length})</div>
+                    <div class="space-y-1">
+                        ${state.mealsEatenToday.map(m => `
+                            <div class="flex items-center justify-between gap-2 text-xs text-slate-200">
+                                <span class="truncate"><span class="text-slate-400 font-mono text-[10px]">${escapeHtml(m.time || '')}</span> • ${escapeHtml(m.title)}${m.protein ? ` <span class="text-emerald-300 font-mono text-[10px]">(${m.protein}g prot)</span>` : ''}</span>
+                                <button onclick="removeQuickEatenMeal('${escapeHtml(m.id)}')" class="text-slate-400 hover:text-red-400 text-[11px] px-1 shrink-0" title="Șterge">✕</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : '';
+
             if (dayMeals.length === 0) {
-                box.innerHTML = `
+                box.innerHTML = eatenSummaryHtml + `
                     <div class="glass rounded-3xl p-6 text-center space-y-3 border-slate-800">
                         <div class="text-3xl">📅</div>
                         <div class="text-xs font-bold text-slate-300">Nicio rețetă programată pentru ${escapeHtml(dayObj.day)}.</div>
@@ -5066,20 +5375,24 @@
                 return;
             }
 
-            box.innerHTML = dayMeals.map(entry => {
+            box.innerHTML = eatenSummaryHtml + dayMeals.map(entry => {
                 const r = (state.recipes || []).find(x => x.id === entry.recipeId);
+                const eaten = isMealEatenToday(entry.id);
                 if (!r) {
                     return `
                         <div class="glass rounded-2xl p-3 flex items-center justify-between text-xs text-slate-400">
                             <span>${escapeHtml(entry.slot)} • ${escapeHtml(entry.recipeTitle || 'Rețetă ștearsă')}</span>
-                            <button onclick="removeMealFromWeeklyPlan(${selectedFoodDayIdx}, '${escapeHtml(entry.id)}')" class="text-red-400 px-2">✕</button>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="toggleMealEatenToday(${selectedFoodDayIdx}, '${escapeHtml(entry.id)}')" class="px-2 py-1 rounded-xl text-[10px] font-bold ${eaten ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300'}">${eaten ? '✅ Mâncat' : '🍽️ Am mâncat'}</button>
+                                <button onclick="removeMealFromWeeklyPlan(${selectedFoodDayIdx}, '${escapeHtml(entry.id)}')" class="text-red-400 px-2">✕</button>
+                            </div>
                         </div>`;
                 }
                 const totalMins = (r.prepTimeMinutes || 0) + (r.cookTimeMinutes || 0);
                 const ingPreview = (r.ingredients || []).map(i => i.originalText || i.name).join(', ');
                 const prepPreview = (r.instructions || []).map(s => s.text || String(s)).join(' ');
                 return `
-                    <div onclick="openRecipeDetail('${escapeHtml(r.id)}')" class="glass rounded-3xl p-4 space-y-2.5 cursor-pointer hover:border-emerald-500/50 transition">
+                    <div onclick="openRecipeDetail('${escapeHtml(r.id)}')" class="glass rounded-3xl p-4 space-y-2.5 cursor-pointer transition ${eaten ? 'border-emerald-500/70 bg-emerald-950/15' : 'hover:border-emerald-500/50'}">
                         <div class="flex items-start justify-between gap-2">
                             <div class="min-w-0">
                                 <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">${escapeHtml(entry.slot)}</div>
@@ -5087,6 +5400,7 @@
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 ${r.image ? `<img src="${r.image}" class="w-11 h-11 rounded-xl object-cover border border-slate-700" alt="">` : ''}
+                                <button onclick="event.stopPropagation(); toggleMealEatenToday(${selectedFoodDayIdx}, '${escapeHtml(entry.id)}')" class="px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition ${eaten ? 'bg-emerald-600 border-emerald-400 text-white' : 'bg-slate-800 hover:bg-emerald-900 border-slate-700 text-emerald-300'}" title="Marchează că ai mâncat azi">${eaten ? '✅ Mâncat' : '🍽️ Am mâncat'}</button>
                                 <button onclick="event.stopPropagation(); addWeeklyEntryToShopping('${escapeHtml(r.id)}')" class="px-2 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-800 border border-emerald-700/60 text-emerald-300 text-[11px] font-bold" title="Trimite ingredientele în Cumpărături">+ 🛒</button>
                                 <button onclick="event.stopPropagation(); removeMealFromWeeklyPlan(${selectedFoodDayIdx}, '${escapeHtml(entry.id)}')" class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-red-900 text-slate-400 hover:text-red-300 text-[11px] font-bold" title="Scoate din zi">✕</button>
                             </div>
@@ -5095,7 +5409,7 @@
                             ${ingPreview ? `<div><strong class="text-cyan-300">🛒 Ingrediente:</strong> ${escapeHtml(ingPreview)}</div>` : ''}
                             ${prepPreview ? `<div class="line-clamp-3"><strong class="text-emerald-300">👨‍🍳 Preparare:</strong> ${escapeHtml(prepPreview)}</div>` : ''}
                         </div>
-                        ${totalMins > 0 ? `<div class="text-[10px] text-slate-400 font-mono">⏱️ ${totalMins} min • ${getCategoryIcon(r.category)} ${escapeHtml(r.category)}</div>` : ''}
+                        ${totalMins > 0 || r.nutrition ? `<div class="text-[10px] text-slate-400 font-mono">${totalMins > 0 ? `⏱️ ${totalMins} min • ` : ''}${getCategoryIcon(r.category)} ${escapeHtml(r.category)}${r.nutrition ? ` • 🥩 ${r.nutrition.protein}g prot / ${r.nutrition.calories} kcal` : ''}</div>` : ''}
                     </div>`;
             }).join('');
         }
@@ -7200,16 +7514,21 @@ Structurează clar cu:
 
                         appendBubble(`[Telegram] ${txt}`, 'user', true);
                         let reply = "Am primit mesajul tău! Păstrează respirația calmă.";
+                        const promptTxt = txt === "/plan"
+                            ? "Fă o ANALIZĂ 360° completă din toate perspectivele (ora actuală, faza zilei, biometrie brățară/cântar, mișcare/kineto, nutriție/cămară, suplimente, țigări/SOS, stadiul Faza 0/Ziua X) și dă-mi un PLAN TACTIC concret pe ore pentru următoarele ore."
+                            : txt;
                         if (state.apiKey) {
                             try {
-                                reply = await callUniversalAI(state.apiKey, buildSystemPrompt(), state.chatHistory.slice(-10));
+                                const rawReply = await callUniversalAI(state.apiKey, buildSystemPrompt(), buildFormattedChatMessages(promptTxt));
+                                reply = applyMemoryTagFromReply(rawReply);
                             } catch (e) {
                                 reply = `❌ Eroare AI: ${e.message}`;
                             }
                         }
                         appendBubble(reply, 'ai', false);
-                        state.chatHistory.push({ role: "assistant", content: reply });
+                        state.chatHistory.push({ role: "assistant", content: reply, ts: Date.now() });
                         localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory.slice(-20)));
+                        markStateDirtyAndSync();
 
                         await callTelegramAPI(state.tgToken, "sendMessage", {
                             chat_id: state.tgChatId,
@@ -7381,18 +7700,80 @@ async function saveCloudState(env, st) {
   await env.RESET_KV.put("RESET_CLOUD_STATE", JSON.stringify(st));
 }
 
-function buildWorkerSystemPrompt(st, todayStr) {
+function buildWorkerTemporalInfo(st, todayStr, hmStr) {
+  const daysRo = ["Duminică", "Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă"];
+  const nowParts = todayStr.split("-").map(Number);
+  const base = new Date(nowParts[0], nowParts[1] - 1, nowParts[2]);
+  const calLines = [];
+  for (let i = 0; i <= 7; i++) {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    const lbl = i === 0 ? "Azi" : (i === 1 ? "Mâine" : (i === 2 ? "Poimâine" : "Peste " + i + " zile"));
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    calLines.push(lbl + " = " + daysRo[d.getDay()] + " " + dd + "." + mm);
+  }
+  const [hh, mm] = (hmStr || "12:00").split(":").map(Number);
+  const nowMins = hh * 60 + mm;
+  const nightTime = (st && st.stepTimes && st.stepTimes.night) ? st.stepTimes.night : "20:30";
+  let dayPart = "Ziua / În cursul turei";
+  if (nowMins < 5 * 60) dayPart = "Noaptea târziu (ore de somn/insomnie)";
+  else if (nowMins < 12 * 60) dayPart = "Dimineața";
+  else if (nowMins < 16 * 60) dayPart = "După-amiaza (pe traseu)";
+  else if (nowMins < 20 * 60) dayPart = "Seara devreme / După tură (NU este ora de somn încă! Pasul de seară e la " + nightTime + ")";
+  else if (nowMins < 23 * 60) dayPart = "Seara / Pregătire de somn";
+  else dayPart = "Noaptea (ora de culcare)";
+
+  let quitLine = "Faza activă: " + ((st && st.phase === "2") ? "Faza 2 Total Clean" : "Faza 1 Zero THC");
+  if (st && st.quitDate) {
+    const qd = new Date(st.quitDate);
+    if (!isNaN(qd.getTime())) {
+      const diffMs = qd.getTime() - Date.now();
+      if (diffMs > 0) {
+        const hrs = Math.ceil(diffMs / 3600000);
+        const days = Math.ceil(diffMs / 86400000);
+        quitLine = "MOD PREGĂTIRE (FAZA 0 — ÎNCĂ NU S-A OPRIT DIN THC!): Oprirea este programată pe " + st.quitDate.replace("T", " ") + " (peste ~" + days + " zile / " + hrs + " ore).";
+      } else {
+        const cleanDays = Math.floor(Math.abs(diffMs) / 86400000) + 1;
+        quitLine = "ZIUA " + cleanDays + " fără THC (oprit pe " + st.quitDate.replace("T", " ") + ").";
+      }
+    }
+  }
+  return {
+    header: daysRo[base.getDay()] + ", " + todayStr + " ora " + hmStr + " | Moment zi: " + dayPart,
+    calendar: calLines.join(" | "),
+    quitLine
+  };
+}
+
+function buildWorkerSystemPrompt(st, todayStr, hmStr) {
   const hp = (st && st.healthProfile) || {};
   const cond = hp.conditions || "Psoas major drept foarte tensionat/scurtat, sciatică pe stânga, postură înclinată spre stânga.";
   const life = hp.lifestyle || "Taximetrist 8-10h/zi la volan. Gătesc cu Instant Pot, Airfryer, Blender.";
   const rest = hp.restrictions || "Mâncăruri românești reinterpretate sănătos și caserole practice.";
   const notes = hp.medicalNotes ? "\\n- Note medicale/analize: " + hp.medicalNotes : "";
   const mem = st && st.aiMemorySummary ? "\\nMEMORIE PE TERMEN LUNG:\\n" + st.aiMemorySummary : "";
+  const temp = buildWorkerTemporalInfo(st, todayStr, hmStr || "12:00");
   const isTodayState = st && (st.lastDateYMD === todayStr || !st.lastDateYMD);
   const doneKeys = isTodayState && st.stepsDone ? Object.keys(st.stepsDone).filter(k => st.stepsDone[k]).join(", ") : "";
   const extToday = isTodayState && Array.isArray(st.todayExternalMetrics) && st.todayExternalMetrics.length
     ? st.todayExternalMetrics.join(" | ") : "niciuna azi";
   const cigs = isTodayState && st.cigsToday !== undefined ? st.cigsToday : 0;
+  const ms = (isTodayState && st && st.moveStats) || {};
+  const bio = (st && st.biometricsToday) || {};
+  const bioParts = [];
+  if (bio.hr) bioParts.push("Puls=" + bio.hr + " bpm");
+  if (bio.rhr) bioParts.push("RHR=" + bio.rhr + " bpm");
+  if (bio.steps) bioParts.push("Pași=" + bio.steps);
+  if (bio.sleepHours) bioParts.push("Somn=" + bio.sleepHours + "h");
+  if (bio.weightKg) bioParts.push("Greutate=" + bio.weightKg + "kg");
+  if (bio.bodyFatPct) bioParts.push("Grăsime=" + bio.bodyFatPct + "%");
+  if (bio.visceralFat) bioParts.push("Viscerală=" + bio.visceralFat);
+  if (bio.proteinPct) bioParts.push("Proteine=" + bio.proteinPct + "%" + (bio.proteinPct < 15 ? " (SCĂZUT)" : ""));
+  const meals = isTodayState && Array.isArray(st.mealsEatenToday) && st.mealsEatenToday.length
+    ? st.mealsEatenToday.map(m => (m.time || "") + " " + m.title).join("; ") : "nimic notat încă";
+  const sos = isTodayState && Array.isArray(st.sosLogsToday) && st.sosLogsToday.length
+    ? st.sosLogsToday.map(s => s.time + " " + s.type).join("; ") : "niciuna azi";
 
   const hist = (st && st.dailyHistory) || {};
   const hKeys = Object.keys(hist).sort().slice(-5);
@@ -7406,17 +7787,48 @@ function buildWorkerSystemPrompt(st, todayStr) {
     : "încă fără zile arhivate";
 
   return "Ești cel mai bun prieten și camaradul meu pragmatic în renunțarea la THC și tutun. Vorbim în română, cald, direct și fără clișee.\\n\\n"
+    + "TIMP & CALENDAR:\\n- Acum: " + temp.header + "\\n- Harta 7 zile: " + temp.calendar + "\\n- " + temp.quitLine + "\\n\\n"
     + "PROFIL REAL & MEDICAL:\\n- Job & Stil: " + life + "\\n- Condiții medicale: " + cond + "\\n- Restricții & preferințe: " + rest + notes + mem + "\\n\\n"
     + "ISTORIC RECENT:\\n" + histTxt + "\\n\\n"
-    + "AZI (" + todayStr + "):\\n- Pași bifați azi: " + (doneKeys || "niciunul încă") + "\\n- Țigări azi: " + cigs + "\\n- Date din poze/cântar/aplicații azi: " + extToday + "\\n\\n"
+    + "AZI (" + todayStr + "):\\n- Pași/Suplimente bifate azi: " + (doneKeys || "niciunul încă")
+    + "\\n- Biometrie & Cântar: " + (bioParts.length ? bioParts.join(", ") : "necompletat") + " | Extra: " + extToday
+    + "\\n- Mișcare: " + (ms.walkMinsToday || 0) + "/" + (ms.walkGoal || 30) + " min mers, " + (ms.taxiBreaksToday || 0) + " pauze taxi"
+    + "\\n- Mese mâncate azi: " + meals
+    + "\\n- Țigări azi: " + cigs + " | SOS azi: " + sos + "\\n\\n"
     + "REGULI:\\n"
-    + "1. Dacă trimit o poză (cântar smart cu BMI/grăsime/mușchi, somn, smartwatch, pași, analize medicale, mâncare sau exerciții) sau o informație medicală nouă, analizeaz-o clar și, dacă sunt cifre/fapte de reținut pe viitor, adaugă la final pe o linie nouă: [MEMORIE: rezumat telegrafic max 180 caractere]\\n"
-    + "2. Fii scurt și ușor de citit pe telefon (2-3 paragrafe).";
+    + "1. Respectă strict ora și data de azi! Nu trimite utilizatorul la culcare la 18:40 și ține cont că mesajele vechi din istoric au alt timestamp.\\n"
+    + "2. Dacă este în Faza 0 (încă nu s-a oprit), NU spune că e în sevraj de abstinență; ajută-l cu reducere treptată (tapering), NAC+Magneziu, proteine și psoas până la data stabilită.\\n"
+    + "3. Dacă trimit o poză (cântar smart, Fitbit/Health, somn, pași, analize) sau cifre noi, extrage-le și pune la final: [BIOMETRIE: hr=... | steps=... | sleepHrs=... | weight=... | bodyFat=... | visceral=... | proteinPct=... | musclePct=...] și [MEMORIE: rezumat max 180 car]\\n"
+    + "4. Fii scurt și percutant (2-3 paragrafe).";
 }
 
 function extractAndApplyMemory(st, rawReply, todayStr, hmStr) {
-  const m = rawReply.match(/\\[MEMORIE:\\s*([\\s\\S]+?)\\]/i);
-  const clean = rawReply.replace(/\\[MEMORIE:\\s*[\\s\\S]+?\\]/gi, "").trim();
+  let clean = rawReply;
+  const bioM = clean.match(/\\[BIOMETRIE:\\s*([^\\]]+)\\]/i);
+  clean = clean.replace(/\\[BIOMETRIE:\\s*[^\\]]+\\]/gi, "").trim();
+  if (bioM && bioM[1]) {
+    st.biometricsToday = st.biometricsToday || {};
+    bioM[1].split(/[|;,]/).forEach(part => {
+      const kv = part.split("=");
+      if (kv.length < 2) return;
+      const k = kv[0].trim().toLowerCase();
+      const v = parseFloat(kv[1].trim().replace(",", "."));
+      if (isNaN(v)) return;
+      if (k === "hr") st.biometricsToday.hr = Math.round(v);
+      else if (k === "rhr") st.biometricsToday.rhr = Math.round(v);
+      else if (k === "steps") st.biometricsToday.steps = Math.round(v);
+      else if (k === "sleephrs" || k === "sleep" || k === "sleephours") st.biometricsToday.sleepHours = v;
+      else if (k === "sleepscore") st.biometricsToday.sleepScore = Math.round(v);
+      else if (k === "weight" || k === "weightkg") st.biometricsToday.weightKg = v;
+      else if (k === "bodyfat" || k === "bodyfatpct") st.biometricsToday.bodyFatPct = v;
+      else if (k === "visceral" || k === "visceralfat") st.biometricsToday.visceralFat = v;
+      else if (k === "proteinpct" || k === "protein") st.biometricsToday.proteinPct = v;
+      else if (k === "musclepct" || k === "muscle") st.biometricsToday.musclePct = v;
+    });
+    st.biometricsToday.updatedAt = Date.now();
+  }
+  const m = clean.match(/\\[MEMORIE:\\s*([\\s\\S]+?)\\]/i);
+  clean = clean.replace(/\\[MEMORIE:\\s*[\\s\\S]+?\\]/gi, "").trim();
   if (m && m[1]) {
     const fact = m[1].trim();
     st.todayExternalMetrics = Array.isArray(st.todayExternalMetrics) ? st.todayExternalMetrics : [];
@@ -7451,7 +7863,7 @@ async function handleTelegramUpdate(body, env) {
       await saveCloudState(env, st);
       await sendTg("🔥 Bravo, camarade! Pas bifat și sincronizat! Ține ritmul curat azi.", null, chatId);
     } else if (action === "step_enc") {
-      const sys = buildWorkerSystemPrompt(st, todayStr);
+      const sys = buildWorkerSystemPrompt(st, todayStr, hmStr);
       const reply = await askGeminiWithHistory(sys, [{ role: "user", parts: [{ text: "Nu am făcut încă pasul " + stepKey + ". Încurajează-mă cald fără reproșuri și dă-mi o micro-acțiune de 60 secunde ținând cont de profilul meu." }] }]);
       await sendTg("💪 " + reply, null, chatId);
     }
@@ -7465,7 +7877,7 @@ async function handleTelegramUpdate(body, env) {
 
   const text = (body.message.text || body.message.caption || "").trim();
   if (text === "/start") {
-    await sendTg("Salut, camarade! Botul RESET Neuro 24/7 (Cloudflare) este activ. Îmi poți scrie orice sau îmi poți trimite poze (cântar BMI, somn, smartwatch, analize, mâncare) și țin minte tot!", null, incomingChatId);
+    await sendTg("Salut, camarade! Botul RESET Neuro 24/7 (Cloudflare) este activ. Îmi poți scrie orice, trimite /plan pentru analiza 360° sau trimite poze (cântar BMI, somn, Fitbit Air, analize, mâncare) și țin minte tot!", null, incomingChatId);
     return;
   }
 
@@ -7477,16 +7889,23 @@ async function handleTelegramUpdate(body, env) {
 
   if (!text && !imagePart) return;
 
-  const sys = buildWorkerSystemPrompt(st, todayStr);
+  const sys = buildWorkerSystemPrompt(st, todayStr, hmStr);
   const hist = Array.isArray(st.chatHistory) ? st.chatHistory.slice(-10) : [];
-  const contents = hist.map(m => ({
-    role: m.role === "assistant" ? "model" : "user",
-    parts: [{ text: m.content || "" }]
-  }));
+  const contents = hist.map(m => {
+    const tStr = m.ts ? new Date(m.ts).toLocaleTimeString("ro-RO", { timeZone: TIMEZONE, hour: "2-digit", minute: "2-digit" }) : "";
+    const prefix = tStr ? "[" + tStr + "] " : "";
+    return {
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: prefix + (m.content || "") }]
+    };
+  });
 
   const userParts = [];
   if (imagePart) userParts.push(imagePart);
-  userParts.push({ text: text || "Analizează această poză (cântar BMI, somn, smartwatch, analize medicale, mâncare sau exerciții), extrage cifrele importante și spune-mi ce recomandare ai pentru mine azi." });
+  const effectiveText = text === "/plan"
+    ? "Fă o ANALIZĂ 360° completă (ora actuală, faza zilei, biometrie Fitbit/cântar, mișcare, mese, suplimente, țigări/SOS, Faza 0 vs Ziua X) și dă-mi un plan tactic pe ore."
+    : (text || "Analizează această poză (cântar BMI, somn, brățară Health, analize medicale, mâncare sau exerciții), extrage cifrele importante și spune-mi ce recomandare ai pentru mine azi.");
+  userParts.push({ text: "[ACUM " + todayStr + " " + hmStr + "] " + effectiveText });
   contents.push({ role: "user", parts: userParts });
 
   try {
@@ -7529,7 +7948,7 @@ async function downloadTelegramPhotoAsPart(fileId) {
 }
 
 async function runScheduledCheckins(env) {
-  const { todayStr, curMins } = getNowParts();
+  const { todayStr, hmStr, curMins } = getNowParts();
   const st = await loadCloudState(env);
   const isTodayState = st && st.lastDateYMD === todayStr;
 
@@ -7551,7 +7970,7 @@ async function runScheduledCheckins(env) {
       let messageText = s.msg;
       if (GEMINI_KEY && !GEMINI_KEY.startsWith("PUNE_")) {
         try {
-          const sys = buildWorkerSystemPrompt(st, todayStr);
+          const sys = buildWorkerSystemPrompt(st, todayStr, hmStr);
           const aiMsg = await askGeminiWithHistory(sys, [{
             role: "user",
             parts: [{ text: "Generează mesajul scurt de check-in (2-3 propoziții) pentru pasul " + s.label + " (ora " + s.time + "). Adaptează-l la ce am făcut azi și în ultimele zile, la măsurătorile din poze și profilul meu medical. Întrebarea de bază era: " + s.msg }]
@@ -7862,12 +8281,38 @@ function setWebhook() {
             }, st.ms);
         }
 
+        function logSosEvent(type, detail) {
+            if (!Array.isArray(state.sosLogsToday)) state.sosLogsToday = [];
+            const nowHm = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            state.sosLogsToday.push({ time: nowHm, type, detail });
+            if (state.sosLogsToday.length > 20) state.sosLogsToday = state.sosLogsToday.slice(-20);
+            localStorage.setItem('reset_sosLogsToday', JSON.stringify(state.sosLogsToday));
+            renderSosTodaySummary();
+            markStateDirtyAndSync();
+        }
+
+        function renderSosTodaySummary() {
+            const countEl = document.getElementById('sos-today-count');
+            const listEl = document.getElementById('sos-today-list');
+            if (!countEl || !listEl) return;
+            const logs = state.sosLogsToday || [];
+            countEl.innerText = `${logs.length} ${logs.length === 1 ? 'sesiune' : 'sesiuni'}`;
+            if (logs.length === 0) {
+                listEl.innerText = 'Nicio criză sau sesiune SOS înregistrată azi.';
+                return;
+            }
+            listEl.innerHTML = logs.slice(-5).reverse().map(l =>
+                `<div class="truncate">• <span class="font-mono text-amber-300">${escapeHtml(l.time)}</span> — <strong class="text-white">${escapeHtml(l.type)}</strong>: ${escapeHtml(l.detail)}</div>`
+            ).join('');
+        }
+
         function toggleSosProtocol() {
             haptic(60);
             const btn = document.getElementById('sos-btn');
             const box = document.getElementById('breath-box');
             const txt = document.getElementById('breath-text');
             const minsLabel = Math.round(sosDurationSec / 60);
+            const modeLabel = (SOS_BREATH_MODES[sosBreathMode] || SOS_BREATH_MODES.sigh).label;
 
             if (sosInterval) {
                 clearInterval(sosInterval);
@@ -7878,11 +8323,12 @@ function setWebhook() {
                 const s = String(sosDurationSec % 60).padStart(2, '0');
                 document.getElementById('sos-timer').innerText = `${m}:${s}`;
                 box.style.transform = "scale(1)";
-                txt.innerText = `Apasă Start pentru ${(SOS_BREATH_MODES[sosBreathMode] || SOS_BREATH_MODES.sigh).label}`;
+                txt.innerText = `Apasă Start pentru ${modeLabel}`;
                 btn.innerText = `▶ Pornește Respirația + Cronometrul (${minsLabel} Min)`;
                 return;
             }
 
+            logSosEvent('Respirație SOS', `${modeLabel} (${minsLabel} min pornit)`);
             sosSeconds = sosDurationSec;
             btn.innerText = "⏹ Oprește / Resetează Protocolul";
             sosInterval = setInterval(() => {
@@ -7899,6 +8345,7 @@ function setWebhook() {
                     btn.innerText = `▶ Pornește Respirația + Cronometrul (${minsLabel} Min)`;
                     box.style.transform = "scale(1)";
                     haptic([100, 50, 100, 50, 200]);
+                    logSosEvent('Val depășit ✅', `${modeLabel} (${minsLabel} min complet)`);
                 }
             }, 1000);
 
@@ -7906,9 +8353,201 @@ function setWebhook() {
         }
 
         function triggerSOSChat(presetMessage) {
+            logSosEvent('Intervenție AI SOS', presetMessage.slice(0, 65));
             switchTab('chat');
             document.getElementById('chat-input').value = presetMessage;
             sendMessage();
+        }
+
+        // ==================== BIOMETRIE & HEALTH (BRĂȚARĂ GOOGLE FITBIT AIR & CÂNTAR) ====================
+        function renderBiometricsCard() {
+            const b = state.biometricsToday || {};
+            const hrEl = document.getElementById('bio-card-hr');
+            const stepsEl = document.getElementById('bio-card-steps');
+            const sleepEl = document.getElementById('bio-card-sleep');
+            const bodyEl = document.getElementById('bio-card-body');
+            const updEl = document.getElementById('bio-card-updated');
+            if (!hrEl) return;
+
+            hrEl.innerText = b.hr ? `${b.hr} bpm` : (b.rhr ? `RHR ${b.rhr}` : '—');
+            stepsEl.innerText = b.steps ? Number(b.steps).toLocaleString('ro-RO') : '—';
+            sleepEl.innerText = b.sleepHours ? `${b.sleepHours}h${b.sleepScore ? ` (${b.sleepScore})` : ''}` : '—';
+
+            const bodyParts = [];
+            if (b.bodyFatPct) bodyParts.push(`${b.bodyFatPct}% gr.`);
+            if (b.proteinPct) bodyParts.push(`Prot ${b.proteinPct}%`);
+            else if (b.weightKg) bodyParts.push(`${b.weightKg}kg`);
+            bodyEl.innerText = bodyParts.length ? bodyParts.join(' • ') : '—';
+            if (b.proteinPct && b.proteinPct < 15) {
+                bodyEl.className = "text-[10px] font-extrabold font-mono text-red-300 mt-0.5 leading-tight";
+            } else {
+                bodyEl.className = "text-[10px] font-extrabold font-mono text-amber-300 mt-0.5 leading-tight";
+            }
+
+            if (updEl) {
+                if (b.updatedAt) {
+                    const tStr = new Date(b.updatedAt).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+                    const dStr = new Date(b.updatedAt).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit' });
+                    updEl.innerText = `Actualizat: ${dStr} la ${tStr} • Sincronizat cu Camaradul`;
+                } else {
+                    updEl.innerText = 'Brățară Google Fitbit Air & Cântar Smart';
+                }
+            }
+        }
+
+        function openBiometricsModal() {
+            haptic(20);
+            const b = state.biometricsToday || {};
+            const setVal = (id, v) => {
+                const el = document.getElementById(id);
+                if (el) el.value = (v !== null && v !== undefined) ? String(v) : '';
+            };
+            setVal('bio-in-hr', b.hr);
+            setVal('bio-in-rhr', b.rhr);
+            setVal('bio-in-steps', b.steps);
+            setVal('bio-in-sleep', b.sleepHours);
+            setVal('bio-in-sleepscore', b.sleepScore);
+            setVal('bio-in-weight', b.weightKg);
+            setVal('bio-in-fat', b.bodyFatPct);
+            setVal('bio-in-visceral', b.visceralFat);
+            setVal('bio-in-protein', b.proteinPct);
+            setVal('bio-in-muscle', b.musclePct);
+            const bleEl = document.getElementById('bio-ble-status');
+            if (bleEl) bleEl.classList.add('hidden');
+            openModalWithHistory('biometrics-modal');
+        }
+
+        function saveBiometricsFromModal() {
+            haptic(35);
+            const readNum = (id, isInt = false) => {
+                const raw = (document.getElementById(id)?.value || '').trim().replace(',', '.');
+                if (!raw) return null;
+                const val = isInt ? parseInt(raw, 10) : parseFloat(raw);
+                return isNaN(val) ? null : val;
+            };
+            const stepsVal = readNum('bio-in-steps', true);
+            state.biometricsToday = {
+                hr: readNum('bio-in-hr', true),
+                rhr: readNum('bio-in-rhr', true),
+                steps: stepsVal,
+                sleepHours: readNum('bio-in-sleep', false),
+                sleepScore: readNum('bio-in-sleepscore', true),
+                weightKg: readNum('bio-in-weight', false),
+                bodyFatPct: readNum('bio-in-fat', false),
+                visceralFat: readNum('bio-in-visceral', false),
+                proteinPct: readNum('bio-in-protein', false),
+                musclePct: readNum('bio-in-muscle', false),
+                updatedAt: Date.now()
+            };
+            localStorage.setItem('reset_biometricsToday', JSON.stringify(state.biometricsToday));
+
+            const syncWalk = document.getElementById('bio-sync-walk-check')?.checked;
+            if (syncWalk && stepsVal && stepsVal > 0) {
+                const estMins = Math.round(stepsVal / 100);
+                if (estMins > (state.moveStats.walkMinsToday || 0)) {
+                    state.moveStats.walkMinsToday = estMins;
+                    localStorage.setItem('reset_moveStats', JSON.stringify(state.moveStats));
+                    renderMoveProgress();
+                    if (typeof recordMoveActivity === 'function') recordMoveActivity(estMins, false);
+                    if (typeof renderWeeklyMotivation === 'function') renderWeeklyMotivation();
+                }
+            }
+
+            renderBiometricsCard();
+            updateDashboard();
+            markStateDirtyAndSync();
+            closeModal('biometrics-modal');
+            showToast('⌚ Biometrie salvată! Camaradul și Chef AI văd acum cifrele tale.');
+        }
+
+        async function connectBleHeartRate() {
+            const stEl = document.getElementById('bio-ble-status');
+            const showBle = (msg) => {
+                if (!stEl) return;
+                stEl.innerText = msg;
+                stEl.classList.remove('hidden');
+            };
+            if (!navigator.bluetooth) {
+                showBle('⚠️ Web Bluetooth nu este disponibil aici (necesită Chrome pe Android/Desktop prin HTTPS). Folosește „Scanează Screenshot”!');
+                return;
+            }
+            try {
+                showBle('🔍 Caut dispozitiv Bluetooth cu profil Heart Rate...');
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: ['heart_rate'] }]
+                });
+                showBle(`🔗 Conectare la ${device.name || 'brățară'}...`);
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('heart_rate');
+                const char = await service.getCharacteristic('heart_rate_measurement');
+                await char.startNotifications();
+                char.addEventListener('characteristicvaluechanged', (ev) => {
+                    const dv = ev.target.value;
+                    const flags = dv.getUint8(0);
+                    const bpm = (flags & 0x01) ? dv.getUint16(1, true) : dv.getUint8(1);
+                    if (bpm > 30 && bpm < 230) {
+                        const hrInp = document.getElementById('bio-in-hr');
+                        if (hrInp) hrInp.value = String(bpm);
+                        state.biometricsToday = state.biometricsToday || Object.assign({}, DEFAULT_BIOMETRICS);
+                        state.biometricsToday.hr = bpm;
+                        state.biometricsToday.updatedAt = Date.now();
+                        localStorage.setItem('reset_biometricsToday', JSON.stringify(state.biometricsToday));
+                        renderBiometricsCard();
+                        showBle(`❤️ Puls live citit: ${bpm} bpm!`);
+                    }
+                });
+            } catch (err) {
+                showBle(`ℹ️ ${err.message || 'Brățara nu expune profilul BLE Heart Rate standard (Google Fitbit folosește protocol criptat către telefon).'} Folosește „📷 Scanează Screenshot” din aplicația Google Fit / Health!`);
+            }
+        }
+
+        function handleBiometricPhotoScan(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            if (!state.apiKey) {
+                showToast('⚠️ Configurează cheia API în Setări mai întâi!');
+                event.target.value = '';
+                return;
+            }
+            const btn = document.getElementById('bio-scan-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳</span><span>Analizez captura...</span>';
+            }
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const photoUrl = await compressImageDataUrl(ev.target.result);
+                    const m = photoUrl.match(/^data:([^;]+);base64,(.+)$/);
+                    if (!m) throw new Error('Imagine invalidă');
+
+                    const scanPrompt = 'Aceasta este o captură din aplicația de brățară (Google Fitbit / Health) sau cântar smart. Extrage TOATE cifrele biometrice vizibile (puls, RHR, pași, ore somn, scor somn, greutate, % grăsime, grăsime viscerală, % proteine, % mușchi), dă o interpretare scurtă de 2 paragrafe pentru situația mea de azi și emite obligatoriu la final tagurile [BIOMETRIE: ...] și [MEMORIE: ...].';
+                    appendBubble('📷 [Scanare Captură Health / Cântar]', 'user', true);
+                    const rawReply = await callUniversalAI(state.apiKey, buildSystemPrompt(), [{
+                        role: 'user',
+                        parts: [
+                            { inlineData: { mimeType: m[1], data: m[2] } },
+                            { text: scanPrompt }
+                        ]
+                    }]);
+                    const reply = applyMemoryTagFromReply(rawReply);
+                    const replyTs = Date.now();
+                    state.chatHistory.push({ role: 'assistant', content: reply, ts: replyTs });
+                    localStorage.setItem('reset_chatHistory', JSON.stringify(state.chatHistory.slice(-20)));
+                    renderChatHistory();
+                    markStateDirtyAndSync();
+                    showToast('⌚ Date biometrice extrase și salvate pe Panou!');
+                } catch (err) {
+                    showToast('❌ Eroare scanare: ' + err.message);
+                } finally {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>📷</span><span>Scanează Captură Health</span>';
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
         }
 
         // ==================== CHAT & ASISTENT AI CAMARAD ====================
@@ -7998,55 +8637,206 @@ function setWebhook() {
             return keys.map(k => {
                 const d = hist[k] || {};
                 const doneCount = Object.values(d.stepsDone || {}).filter(Boolean).length;
-                const ext = (d.externalMetrics && d.externalMetrics.length) ? ` | Date externe: ${d.externalMetrics.join('; ')}` : "";
-                return `  • ${k}: ${doneCount}/4 pași, ${d.cigs ?? 0} țigări, ${d.walkMins ?? 0} min mers, antrenament: ${d.workoutDone ? 'da' : 'nu'}${ext}`;
+                const bio = d.biometrics || {};
+                const bioNote = [
+                    bio.hr ? `HR ${bio.hr}` : '',
+                    bio.steps ? `${bio.steps} pași` : '',
+                    bio.sleepHours ? `somn ${bio.sleepHours}h` : ''
+                ].filter(Boolean).join(', ');
+                const mealsNote = (d.mealsEaten && d.mealsEaten.length) ? ` | Mese: ${d.mealsEaten.length}` : '';
+                const sosNote = (d.sosLogs && d.sosLogs.length) ? ` | SOS: ${d.sosLogs.length}` : '';
+                const ext = (d.externalMetrics && d.externalMetrics.length) ? ` | Note: ${d.externalMetrics.join('; ')}` : "";
+                return `  • ${k}: ${doneCount}/4 pași, ${d.cigs ?? 0} țigări, ${d.walkMins ?? 0} min mers, antrenament: ${d.workoutDone ? 'da' : 'nu'}${bioNote ? ' | ' + bioNote : ''}${mealsNote}${sosNote}${ext}`;
             }).join('\n');
         }
 
+        function buildTemporalContext() {
+            const DAYS_RO = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'];
+            const MONTHS_RO = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+            const now = new Date();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            const nowHour = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            const dayName = DAYS_RO[now.getDay()];
+            const nowFull = `${dayName}, ${dd} ${MONTHS_RO[now.getMonth()]} ${yyyy} (${dd}.${mm}.${yyyy}), ora ${nowHour}`;
+
+            const todayMidnight = new Date(yyyy, now.getMonth(), now.getDate());
+            const calItems = [];
+            for (let offset = 0; offset <= 7; offset++) {
+                const d = new Date(todayMidnight);
+                d.setDate(todayMidnight.getDate() + offset);
+                const lbl = offset === 0 ? 'Azi' : (offset === 1 ? 'Mâine (+1z)' : (offset === 2 ? 'Poimâine (+2z)' : `Peste ${offset} zile`));
+                const dStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+                calItems.push(`${lbl} = ${DAYS_RO[d.getDay()]} ${dStr}`);
+            }
+
+            const nowMins = now.getHours() * 60 + now.getMinutes();
+            const tN = timeToMinutes(state.stepTimes?.noon || '12:30');
+            const tC = timeToMinutes(state.stepTimes?.calm || '17:30');
+            const tNi = timeToMinutes(state.stepTimes?.night || '20:30');
+            let dayPhaseDesc = '';
+            if (nowMins < 5 * 60) {
+                dayPhaseDesc = 'Noaptea târziu (ore de somn sau insomnie).';
+            } else if (nowMins < tN) {
+                dayPhaseDesc = `Dimineața / Prima parte a zilei (pasul următor: Pauză la ${state.stepTimes?.noon || '12:30'}).`;
+            } else if (nowMins < tC) {
+                dayPhaseDesc = `Prânz / După-amiază pe traseu (pasul următor: După Tură la ${state.stepTimes?.calm || '17:30'}).`;
+            } else if (nowMins < tNi) {
+                const minsToNight = tNi - nowMins;
+                dayPhaseDesc = `Seara devreme / După tură — ÎNCĂ NU este ora de culcare! Mai sunt ${minsToNight} minute până la pasul de seară/Magneziu (${state.stepTimes?.night || '20:30'}) și câteva ore până la somn.`;
+            } else if (nowMins < 23 * 60) {
+                dayPhaseDesc = `Seara / Pregătire de somn (fereastra optimă pentru Magneziu + Inositol, cină ușoară/ceai și relaxare).`;
+            } else {
+                dayPhaseDesc = 'Noaptea (ora de somn / recuperare).';
+            }
+
+            const { totalHours, currentDayNum, isFuture, countdownMs } = getProgressStats();
+            let quitNice = (state.quitDate || '').replace('T', ' ');
+            let calDaysDiff = 0;
+            const qDate = new Date(state.quitDate);
+            if (!isNaN(qDate.getTime())) {
+                const qMid = new Date(qDate.getFullYear(), qDate.getMonth(), qDate.getDate());
+                calDaysDiff = Math.round((qMid - todayMidnight) / 86400000);
+                const qd = String(qDate.getDate()).padStart(2, '0');
+                const qm = String(qDate.getMonth() + 1).padStart(2, '0');
+                const qh = String(qDate.getHours()).padStart(2, '0');
+                const qmin = String(qDate.getMinutes()).padStart(2, '0');
+                quitNice = `${DAYS_RO[qDate.getDay()]} ${qd}.${qm}.${qDate.getFullYear()} la ${qh}:${qmin}`;
+            }
+            const remHrs = Math.max(0, Math.ceil(countdownMs / 3600000));
+            const statusLine = isFuture
+                ? `ÎNCĂ NU M-AM OPRIT DIN THC — Sunt în FAZA 0 (Pregătirea Terenului / Pre-Oprire). Data opririi (Zero THC) este fixată pe ${quitNice} (peste ${calDaysDiff} zile calendaristice / ~${remHrs} ore).`
+                : `OPRIT DIN THC — Ziua ${currentDayNum} (${totalHours.toFixed(1)} ore fără THC; oprit pe ${quitNice}).`;
+
+            return {
+                nowFull,
+                nowHour,
+                dayPhaseDesc,
+                calendar7Days: calItems.join(' | '),
+                statusLine,
+                isFuture,
+                currentDayNum
+            };
+        }
+
+        function buildBiometricsContext() {
+            const b = state.biometricsToday || {};
+            const lines = [];
+            if (b.hr) lines.push(`Puls curent/măsurat: ${b.hr} bpm`);
+            if (b.rhr) lines.push(`Puls repaus (RHR): ${b.rhr} bpm`);
+            if (b.steps) lines.push(`Pași brățară (Google Fitbit Air / Health): ${b.steps} pași azi`);
+            if (b.sleepHours) lines.push(`Somn azi-noapte: ${b.sleepHours} ore${b.sleepScore ? ` (scor ${b.sleepScore}/100)` : ''}`);
+            if (b.weightKg) lines.push(`Greutate: ${b.weightKg} kg`);
+            if (b.bodyFatPct) lines.push(`Grăsime corporală: ${b.bodyFatPct}%`);
+            if (b.visceralFat) lines.push(`Grăsime viscerală: ${b.visceralFat}`);
+            if (b.proteinPct) lines.push(`Proteine corporale (cântar): ${b.proteinPct}%${b.proteinPct < 15 ? ' (SCĂZUT / UNDER — crește aportul proteic la mese!)' : ''}`);
+            if (b.musclePct) lines.push(`Masă musculară: ${b.musclePct}%`);
+            const ext = (state.todayExternalMetrics || []).length ? state.todayExternalMetrics.join(' | ') : '';
+            return {
+                summary: lines.length ? lines.join('; ') : 'încă neintroduse azi (poți cere poză/captură dacă e util)',
+                extSummary: ext || 'niciuna'
+            };
+        }
+
+        function buildMovementContext() {
+            const exInfo = typeof getCompletedExerciseNamesToday === 'function'
+                ? getCompletedExerciseNamesToday()
+                : { doneNames: [], pendingActiveNames: [] };
+            const woDone = (state.moveStats?.completedWorkoutsToday || []);
+            const hist = state.moveHistory || {};
+            const activeWeekDays = Object.keys(hist).sort().slice(-7).filter(k => (hist[k]?.workouts > 0) || (hist[k]?.mins >= 10)).length;
+
+            return `- Mers pe jos: ${state.moveStats.walkMinsToday || 0}/${state.moveStats.walkGoal || 30} min | Pauze decompresie lângă taxi: ${state.moveStats.taxiBreaksToday || 0} (țintă 3/tură).
+- Antrenament structurat azi: ${state.moveStats.workoutDoneToday ? `DA${woDone.length ? ` (${woDone.join(', ')})` : ''}` : 'Nu încă'} | Zile active recent (7z): ${activeWeekDays}/7.
+- Exerciții Kineto/Postură bifate azi: ${exInfo.doneNames.length ? exInfo.doneNames.join(', ') : 'niciunul încă'}.
+- Exerciții rămase nebifate din nivelul activ (${state.exerciseLevel}): ${exInfo.pendingActiveNames.length ? exInfo.pendingActiveNames.join(', ') : 'toate bifate!'}.`;
+        }
+
+        function buildNutritionContext() {
+            const todayDayIdx = (new Date().getDay() + 6) % 7;
+            const todayName = (FOOD_PLAN_DB[todayDayIdx] || {}).day || 'Azi';
+            const dayMeals = Array.isArray((state.weeklyPlan || {})[String(todayDayIdx)])
+                ? state.weeklyPlan[String(todayDayIdx)]
+                : [];
+            const eatenList = state.mealsEatenToday || [];
+
+            const planLines = dayMeals.map(entry => {
+                const r = (state.recipes || []).find(x => x.id === entry.recipeId);
+                const title = r ? r.title : (entry.recipeTitle || 'Masă');
+                const eatenObj = eatenList.find(m => m.entryId === entry.id);
+                const nut = r?.nutrition ? ` [${r.nutrition.protein}g prot, ${r.nutrition.calories} kcal]` : '';
+                return `${eatenObj ? '✅ MÂNCAT' : '⏳ Programat'} (${entry.slot}): ${title}${nut}`;
+            });
+            const extraEaten = eatenList.filter(m => !m.entryId).map(m => `✅ MÂNCAT (${m.time || 'azi'}): ${m.title}`);
+            const totalProt = eatenList.reduce((acc, m) => acc + (Number(m.protein) || 0), 0);
+            const inStockPantry = (state.pantry || []).filter(p => p.inStock).map(p => p.name).slice(0, 22);
+
+            return `- Meniu programat (${todayName}) & ce am mâncat azi: ${[...planLines, ...extraEaten].join(' | ') || 'nimic bifat/programat încă azi'}${totalProt > 0 ? ` (Total proteine calculate din rețete mâncate: ~${totalProt}g)` : ''}.
+- Stoc în Cămară (disponibil acasă): ${inStockPantry.length ? inStockPantry.join(', ') : 'cămara nu a fost completată încă'}.`;
+        }
+
+        function buildSosContext() {
+            const logs = state.sosLogsToday || [];
+            if (!logs.length) return 'Nicio sesiune SOS sau alertă de craving declanșată azi.';
+            return logs.map(l => `${l.time} [${l.type}: ${l.detail}]`).join(' | ');
+        }
+
         function buildSystemPrompt() {
-            const { totalHours, currentDayNum, isFuture, countdownMs, daysUntilStart } = getProgressStats();
-            const bio = TIMELINE_DB.find(item => currentDayNum <= item.maxDay) || TIMELINE_DB[TIMELINE_DB.length - 1];
-            const nowHour = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+            const temp = buildTemporalContext();
+            const bioData = buildBiometricsContext();
+            const bio = TIMELINE_DB.find(item => temp.currentDayNum <= item.maxDay) || TIMELINE_DB[TIMELINE_DB.length - 1];
             const suppsTaken = Object.entries(state.supps).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'niciunul încă';
             const stepsDoneStr = Object.entries(state.stepsDone).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'niciunul încă';
             const hp = state.healthProfile || DEFAULT_HEALTH_PROFILE;
-            const todayExt = (state.todayExternalMetrics || []).length ? state.todayExternalMetrics.join(' | ') : 'niciuna azi';
 
-            const statusLine = isFuture
-                ? `- MOD PREGĂTIRE (Start programat pe ${(state.quitDate || "").replace('T', ' ')}): mai sunt ${daysUntilStart} zile (${Math.ceil(countdownMs / (1000 * 60 * 60))} ore) până la Zero THC.`
-                : `- Ziua curentă: Ziua ${currentDayNum} (${totalHours.toFixed(1)} ore fără THC).`;
-            const bioLine = isFuture
-                ? `- Stadiu neurobiologic: Faza 0 (Pregătirea terenului — pre-încărcare NAC, D3, Magneziu, deblocare psoas și stabilizare alimentară înainte de Ziua 1).`
+            const bioLine = temp.isFuture
+                ? `- Stadiu neurobiologic: Faza 0 (Pre-Oprire — pregătirea terenului, tapering treptat, pre-încărcare NAC/Magneziu, refacere proteine și deblocare psoas înainte de Ziua 1).`
                 : `- Stadiu neurobiologic: ${bio.title} - ${bio.desc}`;
 
-            return `Ești cel mai bun prieten și camaradul meu pragmatic în renunțarea la THC și fumat (Faza ${state.phase}: ${state.phase === "1" ? "Zero THC, țigări sub pacing" : "Zero THC + Zero Nicotină"}).
-Vorbim în română, direct, cald și încurajator, ca doi tovarăși, fără limbaj de lemn și fără clișee terapeutice corporatiste.
+            return `Ești cel mai bun prieten, antrenor și camaradul meu pragmatic în renunțarea la THC și fumat (Faza ${state.phase}: ${state.phase === "1" ? "Zero THC, țigări sub pacing" : "Zero THC + Zero Nicotină"}).
+Vorbim în română, direct, cald și inteligent, ca doi tovarăși, fără clișee și fără să mă cerți inutil.
 
-PROFILUL MEU REAL & MEDICAL:
-- Job & Stil de viață: ${hp.lifestyle || DEFAULT_HEALTH_PROFILE.lifestyle} (țintesc trezire la ${state.stepTimes.morning}).
+1. TIMP, CALENDAR & STADIU REAL (CRITIC — CITEȘTE CU ATENȚIE):
+- Data și ora exactă ACUM: ${temp.nowFull}
+- Momentul zilei față de programul meu: ${temp.dayPhaseDesc}
+- Harta următoarelor 7 zile: ${temp.calendar7Days}
+- Status Oprire THC: ${temp.statusLine}
+${bioLine}
+
+2. PROFILUL MEU REAL & MEDICAL:
+- Job & Stil de viață: ${hp.lifestyle || DEFAULT_HEALTH_PROFILE.lifestyle} (orar pași: Dimineața ${state.stepTimes.morning}, Pauză ${state.stepTimes.noon}, După Tură ${state.stepTimes.calm}, Seara ${state.stepTimes.night}).
 - Condiții medicale & fizice: ${hp.conditions || DEFAULT_HEALTH_PROFILE.conditions}
 - Restricții, alergii & preferințe: ${hp.restrictions || DEFAULT_HEALTH_PROFILE.restrictions}
 ${hp.medicalNotes ? `- Note medicale / analize: ${hp.medicalNotes}\n` : ''}
-MEMORIE PE TERMEN LUNG & ISTORIC RECENT:
+3. BIOMETRIE & HEALTH (BRĂȚARĂ GOOGLE FITBIT AIR & CÂNTAR SMART):
+- Date structurate azi: ${bioData.summary}
+- Extrase din poze/mesaje azi: ${bioData.extSummary}
+
+4. MIȘCARE, KINETO & POSTURĂ AZI:
+${buildMovementContext()}
+
+5. NUTRIȚIE, MESE AZI & CĂMARĂ:
+${buildNutritionContext()}
+
+6. PROTOCOL CHIMIC (SUPLIMENTE), ȚIGĂRI & JURNAL SOS AZI:
+- Pași & Suplimente bifate azi: ${stepsDoneStr} (suplimente: ${suppsTaken}).
+- Stoc suplimente acasă: NAC, Magneziu Bisglicinat, Myo-Inositol, L-Theanină, Krill Oil, Vitamina D3, Creatină.
+- Țigări fumate azi: ${state.cigsToday} din limita de ${state.cigLimit}${state.lastCigTime > 0 ? ` (ultima acum ${Math.floor((Date.now() - state.lastCigTime) / 60000)} min)` : ''}.
+- Jurnal SOS azi: ${buildSosContext()}
+
+MEMORIE PE TERMEN LUNG & ISTORIC ULTIMELE ZILE:
 ${state.aiMemorySummary ? `- Rezumat memorie: ${state.aiMemorySummary}\n` : ''}- Ultimele zile:\n${buildHistorySummaryText()}
 
-DATELE MELE ÎN TIMP REAL (AZI):
-${statusLine}
-- Țigări fumate azi: ${state.cigsToday} din limita de ${state.cigLimit}.
-- Pași & Suplimente bifate azi: ${stepsDoneStr} (suplimente: ${suppsTaken}).
-- Mișcare azi: ${state.moveStats.walkMinsToday}/${state.moveStats.walkGoal} min mers pe jos, ${state.moveStats.taxiBreaksToday} pauze decompresie taxi, nivel exerciții activ: ${state.exerciseLevel}.
-- Măsurători/poze extrase azi (cântar BMI, somn, smartwatch, analize): ${todayExt}.
-- Ora exactă: ${nowHour}.
-${bioLine}
-- Stoc suplimente disponibile: NAC, Magneziu Bisglicinat, Myo-Inositol, L-Theanină, Krill Oil, Vitamina D3, Creatină.
-
-REGULI:
-1. Dacă încerc să negociez ("trag doar două fumuri să dorm", "am avut o tură grea"), demontează-mi capcana instant! Amintește-mi de "Play the Tape Forward": 5 minute de ușurare falsă urmate de tahicardie, ceață mentală, vinovăție și resetarea receptorilor CB1. (Dacă sunt în Modul Pregătire înainte de Start, ajută-mă să reduc doza și să pregătesc terenul pentru data fixată fără să amân startul!)
-2. Dacă spun că nu am făcut un pas (vitamine, mișcare, mers), NU mă certa niciodată — validează oboseala de pe taxi, încurajează-mă cu căldură și propune o micro-acțiune de 60 de secunde!
-3. Când propui exerciții, suplimente sau rețete, ține cont strict de condițiile medicale, restricțiile, măsurătorile recente (cântar/BMI, somn, analize) și aparatura mea.
-4. Dacă utilizatorul îți trimite o poză (cântar smart cu greutate/BMI/grăsime/masă musculară, captură de somn/pași/smartwatch, analize medicale, mâncare sau exerciții) sau îți spune o condiție medicală nouă / măsurătoare importantă, interpreteaz-o clar și, DOAR dacă există date concrete de reținut pe viitor, adaugă chiar la finalul răspunsului, pe o linie nouă, un singur tag scurt:
-[MEMORIE: rezumat telegrafic de max 180 caractere cu cifrele/faptele cheie]
-5. Fii scurt și percutant (2-3 paragrafe ușor de citit pe telefon) și încheie cu o întrebare scurtă sau o provocare clară.`;
+REGULI STRICTE DE RĂSPUNS:
+1. CONȘTIENȚĂ TEMPORALĂ & ISTORIC: Respectă strict ora exactă (${temp.nowHour}) și ziua de azi! Nu trimite utilizatorul la somn la ora 18:40 și nu presupune că e noapte doar pentru că un mesaj anterior din istoric (cu alt timestamp) a fost scris noaptea!
+2. ÎNȚELEGEREA FAZEI 0 ("ÎNCĂ NU M-AM OPRIT"): Când statusul spune FAZA 0 (înainte de data opririi), utilizatorul NU este încă în sevraj de abstinență totală! Dacă are puls 86 bpm, analizează cauzele reale (oboseală volan, psoas/sciatică, deshidratare, nicotină, cafea, stres), NU da vina pe "sevrajul THC". Când spune "mă opresc în 3-4 zile", verifică întâi calendarul de mai sus față de data deja setată (${(state.quitDate || '').replace('T', ' ')})! Dacă vrea să schimbe data/ora opririi, confirmă-i cald și adaugă la final tag-ul [SET_QUIT_DATE: YYYY-MM-DDTHH:mm].
+3. NEGOCIERI & POFTĂ: Dacă sunt deja în Zero THC și negociez ("trag doar două fumuri"), aplică "Play the Tape Forward" (5 min iluzie vs tahicardie, ceață și resetare CB1). Dacă sunt în Faza 0, ghidează-mă spre tapering (reducere constantă, fără "ultimul fum" compulsiv) și pregătire (NAC, Magneziu, proteine, psoas).
+4. MICRO-ACȚIUNI & ZERO VINOVĂȚIE: Dacă nu am bifat exerciții, mese sau pași, NU mă certa — propune o micro-acțiune concretă adaptată orei actuale, Cămării/Meniului și exercițiilor încă nebifate.
+5. EXTRAGERE AUTOMATĂ BIOMETRIE & MEMORIE: Dacă trimit o poză (cântar smart, captură brățară Google Fitbit Air / Health, somn, analize, mâncare) sau menționez cifre noi, interpretează-le clar și adaugă la final (pe linii separate, DOAR cu câmpurile prezente):
+[BIOMETRIE: hr=... | rhr=... | steps=... | sleepHrs=... | sleepScore=... | weight=... | bodyFat=... | visceral=... | proteinPct=... | musclePct=...]
+[MEMORIE: rezumat telegrafic de max 180 caractere cu faptele cheie]
+6. STIL: Scurt, clar, ușor de citit pe telefon (2-3 paragrafe sau listă tactică dacă am cerut un plan).`;
         }
 
         async function trySingleGeminiModel(key, mdl, systemPrompt, contents) {
@@ -8207,8 +8997,59 @@ REGULI:
         }
 
         function applyMemoryTagFromReply(rawReply) {
-            const match = rawReply.match(/\[MEMORIE:\s*([\s\S]+?)\]/i);
-            const cleanReply = rawReply.replace(/\[MEMORIE:\s*[\s\S]+?\]/gi, '').trim();
+            let cleanReply = String(rawReply || '');
+
+            // 1. Parse [BIOMETRIE: ...]
+            const bioMatch = cleanReply.match(/\[BIOMETRIE:\s*([^\]]+)\]/i);
+            cleanReply = cleanReply.replace(/\[BIOMETRIE:\s*[^\]]+\]/gi, '').trim();
+            if (bioMatch && bioMatch[1]) {
+                state.biometricsToday = Object.assign({}, DEFAULT_BIOMETRICS, state.biometricsToday || {});
+                let bioChanged = false;
+                bioMatch[1].split(/[|;,]/).forEach(part => {
+                    const kv = part.split('=');
+                    if (kv.length < 2) return;
+                    const k = kv[0].trim().toLowerCase();
+                    const v = parseFloat(kv[1].trim().replace(',', '.'));
+                    if (isNaN(v)) return;
+                    bioChanged = true;
+                    if (k === 'hr') state.biometricsToday.hr = Math.round(v);
+                    else if (k === 'rhr') state.biometricsToday.rhr = Math.round(v);
+                    else if (k === 'steps') state.biometricsToday.steps = Math.round(v);
+                    else if (k === 'sleephrs' || k === 'sleep' || k === 'sleephours') state.biometricsToday.sleepHours = v;
+                    else if (k === 'sleepscore') state.biometricsToday.sleepScore = Math.round(v);
+                    else if (k === 'weight' || k === 'weightkg') state.biometricsToday.weightKg = v;
+                    else if (k === 'bodyfat' || k === 'bodyfatpct') state.biometricsToday.bodyFatPct = v;
+                    else if (k === 'visceral' || k === 'visceralfat') state.biometricsToday.visceralFat = v;
+                    else if (k === 'proteinpct' || k === 'protein') state.biometricsToday.proteinPct = v;
+                    else if (k === 'musclepct' || k === 'muscle') state.biometricsToday.musclePct = v;
+                });
+                if (bioChanged) {
+                    state.biometricsToday.updatedAt = Date.now();
+                    localStorage.setItem('reset_biometricsToday', JSON.stringify(state.biometricsToday));
+                    if (typeof renderBiometricsCard === 'function') renderBiometricsCard();
+                    if (typeof updateDashboard === 'function') updateDashboard();
+                }
+            }
+
+            // 2. Parse [SET_QUIT_DATE: YYYY-MM-DDTHH:mm]
+            const quitMatch = cleanReply.match(/\[SET_QUIT_DATE:\s*(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2})\]/i);
+            cleanReply = cleanReply.replace(/\[SET_QUIT_DATE:\s*[^\]]+\]/gi, '').trim();
+            if (quitMatch && quitMatch[1]) {
+                const iso = quitMatch[1].trim().replace(' ', 'T');
+                const parsed = new Date(iso);
+                if (!isNaN(parsed.getTime())) {
+                    state.quitDate = iso;
+                    localStorage.setItem('reset_quitDate', iso);
+                    const qInp = document.getElementById('set-quit-date');
+                    if (qInp) qInp.value = iso;
+                    if (typeof updateDashboard === 'function') updateDashboard();
+                    showToast(`📅 Data opririi a fost actualizată: ${iso.replace('T', ' ')}`);
+                }
+            }
+
+            // 3. Parse [MEMORIE: ...]
+            const match = cleanReply.match(/\[MEMORIE:\s*([\s\S]+?)\]/i);
+            cleanReply = cleanReply.replace(/\[MEMORIE:\s*[\s\S]+?\]/gi, '').trim();
             if (match && match[1]) {
                 const fact = match[1].trim();
                 const stamp = new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
@@ -8228,9 +9069,62 @@ REGULI:
             return cleanReply;
         }
 
-        async function sendMessage() {
+        function buildFormattedChatMessages(overrideCurrentText = null, photoInlinePart = null) {
+            const temp = buildTemporalContext();
+            const recent = state.chatHistory.slice(-10);
+            if (photoInlinePart) {
+                const prior = recent.slice(0, -1).map(m => {
+                    const t = formatChatTimestamp(m.ts);
+                    return { role: m.role, content: (t ? `[${t}] ` : '') + (m.content || '') };
+                });
+                const promptText = overrideCurrentText || 'Analizează această poză (cântar smart, brățară Fitbit/Health, somn, analize medicale, mâncare sau exerciții), extrage cifrele și spune-mi ce recomandare ai pentru mine azi.';
+                return [
+                    ...prior,
+                    {
+                        role: 'user',
+                        parts: [
+                            photoInlinePart,
+                            { text: `[ACUM: ${temp.nowFull}] ${promptText}` }
+                        ]
+                    }
+                ];
+            }
+
+            return recent.map((m, idx) => {
+                const isLast = idx === recent.length - 1;
+                if (isLast && overrideCurrentText) {
+                    return { role: m.role, content: `[ACUM: ${temp.nowFull}] ${overrideCurrentText}` };
+                }
+                const t = formatChatTimestamp(m.ts);
+                const prefix = isLast ? `[ACUM: ${temp.nowFull}] ` : (t ? `[${t}] ` : '');
+                return { role: m.role, content: prefix + (m.content || '') };
+            });
+        }
+
+        function sendQuickChatPrompt(promptText) {
+            switchTab('chat');
+            const inp = document.getElementById('chat-input');
+            if (inp) inp.value = promptText;
+            sendMessage();
+        }
+
+        function trigger360AnalysisPlan() {
+            const displayLabel = '🧠 Analiză 360° & Plan Tactic pe Ore (timp real, biometrie, mișcare, nutriție, suplimente, Faza 0 / progres).';
+            const fullInstruction = `Fă o ANALIZĂ 360° completă din toate perspectivele mele de acum și construiește-mi un PLAN TACTIC CONCRET PE ORE pentru următoarele ore (până la culcare și mâine dimineață).
+Te rog să incluzi clar:
+1. 📊 Diagnosticul Momentului (Corelații 360°): conectează ora și faza zilei cu biometria mea (puls, somn, pași, proteinele/grăsimea de pe cântar), mișcarea făcută azi (mers, pauze taxi, exerciții psoas/sciatică bifate vs rămase), mesele mâncate azi și jurnalul SOS / țigări, ținând cont exact de stadiul meu (Faza 0 Pre-Oprire vs Ziua X).
+2. ⏱️ Planul Tactic pe Ore (Pas cu Pas):
+   - Acum / următoarele 20 min: ce micro-acțiune de deblocare psoas/sciatică sau respirație să fac din cele nebifate azi.
+   - Următoarea masă (cu oră realistă): ce să mănânc concret din Meniul meu sau din Cămară ca să optimizez proteinele și energia.
+   - Suplimentele rămase azi: la ce oră exactă să iau ce a rămas.
+   - Strategia pentru diseară (Faza 0 tapering curat sau menținere Zero THC + pacing țigări).`;
+            switchTab('chat');
+            sendMessage(displayLabel, fullInstruction);
+        }
+
+        async function sendMessage(displayOverride = null, promptOverride = null) {
             const input = document.getElementById('chat-input');
-            const text = input.value.trim();
+            const text = displayOverride !== null ? String(displayOverride).trim() : input.value.trim();
             const photoUrl = pendingChatPhotoDataUrl;
             if (!text && !photoUrl) return;
 
@@ -8239,7 +9133,7 @@ REGULI:
                 : text;
 
             appendBubble(userDisplayText, 'user', true);
-            input.value = '';
+            if (displayOverride === null) input.value = '';
             clearChatPhoto();
 
             if (!state.apiKey) {
@@ -8247,26 +9141,15 @@ REGULI:
                 return;
             }
 
-            const loadingId = appendBubble(photoUrl ? "Analizez poza..." : "Scrie...", 'ai', false);
+            const loadingId = appendBubble(photoUrl ? "Analizez poza..." : (promptOverride ? "Analizez toate datele 360°..." : "Scrie..."), 'ai', false);
 
             try {
-                let messagesToSend = state.chatHistory.slice(-10);
+                let photoInlinePart = null;
                 if (photoUrl) {
                     const m = photoUrl.match(/^data:([^;]+);base64,(.+)$/);
-                    if (m) {
-                        const promptText = text || "Analizează această poză (cântar BMI, somn, smartwatch, analize medicale, mâncare sau exerciții), extrage cifrele importante și spune-mi ce recomandare ai pentru mine azi.";
-                        messagesToSend = [
-                            ...state.chatHistory.slice(-9, -1),
-                            {
-                                role: "user",
-                                parts: [
-                                    { inlineData: { mimeType: m[1], data: m[2] } },
-                                    { text: promptText }
-                                ]
-                            }
-                        ];
-                    }
+                    if (m) photoInlinePart = { inlineData: { mimeType: m[1], data: m[2] } };
                 }
+                const messagesToSend = buildFormattedChatMessages(promptOverride || (photoUrl ? text : null), photoInlinePart);
                 const rawReply = await callUniversalAI(state.apiKey, buildSystemPrompt(), messagesToSend);
                 const reply = applyMemoryTagFromReply(rawReply);
                 const replyTs = Date.now();
@@ -8510,7 +9393,11 @@ REGULI:
                     favoriteRoutineId: state.favoriteRoutineId,
                     moveHistory: state.moveHistory,
                     healthProfile: state.healthProfile,
-                    dailyHistory: state.dailyHistory
+                    dailyHistory: state.dailyHistory,
+                    biometricsToday: state.biometricsToday,
+                    mealsEatenToday: state.mealsEatenToday,
+                    sosLogsToday: state.sosLogsToday,
+                    aiMemorySummary: state.aiMemorySummary
                 }
             };
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
